@@ -4,272 +4,214 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Getting Started • Orderly Chaos</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-    <header class="navbar">
-        <div class="container">
-            <a href="index.html" class="logo">Orderly<span class="logo-chaos">Chaos</span></a>
-            <nav class="nav-links">
-                <a href="getting-started.html">Getting Started</a>
-                <a href="api/python.html">Python API</a>
-                <a href="api/cpp.html">C++ API</a>
-                <a href="api/c.html">C API</a>
-                <a href="examples/index.html">Examples</a>
-                <a href="architecture.html">Architecture</a>
-                <a href="benchmarks.html">Benchmarks</a>
-            </nav>
+    <div class="fixed inset-0 -z-10 bg-[#050505] overflow-hidden">
+        <div class="absolute -top-1/2 -left-1/2 w-[800px] h-[800px] opacity-50" style="background: radial-gradient(circle at 50% 50%, rgba(99,102,245,0.15), transparent 70%)"></div>
+        <div class="absolute -bottom-1/2 -right-1/2 w-[800px] h-[800px] opacity-40" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%)"></div>
+    </div>
+
+    <nav class="fixed top-6 left-0 right-0 mx-auto w-max z-50">
+        <div class="flex items-center justify-between px-6 py-3 bg-black/10 backdrop-blur-3xl border border-white/10 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
+            <a href="index.html" class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent">Orderly<span class="text-cyan-400">Chaos</span></a>
+            <div class="hidden md:flex items-center gap-8 ml-8">
+                <a href="getting-started.html" class="text-sm font-medium text-cyan-300">Getting Started</a>
+                <a href="api/python.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Python API</a>
+                <a href="api/cpp.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C++ API</a>
+                <a href="api/c.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C API</a>
+                <a href="examples/index.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Examples</a>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <section class="content-section">
-        <div class="doc-content">
-            <h1>Getting Started with Orderly Chaos</h1>
-            
-            <p>Orderly Chaos is a high-performance limit order book implementation with price-time priority matching,
-            designed for financial market data streaming. This guide will help you get up and running quickly.</p>
+    <main class="pt-24 pb-32">
+        <div class="container mx-auto px-6">
+            <div class="content-page">
+                <div class="page-header">
+                    <span class="page-badge">Getting Started</span>
+                    <h1 class="page-title">Getting Started with Orderly Chaos</h1>
+                    <p class="page-description">
+                        Everything you need to know to start using Orderly Chaos for your trading and market data applications.
+                    </p>
+                </div>
 
-            <h2>Table of Contents</h2>
-            <ul>
-                <li><a href="#installation">Installation</a></li>
-                <li><a href="#quick-start">Quick Start</a></li>
-                <li><a href="#python-guide">Python Guide</a></li>
-                <li><a href="#cpp-guide">C++ Guide</a></li>
-                <li><a href="#c-guide">C API Guide</a></li>
-                <li><a href="#development">Development Setup</a></li>
-            </ul>
+                <div class="docs-layout">
+                    <nav class="toc">
+                        <div class="toc-nav">
+                            <ul>
+                                <li><a href="#installation">Installation</a></li>
+                                <li><a href="#quick-start">Quick Start</a></li>
+                                <li><a href="#python-guide">Python Guide</a></li>
+                                <li><a href="#cpp-guide">C++ Guide</a></li>
+                                <li><a href="#c-guide">C API Guide</a></li>
+                                <li><a href="#development">Development</a></li>
+                            </ul>
+                        </div>
+                    </nav>
 
-            <h2 id="installation">Installation</h2>
-            
-            <h3>Python (from PyPI)</h3>
-            <pre><code>pip install orderly-chaos</code></pre>
+                    <div class="doc-content">
+                        <h2 id="installation">Installation</h2>
 
-            <h3>Python (from source)</h3>
-            <pre><code>git clone https://github.com/Meetmendapara09/Orderly-Chaos.git
+                        <h3>Python (from PyPI)</h3>
+                        <pre><code>pip install orderly-chaos</code></pre>
+
+                        <h3>Python (from source)</h3>
+                        <pre><code>git clone https://github.com/Meetmendapara09/Orderly-Chaos.git
 cd Orderly-Chaos
 scons
 pip install -e .</code></pre>
 
-            <h3>Build Requirements</h3>
-            <p>Orderly Chaos requires the following dependencies:</p>
-            <ul>
-                <li><strong>C++ Compiler</strong>: GCC 7+ (g++ with C++17 support)</li>
-                <li><strong>Python</strong>: 3.5+ (for Python bindings)</li>
-                <li><strong>SCons</strong>: Build system (<code>pip install scons</code>)</li>
-                <li><strong>On Windows</strong>: Visual Studio 17.0 tools or MinGW-w64</li>
-            </ul>
+                        <h3>Build Requirements</h3>
+                        <p>The following dependencies are required:</p>
+                        <ul>
+                            <li><strong>C++ Compiler</strong>: GCC 7+ or Clang with C++17 support</li>
+                            <li><strong>Python</strong>: 3.5+ (for Python bindings)</li>
+                            <li><strong>SCons</strong>: Build system (<code>pip install scons</code>)</li>
+                            <li><strong>On Windows</strong>: Visual Studio 17.0 tools or MinGW-w64</li>
+                        </ul>
 
-            <h2 id="quick-start">Quick Start</h2>
-            
-            <h3>Python Example</h3>
-            <pre><code>from orderly_chaos import LimitOrderBook
+                        <h2 id="quick-start">Quick Start</h2>
 
-# Create a new order book
+                        <h3>Python</h3>
+                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+
 book = LimitOrderBook()
 
-# Place limit orders
-book.limit_sell(order_id=1, quantity=100, price=102.50)
-book.limit_buy(order_id=2, quantity=50, price=102.40)
+<span class="comment"># Place limit orders</span>
+book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)
+book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)
 
-# Market orders
-book.market_buy(order_id=3, quantity=75)
+<span class="comment"># Market orders</span>
+book.market_buy(order_id=<span class="number">3</span>, quantity=<span class="number">75</span>)
 
-# Check state
-print(f"Best Ask: ${book.best_sell()}")
-print(f"Best Bid: ${book.best_buy()}")
-print(f"Total Volume: {book.volume()}")
-print(f"Order Count: {book.count()}")
+<span class="comment"># Query state</span>
+print(f<span class="string">"Best Ask: ${book.best_sell() / 100:.2f}"</span>)
+print(f<span class="string">"Total Volume: {book.volume()}"</span>)</code></pre>
 
-# Cancel an order
-book.cancel(1)</code></pre>
+                        <h3>C++</h3>
+                        <pre><code>#include <span class="string">"limit_order_book.hpp"</span>
+<span class="keyword">#include</span> <span class="string">&lt;iostream&gt;</span>
 
-            <h3>C++ Example</h3>
-            <pre><code>#include "limit_order_book.hpp"
-#include &lt;iostream&gt;
-
-int main() {
+<span class="keyword">int</span> main() {
     LOB::LimitOrderBook book;
 
-    // Place limit orders
-    book.limit_sell(1, 100, 10250);  // order_id=1, qty=100, price=102.50
-    book.limit_buy(2, 50, 10240);    // order_id=2, qty=50, price=102.40
+    book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+    book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
 
-    // Market orders
-    book.market_buy(3, 75);          // order_id=3, qty=75
-
-    // Query state
-    std::cout << "Best Ask: " << book.best_sell() << std::endl;
-    std::cout << "Best Bid: " << book.best_buy() << std::endl;
-    std::cout << "Total Volume: " << book.volume() << std::endl;
-
-    return 0;
+    std::cout <span class="keyword">&lt;&lt;</span> <span class="string">"Volume: "</span> <span class="keyword">&lt;&lt;</span> book.volume();
+    <span class="keyword">return</span> <span class="number">0</span>;
 }</code></pre>
 
-            <h2 id="python-guide">Python Guide</h2>
-            
-            <h3>Creating a Limit Order Book</h3>
-            <pre><code>from orderly_chaos import LimitOrderBook
+                        <h2 id="python-guide">Python Guide</h2>
 
+                        <h3>Creating a Limit Order Book</h3>
+                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
 book = LimitOrderBook()</code></pre>
 
-            <h3>Placing Orders</h3>
-            <p>There are several methods for placing orders:</p>
-            
-            <h4>Limit Orders</h4>
-            <pre><code># Place a sell limit order
-book.limit_sell(order_id=1, quantity=100, price=102.50)
+                        <h3>Placing Orders</h3>
+                        <pre><code><span class="comment"># Limit orders</span>
+book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)
+book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)
+book.limit(<span class="keyword">side</span>=<span class="keyword">True</span>, order_id=<span class="number">3</span>, quantity=<span class="number">75</span>, price=<span class="number">10230</span>)
 
-# Place a buy limit order
-book.limit_buy(order_id=2, quantity=50, price=102.40)
+<span class="comment"># Market orders</span>
+book.market_buy(order_id=<span class="number">4</span>, quantity=<span class="number">25</span>)
+book.market_sell(order_id=<span class="number">5</span>, quantity=<span class="number">25</span>)</code></pre>
 
-# Place using generic limit method
-# side=True for buy, side=False for sell
-book.limit(side=True, order_id=3, quantity=75, price=102.30)</code></pre>
+                        <h3>Querying the Book</h3>
+                        <pre><code>book.best_sell()        <span class="comment"># best ask price</span>
+book.best_buy()         <span class="comment"># best bid price</span>
+book.best(<span class="keyword">True</span>)              <span class="comment"># best price for side</span>
+book.volume()           <span class="comment"># total volume</span>
+book.volume(<span class="number">10250</span>)           <span class="comment"># volume at price</span>
+book.count()            <span class="comment"># order count</span>
+book.has(1)             <span class="comment"># check order exists</span>
+book.cancel(1)          <span class="comment"># cancel order</span>
+book.clear()            <span class="comment"># clear all orders</span></code></pre>
 
-            <h4>Market Orders</h4>
-            <pre><code># Execute a market buy (matches against sell side)
-book.market_buy(order_id=4, quantity=100)
+                        <h2 id="cpp-guide">C++ Guide</h2>
+                        <pre><code><span class="keyword">#include</span> <span class="string">"limit_order_book.hpp"</span>
+<span class="keyword">#include</span> <span class="string">&lt;iostream&gt;</span>
 
-# Execute a market sell (matches against buy side)
-book.market_sell(order_id=5, quantity=50)
+<span class="keyword">using</span> <span class="keyword">namespace</span> LOB;
 
-# Generic market method
-book.market(side=True, order_id=6, quantity=30)</code></pre>
-
-            <h3>Querying the Book</h3>
-            <pre><code># Best prices
-book.best_sell()     # best ask price (sell side)
-book.best_buy()      # best bid price (buy side)
-book.best(side=True) # best price for given side
-
-# Volumes
-book.volume()           # total volume across both sides
-book.volume_sell()      # total sell-side volume
-book.volume_buy()       # total buy-side volume
-book.volume(price)      # volume at a specific price level
-
-# Counts
-book.count()            # total orders in book
-book.count_sell()       # orders on sell side
-book.count_buy()        # orders on buy side
-book.count_at(price)    # orders at a specific price
-
-# Order existence
-book.has(order_id=1)    # check if order exists
-
-# Cancel orders
-book.cancel(order_id=1)
-
-# Clear book
-book.clear()</code></pre>
-
-            <h2 id="cpp-guide">C++ Guide</h2>
-            
-            <h3>Include and Link</h3>
-            <pre><code>#include "limit_order_book.hpp"
-
-// Link against lib_orderly_chaos.so (Linux/Mac) 
-// or lib_orderly_chaos.dll (Windows)</code></pre>
-
-            <h3>C++ API Example</h3>
-            <pre><code>#include "limit_order_book.hpp"
-#include &lt;iostream&gt;
-
-using namespace LOB;
-
-int main() {
+<span class="keyword">int</span> main() {
     LimitOrderBook book;
 
-    // Place limit orders
-    book.limit_sell(1, 100, 10250);
-    book.limit_buy(2, 50, 10240);
+    <span class="comment">// Place limit orders</span>
+    book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+    book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
 
-    // Market orders
-    book.market_sell(3, 25);
-    book.market_buy(4, 10);
+    <span class="comment">// Market orders</span>
+    book.market_buy(<span class="number">3</span>, <span class="number">25</span>);
 
-    // Query
-    std::cout &lt;&lt; "Volume: " &lt;&lt; book.volume() &lt;&lt; std::endl;
-    std::cout &lt;&lt; "Count: " &lt;&lt; book.count() &lt;&lt; std::endl;
+    <span class="comment">// Query</span>
+    std::cout <span class="keyword">&lt;&lt;</span> book.best_sell() <span class="keyword">&lt;&lt;</span> std::endl;
+    std::cout <span class="keyword">&lt;&lt;</span> book.volume() <span class="keyword">&lt;&lt;</span> std::endl;
 
-    // Cancel
-    book.cancel(1);
+    <span class="comment">// Cancel</span>
+    book.cancel(<span class="number">1</span>);
+    <span class="comment">// Clear</span>
+    book.clear();
 
-    return 0;
+    <span class="keyword">return</span> <span class="number">0</span>;
 }</code></pre>
 
-            <h2 id="c-guide">C API Guide</h2>
-            
-            <p>The C API provides a simple interface for other languages to interact with the engine.</p>
+                        <h2 id="c-guide">C API Guide</h2>
+                        <pre><code><span class="keyword">#include</span> <span class="string">"lib_lob.hpp"</span>
 
-            <pre><code>#include "lib_lob.hpp"
+<span class="keyword">int</span> main() {
+    <span class="comment">// Create book</span>
+    LOB::LimitOrderBook* book = new_();
 
-int main() {
-    // Create book
-    void* book = new_();
+    <span class="comment">// Place orders</span>
+    limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+    limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
 
-    // Place orders
-    limit_sell(book, 1, 100, 10250);
-    limit_buy(book, 2, 50, 10240);
+    <span class="comment">// Market orders</span>
+    market_buy(book, <span class="number">3</span>, <span class="number">25</span>);
 
-    // Market orders
-    market_buy(book, 3, 25);
+    <span class="comment">// Query</span>
+    LOB::Price best_ask = best_sell(book);
+    LOB::Volume vol = volume(book);
 
-    // Query
-    Price best_ask = best_sell(book);
-    Price best_bid = best_buy(book);
-    Volume total_vol = volume(book);
-
-    // Cancel and cleanup
-    cancel(book, 1);
+    <span class="comment">// Cancel and cleanup</span>
+    cancel(book, <span class="number">1</span>);
     delete_(book);
 
-    return 0;
+    <span class="keyword">return</span> <span class="number">0</span>;
 }</code></pre>
 
-            <h2 id="development">Development Setup</h2>
-            
-            <h3>Running Tests</h3>
-            <pre><code># C++ tests
-scons test
-
-# Python tests
-python -m unittest discover .
-
-# All tests (C++ then Python)
-make test</code></pre>
-
-            <h3>Building</h3>
-            <pre><code># Build C++ shared library
+                        <h2 id="development">Development Setup</h2>
+                        <pre><code><span class="comment"># Build C++ library</span>
 scons
 
-# Build Python package
-pip install -e .
+<span class="comment"># Run C++ tests</span>
+scons test
 
-# Build deployment package
+<span class="comment"># Run Python tests</span>
+python -m unittest discover .
+
+<span class="comment"># Build deployment package</span>
 make deployment</code></pre>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
+    </main>
 
     <footer class="footer">
-        <div class="container">
+        <div class="container mx-auto px-6">
             <div class="footer-content">
-                <div class="footer-brand">
-                    <span class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></span>
-                    <p class="footer-tagline">A Non-Consensual Matching Engine for Unruly Capital</p>
+                <div>
+                    <div class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></div>
+                    <p>&copy; 2026 Orderly Chaos. MIT License.</p>
+                    <div class="footer-links mt-4">
+                        <a href="index.html">Home</a>
+                        <a href="api/python.html">Python API</a>
+                    </div>
                 </div>
-                <div class="footer-links">
-                    <a href="index.html">Home</a>
-                    <a href="api/python.html">Python API</a>
-                    <a href="api/cpp.html">C++ API</a>
-                </div>
-                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="social-link">GitHub</a>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Orderly Chaos. MIT License.</p>
             </div>
         </div>
     </footer>

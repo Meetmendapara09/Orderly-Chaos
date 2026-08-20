@@ -5,69 +5,234 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orderly Chaos</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="navbar">
-        <div class="container">
-            <a href="index.html" class="logo">Orderly<span class="logo-chaos">Chaos</span></a>
-            <nav class="nav-links">
-                <a href="getting-started.html">Getting Started</a>
-                <a href="api/python.html">Python API</a>
-                <a href="api/cpp.html">C++ API</a>
-                <a href="api/c.html">C API</a>
-                <a href="examples/index.html">Examples</a>
-                <a href="architecture.html">Architecture</a>
-                <a href="benchmarks.html">Benchmarks</a>
-            </nav>
-        </div>
-    </header>
+    <!-- Radial mesh gradient background -->
+    <div class="fixed inset-0 -z-10 bg-[#050505] overflow-hidden">
+        <div class="absolute -top-1/2 -left-1/2 w-[800px] h-[800px] opacity-50" style="background: radial-gradient(circle at 50% 50%, rgba(99,102,245,0.15), transparent 70%)"></div>
+        <div class="absolute -bottom-1/2 -right-1/2 w-[800px] h-[800px] opacity-40" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%)"></div>
+    </div>
 
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="hero-title">Orderly Chaos</h1>
-                <p class="hero-subtitle">A Non-Consensual Matching Engine for Unruly Capital</p>
-                <p class="hero-description">
-                    High-performance limit order book implementation with price-time priority matching,
-                    designed for financial market data streaming. Built in C++ with Python bindings.
-                </p>
-                <div class="hero-buttons">
-                    <a href="getting-started.html" class="btn btn-primary">Get Started</a>
-                    <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="btn btn-secondary">View on GitHub</a>
+    <!-- Floating glass nav -->
+    <nav class="fixed top-6 left-0 right-0 mx-auto w-max z-50">
+        <div class="flex items-center justify-between px-6 py-3 bg-black/10 backdrop-blur-3xl border border-white/10 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
+            <a href="index.html" class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent">
+                Orderly<span class="text-cyan-400">Chaos</span>
+            </a>
+            <div class="hidden md:flex items-center gap-8 ml-8">
+                <a href="getting-started.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300">Getting Started</a>
+                <a href="api/python.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300">Python API</a>
+                <a href="api/cpp.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300">C++ API</a>
+                <a href="api/c.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300">C API</a>
+                <a href="examples/index.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all duration-300">Examples</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero section -->
+    <main class="pt-24 pb-32 min-h-[100dvh]">
+        <div class="container mx-auto px-6">
+            <div class="hero-grid">
+                <div class="space-y-8">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-medium tracking-widets uppercase text-cyan-400">
+                        <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                        <span>High-Performance Matching Engine</span>
+                    </div>
+                    <h1 class="text-6xl md:text-7xl font-extrabold leading-[0.9] tracking-tight">
+                        <span class="block bg-gradient-to-r from-white via-gray-100 to-cyan-300 bg-clip-text text-transparent">Orderly</span>
+                        <span class="block bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent mt-2">Chaos</span>
+                    </h1>
+                    <p class="text-xl text-gray-400 max-w-lg leading-relaxed">
+                        A Non-Consensual Matching Engine for Unruly Capital. Price-time priority order matching
+                        for financial market data streams. C++ core with Python bindings.
+                    </p>
+                    <div class="flex gap-4 pt-4">
+                        <a href="getting-started.html" class="group relative inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium rounded-full transition-all duration-300 hover:scale-[0.98] hover:shadow-[0_10px_40px_rgba(139,92,246,0.3)] active:scale-[0.97]">
+                            <span>Documentation</span>
+                            <span class="w-6 h-6 rounded-full bg-black/20 flex items-center justify-center transition-transform group-hover:translate-x-0.5">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M7 7l10 10M7 7l10-10M7 7h10"></path>
+                                </svg>
+                            </span>
+                        </a>
+                        <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/5 text-gray-200 font-medium rounded-full border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-[0.98] active:scale-[0.97]">
+                            GitHub
+                        </a>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="p-1.5 bg-white/5 ring-1 ring-black/5 rounded-[2rem] border border-white/10">
+                        <div class="bg-[#0a0a14]/80 backdrop-blur-xl rounded-[calc(2rem-0.375rem)] p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
+                            <div class="orderbook-visual">
+                                <div class="orderbook-header">
+                                    <span>Order Book</span>
+                                    <span class="spread-value">Spread: $0.05</span>
+                                </div>
+                                <div class="orderbook-asks space-y-1 mt-3">
+                                    <div class="orderbook-row ask">
+                                        <span class="price">102.50</span>
+                                        <span class="size">200</span>
+                                    </div>
+                                    <div class="orderbook-row ask">
+                                        <span class="price">102.45</span>
+                                        <span class="size">150</span>
+                                    </div>
+                                </div>
+                                <div class="spread my-3">
+                                    <div class="divider"></div>
+                                    <span class="label">Spread: $0.05</span>
+                                    <div class="divider"></div>
+                                </div>
+                                <div class="orderbook-bids space-y-1">
+                                    <div class="orderbook-row bid">
+                                        <span class="size">300</span>
+                                        <span class="price">102.40</span>
+                                    </div>
+                                    <div class="orderbook-row bid">
+                                        <span class="size">100</span>
+                                        <span class="price">102.35</span>
+                                    </div>
+                                </div>
+                                <div class="book-stats">
+                                    <div class="stat-row">
+                                        <span>Total Volume</span>
+                                        <span class="stat-value">750</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Glow -->
+                    <div class="absolute -inset-2 bg-gradient-to-br from-indigo-500/20 via-transparent to-cyan-500/20 rounded-[2rem] blur-2xl opacity-50 -z-1"></div>
                 </div>
             </div>
-            <div class="hero-visual">
-                <div class="orderbook-visual">
-                    <div class="orderbook-header">
-                        <span>Price</span>
-                        <span>Size</span>
-                    </div>
-                    <div class="orderbook-asks">
-                        <div class="orderbook-row ask">
-                            <span class="price">102.50</span>
-                            <span class="size">200</span>
+        </div>
+    </main>
+
+    <!-- Features - Asymmetrical Bento -->
+    <section class="features-section">
+        <div class="container mx-auto px-6">
+            <div class="section-header">
+                <span class="badge">Features</span>
+                <h2>Built for Speed and Precision</h2>
+            </div>
+            <div class="bento-grid">
+                <div class="bento-card large">
+                    <a href="architecture.html" class="group block">
+                        <div class="card-outer h-full">
+                            <div class="card-inner">
+                                <div class="flex items-start gap-6">
+                                    <div class="card-icon cyan">⚡</div>
+                                    <div class="flex-1">
+                                        <h3 class="card-title group-hover:text-white">High-Performance Core</h3>
+                                        <p class="card-description">
+                                            Written in optimized C++ with O(log n) operations for all critical paths.
+                                            Red-black trees for price levels, hash maps for O(1) order lookup.
+                                            Compiled with <code>-O2 -march=native -pipe</code>.
+                                        </p>
+                                        <div class="card-stats">
+                                            <span class="stat-chip"><span class="text-emerald-400">●</span> O(log n) inserts</span>
+                                            <span class="stat-chip"><span class="text-emerald-400">●</span> O(1) lookups</span>
+                                            <span class="stat-chip"><span class="text-emerald-400">●</span> ~0.3μs per op</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="orderbook-row ask">
-                            <span class="price">102.45</span>
-                            <span class="size">150</span>
-                        </div>
+                    </a>
+                </div>
+                <div class="bento-card small space-y-4">
+                    <div class="group">
+                        <a href="api/python.html" class="block">
+                            <div class="card-outer h-full">
+                                <div class="card-inner">
+                                    <div class="card-icon cyan">🐍</div>
+                                    <h3 class="card-title group-hover:text-white">Python Bindings</h3>
+                                    <p class="card-description">Seamless integration via ctypes. Rapid prototyping for research and trading strategies.</p>
+                                </div>
+                            </div>
+                        </a>
                     </div>
-                    <div class="spread">
-                        <div class="spread-line"></div>
-                        <span class="spread-label">Spread: $0.10</span>
-                        <div class="spread-line"></div>
+                    <div class="group">
+                        <a href="api/cpp.html" class="block">
+                            <div class="card-outer h-full">
+                                <div class="card-inner">
+                                    <div class="card-icon emerald">⚙️</div>
+                                    <h3 class="card-title group-hover:text-white">C++ Native</h3>
+                                    <p class="card-description">Direct access to the engine for maximum performance. Zero abstraction overhead.</p>
+                                </div>
+                            </div>
+                        </a>
                     </div>
-                    <div class="orderbook-bids">
-                        <div class="orderbook-row bid">
-                            <span class="size">300</span>
-                            <span class="price">102.40</span>
+                </div>
+                <div class="bento-card large">
+                    <div class="group">
+                        <a href="examples/index.html" class="block">
+                            <div class="card-outer h-full">
+                                <div class="card-inner">
+                                    <div class="flex items-start gap-6">
+                                        <div class="card-icon yellow">📊</div>
+                                        <div class="flex-1">
+                                            <h3 class="card-title group-hover:text-white">Market Data Ready</h3>
+                                            <p class="card-description">
+                                                Built for reception of market data streams with price-time priority matching.
+                                                Handles limit, market, cancel, and reduce operations with precision.
+                                            </p>
+                                            <div class="card-stats">
+                                                <span class="stat-chip"><span class="text-yellow-400">✓</span> Price-time priority</span>
+                                                <span class="stat-chip"><span class="text-yellow-400">✓</span> Multi-sided book</span>
+                                                <span class="stat-chip"><span class="text-yellow-400">✓</span> Volume aggregation</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="bento-card small">
+                    <div class="group">
+                        <a href="benchmarks.html" class="block">
+                            <div class="card-outer h-full">
+                                <div class="card-inner">
+                                    <div class="card-icon purple">🚀</div>
+                                    <h3 class="card-title group-hover:text-white">Benchmarks</h3>
+                                    <p class="card-description">Comprehensive performance benchmarks and complexity analysis. Sub-microsecond latencies.</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech stack -->
+    <section class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="tech-wrapper">
+                <div class="tech-outer">
+                    <div class="tech-inner">
+                        <div class="tech-header">
+                            <span>Built with</span>
                         </div>
-                        <div class="orderbook-row bid">
-                            <span class="size">100</span>
-                            <span class="price">102.35</span>
+                        <div class="tech-grid">
+                            <div class="tech-item cyan text-center">
+                                <div class="tech-name">C++17</div>
+                                <div class="tech-desc">Core engine</div>
+                            </div>
+                            <div class="tech-item purple text-center">
+                                <div class="tech-name">Python</div>
+                                <div class="tech-desc">Bindings</div>
+                            </div>
+                            <div class="tech-item emerald text-center">
+                                <div class="tech-name">SCons</div>
+                                <div class="tech-desc">Build system</div>
+                            </div>
+                            <div class="tech-item yellow text-center">
+                                <div class="tech-name">Catch2</div>
+                                <div class="tech-desc">Testing</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -75,122 +240,20 @@
         </div>
     </section>
 
-    <section class="features">
-        <div class="container">
-            <h2 class="section-title">Core Features</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>High Performance</h3>
-                    <p>Written in C++ with -O3 optimization, delivering microsecond-level order matching latency.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🐍</div>
-                    <h3>Python Bindings</h3>
-                    <p>Seamless integration with Python through ctypes, enabling rapid prototyping and research.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚙️</div>
-                    <h3>Multi-Language</h3>
-                    <p>Native APIs for C++, C, and Python — choose your preferred development environment.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Market Data</h3>
-                    <p>Designed for reception of market data streams with price-time priority matching.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🧪</div>
-                    <h3>Battle-Tested</h3>
-                    <p>Comprehensive test suite with 591+ assertions covering all matching scenarios.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔧</div>
-                    <h3>Extensible</h3>
-                    <p>Modular architecture built on efficient data structures — red-black trees and hash maps.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="quickstart">
-        <div class="container">
-            <h2 class="section-title">Quick Start</h2>
-            <div class="quickstart-grid">
-                <div class="quickstart-item">
-                    <h3>Install</h3>
-                    <pre><code>pip install orderly-chaos</code></pre>
-                </div>
-                <div class="quickstart-item">
-                    <h3>Python Usage</h3>
-                    <pre><code>from orderly_chaos import LimitOrderBook
-
-book = LimitOrderBook()
-book.limit_sell(order_id=1, quantity=100, price=102.50)
-book.limit_buy(order_id=2, quantity=50, price=102.40)
-print(book.volume())  # 150</code></pre>
-                </div>
-                <div class="quickstart-item">
-                    <h3>C++ Usage</h3>
-                    <pre><code>#include "limit_order_book.hpp"
-
-LOB::LimitOrderBook book;
-book.limit_sell(1, 100, 10250);
-book.limit_buy(2, 50, 10240);
-std::cout << book.volume();</code></pre>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="tech-stack">
-        <div class="container">
-            <h2 class="section-title">Technology Stack</h2>
-            <div class="tech-grid">
-                <div class="tech-item">
-                    <span class="tech-icon">C++</span>
-                    <span class="tech-label">Core Engine</span>
-                </div>
-                <div class="tech-item">
-                    <span class="tech-icon">Python</span>
-                    <span class="tech-label">Bindings</span>
-                </div>
-                <div class="tech-item">
-                    <span class="tech-icon">SCons</span>
-                    <span class="tech-label">Build System</span>
-                </div>
-                <div class="tech-item">
-                    <span class="tech-icon">Catch2</span>
-                    <span class="tech-label">Testing</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    <!-- Footer -->
     <footer class="footer">
-        <div class="container">
+        <div class="container mx-auto px-6">
             <div class="footer-content">
-                <div class="footer-brand">
-                    <span class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></span>
-                    <p class="footer-tagline">A Non-Consensual Matching Engine for Unruly Capital</p>
+                <div>
+                    <div class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></div>
+                    <p>&copy; 2026 Orderly Chaos. MIT License.</p>
+                    <div class="footer-links mt-4">
+                        <a href="getting-started.html">Docs</a>
+                        <a href="https://github.com/Meetmendapara09/Orderly-Chaos">GitHub</a>
+                    </div>
                 </div>
-                <div class="footer-links">
-                    <a href="getting-started.html">Getting Started</a>
-                    <a href="api/python.html">Python API</a>
-                    <a href="api/cpp.html">C++ API</a>
-                    <a href="examples/index.html">Examples</a>
-                    <a href="https://github.com/Meetmendapara09/Orderly-Chaos/blob/main/LICENSE">License</a>
-                </div>
-                <div class="footer-social">
-                    <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="social-link">GitHub</a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Orderly Chaos. MIT License.</p>
             </div>
         </div>
     </footer>
-
-    <script src="scripts.js"></script>
 </body>
 </html>

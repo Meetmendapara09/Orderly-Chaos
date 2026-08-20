@@ -5,279 +5,257 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C++ API • Orderly Chaos</title>
     <link rel="stylesheet" href="../styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="navbar">
-        <div class="container">
-            <a href="../index.html" class="logo">Orderly<span class="logo-chaos">Chaos</span></a>
-            <nav class="nav-links">
-                <a href="../getting-started.html">Getting Started</a>
-                <a href="python.html">Python API</a>
-                <a href="cpp.html" class="active">C++ API</a>
-                <a href="c.html">C API</a>
-                <a href="../examples/index.html">Examples</a>
-            </nav>
+    <div class="fixed inset-0 -z-10 bg-[#050505] overflow-hidden">
+        <div class="absolute -top-1/2 -left-1/2 w-[800px] h-[800px] opacity-50" style="background: radial-gradient(circle at 50% 50%, rgba(99,102,245,0.15), transparent 70%)"></div>
+        <div class="absolute -bottom-1/2 -right-1/2 w-[800px] h-[800px] opacity-40" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%)"></div>
+    </div>
+
+    <nav class="fixed top-6 left-0 right-0 mx-auto w-max z-50">
+        <div class="flex items-center justify-between px-6 py-3 bg-black/10 backdrop-blur-3xl border border-white/10 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
+            <a href="index.html" class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent">Orderly<span class="text-cyan-400">Chaos</span></a>
+            <div class="hidden md:flex items-center gap-8 ml-8">
+                <a href="../getting-started.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Getting Started</a>
+                <a href="python.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Python API</a>
+                <a href="cpp.html" class="text-sm font-medium text-cyan-300">C++ API</a>
+                <a href="c.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C API</a>
+                <a href="../examples/index.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Examples</a>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <section class="content-section">
-        <div class="doc-content">
-            <h1>C++ API Reference</h1>
-            <p>The native C++ API for Orderly Chaos provides direct access to the high-performance matching engine.</p>
+    <main class="pt-24 pb-32">
+        <div class="container mx-auto px-6">
+            <div class="content-page">
+                <div class="page-header">
+                    <span class="page-badge">API Reference</span>
+                    <h1 class="page-title">C++ API Reference</h1>
+                    <p class="page-description">
+                        Native C++ interface for the Orderly Chaos matching engine. Provides direct access with zero abstraction overhead.
+                    </p>
+                </div>
 
-            <h2>Header Files</h2>
-            <pre><code>#include "limit_order_book.hpp"  // Main LOB class
+                <div class="docs-layout">
+                    <nav class="toc">
+                        <div class="toc-nav">
+                            <ul>
+                                <li><a href="#headers">Header Files</a></li>
+                                <li><a href="#limit-order-book">LOB::LimitOrderBook</a>
+                                    <ul>
+                                        <li><a href="#limit-methods">Limit Order Methods</a></li>
+                                        <li><a href="#market-methods">Market Order Methods</a></li>
+                                        <li><a href="#query-methods">Query Methods</a></li>
+                                        <li><a href="#management">Management Methods</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#structures">Structures</a></li>
+                                <li><a href="#types">Type Definitions</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+
+                    <div class="doc-content">
+                        <h2 id="headers">Header Files</h2>
+                        <pre><code>#include "limit_order_book.hpp"  // Main LOB class
 #include "lib_lob.hpp"           // C-compatible API
 #include "limit_tree.hpp"        // Underlying tree structure
 #include "structures.hpp"        // Order, Limit, Side types</code></pre>
 
-            <h2>Namespace</h2>
-            <p>All C++ classes are in the <code>LOB</code> namespace.</p>
+                        <h2 id="limit-order-book">LOB::LimitOrderBook</h2>
+                        <p>An order book for managing Limit/Order objects in a continuous double auction with price-time priority.</p>
 
-            <h2 class="api-section">LOB::LimitOrderBook</h2>
-            <p>The main order book class implementing a continuous double auction with price-time priority.</p>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">LimitOrderBook()</div>
+                                <div class="method-description">Initialize a new empty limit order book.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">LimitOrderBook()</div>
-                <div class="method-description">
-                    Initialize a new empty limit order book.
-                </div>
-            </div>
+                        <h3 id="limit-methods">Limit Order Methods</h3>
 
-            <h3>Order Placement</h3>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">void limit_sell(UID order_id, Quantity quantity, Price price)</div>
+                                <div class="method-description">Add a new sell limit order. Matches against buy orders if price crosses the spread.</div>
+                                <table class="param-table">
+                                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+                                    <tr><td>order_id</td><td>UID</td><td>Unique order identifier</td></tr>
+                                    <tr><td>quantity</td><td>Quantity</td><td>Number of shares to sell</td></tr>
+                                    <tr><td>price</td><td>Price</td><td>Limit price</td></tr>
+                                </table>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">void limit_sell(UID order_id, Quantity quantity, Price price)</div>
-                <div class="method-description">
-                    Add a new sell limit order to the book. If the price crosses the spread, matches against existing buy orders.
-                </div>
-                <table class="param-table">
-                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-                    <tr><td>order_id</td><td>UID</td><td>Unique order identifier</td></tr>
-                    <tr><td>quantity</td><td>Quantity</td><td>Number of shares to sell</td></tr>
-                    <tr><td>price</td><td>Price</td><td>Limit price for the order</td></tr>
-                </table>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">void limit_buy(UID order_id, Quantity quantity, Price price)</div>
+                                <div class="method-description">Add a new buy limit order. Matches against sell orders if price crosses the spread.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">void limit_buy(UID order_id, Quantity quantity, Price price)</div>
-                <div class="method-description">
-                    Add a new buy limit order to the book. If the price crosses the spread, matches against existing sell orders.
-                </div>
-                <table class="param-table">
-                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-                    <tr><td>order_id</td><td>UID</td><td>Unique order identifier</td></tr>
-                    <tr><td>quantity</td><td>Quantity</td><td>Number of shares to buy</td></tr>
-                    <tr><td>price</td><td>Price</td><td>Limit price for the order</td></tr>
-                </table>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">void limit(Side side, UID order_id, Quantity quantity, Price price)</div>
+                                <div class="method-description">Add a limit order to the specified side.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">void limit(Side side, UID order_id, Quantity quantity, Price price)</div>
-                <div class="method-description">
-                    Add a limit order to the specified side of the book.
-                </div>
-            </div>
+                        <h3 id="market-methods">Market Order Methods</h3>
 
-            <div class="api-method">
-                <div class="method-signature">void cancel(UID order_id)</div>
-                <div class="method-description">
-                    Cancel an existing order by its ID.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">void market_sell(UID order_id, Quantity quantity)</div>
+                                <div class="method-description">Execute a market sell order against buy-side liquidity.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">void reduce(UID order_id, Quantity quantity)</div>
-                <div class="method-description">
-                    Reduce the quantity of an existing order.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">void market_buy(UID order_id, Quantity quantity)</div>
+                                <div class="method-description">Execute a market buy order against sell-side liquidity.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">void clear()</div>
-                <div class="method-description">
-                    Remove all orders from the book.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">void market(Side side, UID order_id, Quantity quantity)</div>
+                                <div class="method-description">Execute a market order on the specified side.</div>
+                            </div>
+                        </div>
 
-            <h3>Market Orders</h3>
+                        <h3 id="query-methods">Query Methods</h3>
 
-            <div class="api-method">
-                <div class="method-signature">void market_sell(UID order_id, Quantity quantity)</div>
-                <div class="method-description">
-                    Execute a market sell order, matching against buy-side liquidity.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">bool has(UID order_id) const</div>
+                                <div class="method-description">Check if an order with the given ID exists. O(1) average time.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">void market_buy(UID order_id, Quantity quantity)</div>
-                <div class="method-description">
-                    Execute a market buy order, matching against sell-side liquidity.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">const Order& get(UID order_id)</div>
+                                <div class="method-description">Get a reference to the order with the given ID.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">void market(Side side, UID order_id, Quantity quantity)</div>
-                <div class="method-description">
-                    Execute a market order on the specified side.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">Price best_sell() const</div>
+                                <div class="method-description">Return the best (lowest) sell/ask price. Returns 0 if empty. O(1).</div>
+                            </div>
+                        </div>
 
-            <h3>Query Methods</h3>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">Price best_buy() const</div>
+                                <div class="method-description">Return the best (highest) buy/bid price. Returns 0 if empty. O(1).</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">bool has(UID order_id) const</div>
-                <div class="method-description">
-                    Check if an order with the given ID exists in the book.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">Price best(Side side) const</div>
+                                <div class="method-description">Return the best price for the given side.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">const Order& get(UID order_id)</div>
-                <div class="method-description">
-                    Get a reference to the order with the given ID.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">Price price() const</div>
+                                <div class="method-description">Return the current midpoint price. O(1).</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">Price best_sell() const</div>
-                <div class="method-description">
-                    Return the best (lowest) sell/ask price. Returns 0 if empty.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">Price last_best_sell() const</div>
+                                <div class="method-description">Return the last best sell price before the most recent change.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">Price best_buy() const</div>
-                <div class="method-description">
-                    Return the best (highest) buy/bid price. Returns 0 if empty.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">Price last_best_buy() const</div>
+                                <div class="method-description">Return the last best buy price before the most recent change.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">Price best(Side side) const</div>
-                <div class="method-description">
-                    Return the best price for the given side.
-                </div>
-            </div>
+                        <h3 id="management">Management Methods</h3>
 
-            <div class="api-method">
-                <div class="method-signature">Price price() const</div>
-                <div class="method-description">
-                    Return the current midpoint price (best bid + best ask / 2). Returns 0 if book is empty.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">void cancel(UID order_id)</div>
+                                <div class="method-description">Cancel an existing order. O(log n) due to tree removal.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">Volume volume() const</div>
-                <div class="method-description">
-                    Return the total volume across both sides of the book.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">void reduce(UID order_id, Quantity quantity)</div>
+                                <div class="method-description">Reduce the quantity of an existing order by the specified amount.</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">Volume volume(Price price) const</div>
-                <div class="method-description">
-                    Return the volume at a specific price level.
-                </div>
-            </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">void clear()</div>
+                                <div class="method-description">Remove all orders from both sides of the book. O(n).</div>
+                            </div>
+                        </div>
 
-            <div class="api-method">
-                <div class="method-signature">Volume volume_sell() const</div>
-                <div class="method-description">
-                    Return the total volume on the sell side.
-                </div>
-            </div>
+                        <h2 id="structures">Structures</h2>
 
-            <div class="api-method">
-                <div class="method-signature">Volume volume_buy() const</div>
-                <div class="method-description">
-                    Return the total volume on the buy side.
-                </div>
-            </div>
-
-            <div class="api-method">
-                <div class="method-signature">Count count() const</div>
-                <div class="method-description">
-                    Return the total number of orders in the book.
-                </div>
-            </div>
-
-            <div class="api-method">
-                <div class="method-signature">Count count_sell() const</div>
-                <div class="method-description">
-                    Return the number of orders on the sell side.
-                </div>
-            </div>
-
-            <div class="api-method">
-                <div class="method-signature">Count count_buy() const</div>
-                <div class="method-description">
-                    Return the number of orders on the buy side.
-                </div>
-            </div>
-
-            <div class="api-method">
-                <div class="method-signature">Count count_at(Price price) const</div>
-                <div class="method-description">
-                    Return the number of orders at a specific price.
-                </div>
-            </div>
-
-            <h2>Type Definitions</h2>
-            <table class="param-table">
-                <tr><th>Type</th><th>Description</th></tr>
-                <tr><td>UID</td><td>typedef for std::uint64_t - Order identifier</td></tr>
-                <tr><td>Quantity</td><td>typedef for std::uint32_t - Number of shares</td></tr>
-                <tr><td>Price</td><td>typedef for std::uint64_t - Price value</td></tr>
-                <tr><td>Volume</td><td>typedef for std::uint32_t - Total share volume</td></tr>
-                <tr><td>Count</td><td>typedef for std::uint32_t - Order count</td></tr>
-            </table>
-
-            <h2>Supporting Structures</h2>
-
-            <h3>LOB::Order</h3>
-            <p>Represents a single order in the book.</p>
-            <pre><code>struct Order {
+                        <h3>LOB::Order</h3>
+                        <pre><code>struct Order {
     UID uid;           // unique order ID
     Side side;         // buy or sell
-    Quantity quantity; // number of shares
+    Quantity quantity; // shares in this order
     Price price;       // price of the order
-    Limit* limit;      // pointer to the limit level
+    Limit* limit;      // pointer to containing price level
+    Order* prev;       // previous order at this price level
+    Order* next;       // next order at this price level
 };</code></pre>
 
-            <h3>LOB::Limit</h3>
-            <p>Represents a price level in the order book tree.</p>
-            <pre><code>struct Limit {
+                        <h3>LOB::Limit</h3>
+                        <pre><code>struct Limit {
     Price key;             // price level
     Volume volume;         // total volume at this price
-    Count count;           // number of orders at this price
-    Order* head;           // head of the order queue
-    Order* tail;           // tail of the order queue
+    Count count;           // orders at this price
+    Order* head;           // first order (time-priority queue)
+    Order* tail;           // last order
     Limit* next;           // next price level
     Limit* prev;           // previous price level
 };</code></pre>
+
+                        <h2 id="types">Type Definitions</h2>
+                        <table class="param-table">
+                            <tr><th>Type</th><th>Underlying C++ Type</th><th>Description</th></tr>
+                            <tr><td><code>UID</code></td><td><code>std::uint64_t</code></td><td>Order identifier</td></tr>
+                            <tr><td><code>Side</code></td><td><code>enum</code></td><td>Buy/Sell side</td></tr>
+                            <tr><td><code>Quantity</code></td><td><code>std::uint32_t</code></td><td>Number of shares</td></tr>
+                            <tr><td><code>Price</code></td><td><code>std::uint64_t</code></td><td>Price value</td></tr>
+                            <tr><td><code>Volume</code></td><td><code>std::uint32_t</code></td><td>Total share volume</td></tr>
+                            <tr><td><code>Count</code></td><td><code>std::uint32_t</code></td><td>Order count</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
+    </main>
 
     <footer class="footer">
-        <div class="container">
+        <div class="container mx-auto px-6">
             <div class="footer-content">
-                <div class="footer-brand">
-                    <span class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></span>
-                    <p class="footer-tagline">A Non-Consensual Matching Engine for Unruly Capital</p>
+                <div>
+                    <div class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></div>
+                    <p>&copy; 2026 Orderly Chaos. MIT License.</p>
+                    <div class="footer-links mt-4">
+                        <a href="../index.html">Home</a>
+                        <a href="../../getting-started.html">Getting Started</a>
+                    </div>
                 </div>
-                <div class="footer-links">
-                    <a href="../index.html">Home</a>
-                    <a href="python.html">Python API</a>
-                    <a href="cpp.html">C++ API</a>
-                </div>
-                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="social-link">GitHub</a>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Orderly Chaos. MIT License.</p>
             </div>
         </div>
     </footer>

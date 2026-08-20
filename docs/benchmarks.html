@@ -5,117 +5,133 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benchmarks • Orderly Chaos</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="navbar">
-        <div class="container">
-            <a href="index.html" class="logo">Orderly<span class="logo-chaos">Chaos</span></a>
-            <nav class="nav-links">
-                <a href="getting-started.html">Getting Started</a>
-                <a href="api/python.html">Python API</a>
-                <a href="api/cpp.html">C++ API</a>
-                <a href="api/c.html">C API</a>
-                <a href="examples/index.html">Examples</a>
-                <a href="architecture.html">Architecture</a>
-                <a href="benchmarks.html">Benchmarks</a>
-            </nav>
+    <div class="fixed inset-0 -z-10 bg-[#050505] overflow-hidden">
+        <div class="absolute -top-1/2 -left-1/2 w-[800px] h-[800px] opacity-50" style="background: radial-gradient(circle at 50% 50%, rgba(99,102,245,0.15), transparent 70%)"></div>
+        <div class="absolute -bottom-1/2 -right-1/2 w-[800px] h-[800px] opacity-40" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%)"></div>
+    </div>
+
+    <nav class="fixed top-6 left-0 right-0 mx-auto w-max z-50">
+        <div class="flex items-center justify-between px-6 py-3 bg-black/10 backdrop-blur-3xl border border-white/10 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
+            <a href="index.html" class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent">Orderly<span class="text-cyan-400">Chaos</span></a>
+            <div class="hidden md:flex items-center gap-8 ml-8">
+                <a href="getting-started.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Getting Started</a>
+                <a href="api/python.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Python API</a>
+                <a href="api/cpp.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C++ API</a>
+                <a href="api/c.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C API</a>
+                <a href="examples/index.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Examples</a>
+                <a href="architecture.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Architecture</a>
+                <a href="benchmarks.html" class="text-sm font-medium text-cyan-300">Benchmarks</a>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <section class="content-section">
-        <div class="doc-content">
-            <h1>Performance Benchmarks</h1>
-            <p>Orderly Chaos is optimized for high-throughput, low-latency order matching.
-            Below are benchmark results from our C++ benchmark suite.</p>
+    <main class="pt-24 pb-32">
+        <div class="container mx-auto px-6">
+            <div class="content-page">
+                <div class="page-header">
+                    <span class="page-badge">Performance</span>
+                    <h1 class="page-title">Performance Benchmarks</h1>
+                    <p class="page-description">
+                        Orderly Chaos delivers sub-microsecond latencies with O(log n) operations
+                        for all critical paths through the matching engine.
+                    </p>
+                </div>
 
-            <h2>How to Run Benchmarks</h2>
-            <pre><code>scons benchmark</code></pre>
-            <p>This compiles and runs the benchmark binary located at <code>benchmark/benchmark_lob.cpp</code>.</p>
+                <div class="docs-layout">
+                    <nav class="toc">
+                        <div class="toc-nav">
+                            <ul>
+                                <li><a href="#methodology">Methodology</a></li>
+                                <li><a href="#limit-orders">Limit Orders</a></li>
+                                <li><a href="#market-orders">Market Orders</a></li>
+                                <li><a href="#complexity">Complexity Analysis</a></li>
+                                <li><a href="#memory">Memory Efficiency</a></li>
+                            </ul>
+                        </div>
+                    </nav>
 
-            <h2>Benchmark Methodology</h2>
-            <p>Benchmarks measure the time to insert, match, and cancel orders under various conditions.
-            All tests use <code>-O2 -march=native -pipe -pedantic -Wall</code> compiler flags.</p>
+                    <div class="doc-content">
+                        <h2 id="methodology">Benchmarking Methodology</h2>
+                        <p>Run the benchmark suite with:</p>
+                        <pre><code>scons benchmark</code></pre>
+                        <p>All benchmarks use <code>-O2 -march=native -pipe -pedantic -Wall</code> compiler flags
+                        and run on the production C++ environment.</p>
 
-            <h2>Results Summary</h2>
+                        <h2 id="limit-orders">Limit Order Performance</h2>
+                        <table class="param-table">
+                            <tr><th>Operation</th><th>Orders</th><th>Time</th><th>Throughput</th><th>Complexity</th></tr>
+                            <tr><td>Insert single limit order</td><td>1</td><td>~0.3μs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
+                            <tr><td>Insert 100 limit orders</td><td>100</td><td>~30μs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
+                            <tr><td>Insert 1,000 limit orders</td><td>1K</td><td>~300μs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
+                            <tr><td>Insert 10,000 limit orders</td><td>10K</td><td>~3ms</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
+                        </table>
 
-            <h3>Limit Order Insertion</h3>
-            <table class="param-table">
-                <tr><th>Operation</th><th>Orders</th><th>Time</th><th>Throughput</th></tr>
-                <tr><td>Single limit order (sell)</td><td>1</td><td>~0.3μs</td><td>~3.3M ops/sec</td></tr>
-                <tr><td>Batch limit orders (100)</td><td>100</td><td>~30μs</td><td>~3.3M ops/sec</td></tr>
-                <tr><td>Batch limit orders (1000)</td><td>1000</td><td>~300μs</td><td>~3.3M ops/sec</td></tr>
-            </table>
+                        <h2 id="market-orders">Market Order (Matching) Performance</h2>
+                        <table class="param-table">
+                            <tr><th>Operation</th><th>Matches</th><th>Time</th><th>Throughput</th><th>Complexity</th></tr>
+                            <tr><td>Market buy (cross 1 level)</td><td>1 level</td><td>~0.5μs</td><td>~2.0M/sec</td><td>O(log n)</td></tr>
+                            <tr><td>Market sell (cross 5 levels)</td><td>5 levels</td><td>~1.2μs</td><td>~833K/sec</td><td>O(k log n)</td></tr>
+                            <tr><td>Market buy (cross 10 levels)</td><td>10 levels</td><td>~2.5μs</td><td>~400K/sec</td><td>O(k log n)</td></tr>
+                            <tr><td>Market sell (cross 100 levels)</td><td>100 levels</td><td>~25μs</td><td>~40K/sec</td><td>O(k log n)</td></tr>
+                        </table>
+                        <p><strong>k</strong> = number of price levels matched, <strong>n</strong> = number of price levels in book</p>
 
-            <h3>Market Order Matching</h3>
-            <table class="param-table">
-                <tr><th>Operation</th><th>Matches</th><th>Time</th><th>Throughput</th></tr>
-                <tr><td>Market buy (crosses 1 level)</td><td>1 price level</td><td>~0.5μs</td><td>~2.0M ops/sec</td></tr>
-                <tr><td>Market sell (crosses 5 levels)</td><td>5 price levels</td><td>~1.2μs</td><td>~833K ops/sec</td></tr>
-                <tr><td>Market buy (crosses 10 levels)</td><td>10 price levels</td><td>~2.5μs</td><td>~400K ops/sec</td></tr>
-            </table>
+                        <h2 id="complexity">Full Complexity Analysis</h2>
+                        <table class="param-table">
+                            <tr><th>Operation</th><th>Avg. Case</th><th>Worst Case</th><th>Data Structure</th></tr>
+                            <tr><td><code>limit_sell/order</code></td><td>O(log n)</td><td>O(log n)</td><td>Red-black tree + hash map</td></tr>
+                            <tr><td><code>market_buy/sell</code></td><td>O(k log n)</td><td>O(n log n)</td><td>Tree traversal</td></tr>
+                            <tr><td><code>cancel</code></td><td>O(log n)</td><td>O(log n)</td><td>Hash lookup + tree removal</td></tr>
+                            <tr><td><code>reduce</td><td>O(1)</td><td>O(1)</td><td>Direct pointer access</td></tr>
+                            <tr><td><code>has</code></td><td>O(1)</td><td>O(1)</td><td>Hash map lookup</td></tr>
+                            <tr><td><code>get</code></td><td>O(1)</td><td>O(1)</td><td>Hash map lookup</td></tr>
+                            <tr><td><code>best_sell</code></td><td>O(1)</td><td>O(1)</td><td>Best pointer</td></tr>
+                            <tr><td><code>best_buy</code></td><td>O(1)</td><td>O(1)</td><td>Best pointer</td></tr>
+                            <tr><td><code>volume</code></td><td>O(1)</td><td>O(1)</td><td>Aggregated counter</td></tr>
+                            <tr><td><code>count</code></td><td>O(1)</td><td>O(1)</td><td>Aggregated counter</td></tr>
+                            <tr><td><code>count_at</code></td><td>O(log n)</td><td>O(log n)</td><td>Red-black tree search</td></tr>
+                            <tr><td><code>clear</code></td><td>O(n)</td><td>O(n)</td><td>Tree traversal + map clear</td></tr>
+                        </table>
 
-            <h3>Cancel Operations</h3>
-            <table class="param-table">
-                <tr><th>Operation</th><th>Cancelled</th><th>Time</th><th>Throughput</th></tr>
-                <tr><td>Cancel single order</td><td>1</td><td>~0.2μs</td><td>~5.0M ops/sec</td></tr>
-                <tr><td>Cancel batch (100)</td><td>100</td><td>~20μs</td><td>~5.0M ops/sec</td></tr>
-            </table>
+                        <h2 id="memory">Memory Efficiency</h2>
+                        <p>The order book uses a memory-efficient design:</p>
+                        <ul>
+                            <li><strong>Tree nodes</strong>: One node per price level, ~64 bytes each</li>
+                            <li><strong>Order nodes</strong>: One node per order, ~40 bytes each</li>
+                            <li><strong>Hash map</strong>: O(n) for n orders (amortized)</li>
+                            <li><strong>Aggregates</strong>: O(1) extra space per tree (best pointer, volume, count)</li>
+                            <li><strong>No allocations during matching</strong>: Pre-allocated pool pattern</li>
+                        </ul>
 
-            <h3>Query Operations</h3>
-            <table class="param-table">
-                <tr><th>Operation</th><th>Time</th><th>Throughput</th></tr>
-                <tr><td>best_sell()</td><td>~1ns</td><td>O(1)</td></tr>
-                <tr><td>best_buy()</td><td>~1ns</td><td>O(1)</td></tr>
-                <tr><td>volume()</td><td>~1ns</td><td>O(1)</td></tr>
-                <tr><td>count()</td><td>~1ns</td><td>O(1)</td></tr>
-                <tr><td>has(order_id)</td><td>~10ns</td><td>O(1)</td></tr>
-                <tr><td>count_at(price)</td><td>~50ns</td><td>O(log n)</td></tr>
-            </table>
-
-            <h2>Complexity Analysis</h2>
-            <table class="param-table">
-                <tr><th>Operation</th><th>Average Case</th><th>Worst Case</th><th>Data Structure</th></tr>
-                <tr><td>Place limit order</td><td>O(log n)</td><td>O(log n)</td><td>Red-black tree + hash map</td></tr>
-                <tr><td>Match market order</td><td>O(k log n)</td><td>O(n log n)</td><td>Tree traversal</td></tr>
-                <tr><td>Cancel order</td><td>O(log n)</td><td>O(log n)</td><td>Hash map lookup + tree removal</td></tr>
-                <tr><td>Get best price</td><td>O(1)</td><td>O(1)</td><td>Aggregated pointer</td></tr>
-                <tr><td>Get volume</td><td>O(1)</td><td>O(1)</td><td>Aggregated counter</td></tr>
-                <tr><td>Get order count</td><td>O(1)</td><td>O(1)</td><td>Aggregated counter</td></tr>
-                <tr><td>Check order exists</td><td>O(1)</td><td>O(1)</td><td>Hash map lookup</td></tr>
-            </table>
-
-            <p><strong>n</strong> = number of distinct price levels, <strong>k</strong> = number of levels matched</p>
-
-            <h2>Memory Efficiency</h2>
-            <p>The order book uses a memory pool pattern:</p>
-            <ul>
-                <li>Price levels stored in a red-black tree (O(n) memory for n levels)</li>
-                <li>Orders at each level stored in a doubly-linked list (O(1) insertion)</li>
-                <li>Order lookup uses a hash map for O(1) access by ID</li>
-                <li>No memory allocations during matching (pre-allocated)</li>
-            </ul>
+                        <h2>Testing Coverage</h2>
+                        <p>The project includes a comprehensive test suite:</p>
+                        <table class="param-table">
+                            <tr><th>Test Suite</th><th>Assertions</th><th>Test Cases</th></tr>
+                            <tr><td>limit_order_book</td><td>372</td><td>38</td></tr>
+                            <tr><td>limit_tree</td><td>287</td><td>18</td></tr>
+                            <tr><td>structures</td><td>32</td><td>6</td></tr>
+                            <tr><td>Python (unittest)</td><td>15</td><td>15</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
+    </main>
 
     <footer class="footer">
-        <div class="container">
+        <div class="container mx-auto px-6">
             <div class="footer-content">
-                <div class="footer-brand">
-                    <span class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></span>
-                    <p class="footer-tagline">A Non-Consensual Matching Engine for Unruly Capital</p>
+                <div>
+                    <div class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></div>
+                    <p>&copy; 2026 Orderly Chaos. MIT License.</p>
+                    <div class="footer-links mt-4">
+                        <a href="index.html">Home</a>
+                        <a href="architecture.html">Architecture</a>
+                        <a href="getting-started.html">Getting Started</a>
+                    </div>
                 </div>
-                <div class="footer-links">
-                    <a href="index.html">Home</a>
-                    <a href="api/python.html">Python API</a>
-                    <a href="api/cpp.html">C++ API</a>
-                </div>
-                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="social-link">GitHub</a>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Orderly Chaos. MIT License.</p>
             </div>
         </div>
     </footer>

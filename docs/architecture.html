@@ -5,186 +5,163 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Architecture • Orderly Chaos</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="navbar">
-        <div class="container">
-            <a href="index.html" class="logo">Orderly<span class="logo-chaos">Chaos</span></a>
-            <nav class="nav-links">
-                <a href="getting-started.html">Getting Started</a>
-                <a href="api/python.html">Python API</a>
-                <a href="api/cpp.html">C++ API</a>
-                <a href="api/c.html">C API</a>
-                <a href="examples/index.html">Examples</a>
-                <a href="architecture.html" class="active">Architecture</a>
-                <a href="benchmarks.html">Benchmarks</a>
-            </nav>
-        </div>
-    </header>
+    <div class="fixed inset-0 -z-10 bg-[#050505] overflow-hidden">
+        <div class="absolute -top-1/2 -left-1/2 w-[800px] h-[800px] opacity-50" style="background: radial-gradient(circle at 50% 50%, rgba(99,102,245,0.15), transparent 70%)"></div>
+        <div class="absolute -bottom-1/2 -right-1/2 w-[800px] h-[800px] opacity-40" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%)"></div>
+    </div>
 
-    <section class="content-section">
-        <div class="doc-content">
-            <h1>Architecture & Design</h1>
-            <p>Orderly Chaos is built on a foundation of efficient data structures and a modular design that
-            enables high-performance order matching at microsecond latencies.</p>
-
-            <h2>System Overview</h2>
-            <div style="text-align: center; margin: 32px 0;">
-                <pre style="display: inline-block; text-align: left; background: var(--bg-secondary); padding: 24px; border-radius: 12px; border: 1px solid var(--border-color);">
-┌──────────────────┐  ┌──────────────────┐
-│   Python Layer   │  │    C++ Layer     │
-│                  │  │                  │
-│  orderly_chaos   │  │  LOB::LimitOrder │
-│    .py / .dll    │  │      Book        │
-└────────┬─────────┘  └────────┬────────┘
-         │                     │
-         │   ctypes (C API)    │
-         └─────────────────────┘
-         │   extern "C" bridge │
-         ▼                       ▼
-┌────────────────────────────────────────┐
-│   Matching Engine Core                 │
-│   (LimitTree, Order, Limit)            │
-└────────────────────────────────────────┘</pre>
+    <nav class="fixed top-6 left-0 right-0 mx-auto w-max z-50">
+        <div class="flex items-center justify-between px-6 py-3 bg-black/10 backdrop-blur-3xl border border-white/10 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
+            <a href="index.html" class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent">Orderly<span class="text-cyan-400">Chaos</span></a>
+            <div class="hidden md:flex items-center gap-8 ml-8">
+                <a href="getting-started.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Getting Started</a>
+                <a href="api/python.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Python API</a>
+                <a href="api/cpp.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C++ API</a>
+                <a href="api/c.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C API</a>
+                <a href="examples/index.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Examples</a>
+                <a href="architecture.html" class="text-sm font-medium text-cyan-300">Architecture</a>
             </div>
+        </div>
+    </nav>
 
-            <h2>Core Components</h2>
+    <main class="pt-24 pb-32">
+        <div class="container mx-auto px-6">
+            <div class="content-page">
+                <div class="page-header">
+                    <span class="page-badge">Architecture</span>
+                    <h1 class="page-title">System Architecture</h1>
+                    <p class="page-description">
+                        Orderly Chaos is built on efficient data structures with a layered architecture
+                        for maximum performance and maintainability.
+                    </p>
+                </div>
 
-            <h3>1. LimitOrderBook Class</h3>
-            <p>The <code>LimitOrderBook</code> class is the central component, managing:</p>
-            <ul>
-                <li><strong>Sell Side (Asks)</strong>: <code>LimitTree&lt;Side::Sell&gt;</code></li>
-                <li><strong>Buy Side (Bids)</strong>: <code>LimitTree&lt;Side::Buy&gt;</code></li>
-                <li><strong>Order Store</strong>: <code>std::unordered_map&lt;UID, Order&gt;</code></li>
-            </ul>
+                <div class="docs-layout">
+                    <nav class="toc">
+                        <div class="toc-nav">
+                            <ul>
+                                <li><a href="#layered">Layered Architecture</a></li>
+                                <li><a href="#data-structures">Data Structures</a></li>
+                                <li><a href="#matching">Matching Algorithm</a></li>
+                                <li><a href="#build">Build System</a></li>
+                            </ul>
+                        </div>
+                    </nav>
 
-            <h3>2. LimitTree</h3>
-            <p>A custom red-black tree implementation (from <code>vendor/binary-search-tree</code>) that stores
-            price levels (<code>Limit</code> nodes) in sorted order for O(log n) lookups. The tree is augmented
-            with:</p>
-            <ul>
-                <li><strong>Best pointer</strong>: Points to the best price level for quick access</li>
-                <li><strong>Volume accumulator</strong>: Aggregates total volume across all levels</li>
-                <li><strong>Count accumulator</strong>: Tracks order count across all levels</li>
-                <li><strong>Last best price</strong>: Tracks the previous best price for price movement detection</li>
-            </ul>
+                    <div class="doc-content">
+                        <h2 id="layered">Layered Architecture</h2>
+                        <pre><code>┌──────────────────────────────────────────┐
+│  Python Layer                            │
+│  orderly_chaos.LimitOrderBook            │
+└────────┬─────────────────────────────────┘
+         │ ctypes FFI
+┌────────┴─────────────────────────────────┐
+│  C API Layer (lib_lob.hpp)               │
+│  extern "C" functions                    │
+└────────┬─────────────────────────────────┘
+         │ C++ binding
+┌────────┴─────────────────────────────────┐
+│  C++ Core Layer                          │
+│  LOB::LimitOrderBook                     │
+│  (limit_order_book.hpp)                  │
+└──────────────────────────────────────────┘</code></pre>
 
-            <h3>3. Order Structure</h3>
-            <pre><code>struct Order {
-    UID uid;           // unique order ID
-    Side side;         // buy or sell
-    Quantity quantity; // shares in this order
-    Price price;       // price of the order
-    Limit* limit;      // pointer to containing price level
-    Order* prev;       // previous order at this price level
-    Order* next;       // next order at this price level
-};</code></pre>
+                        <h3>Layer 1: C++ Core</h3>
+                        <p>The core engine in <code>include/limit_order_book.hpp</code> implements the full
+                        order book logic with price-time priority matching. This is where all the
+                        performance-critical code lives.</p>
 
-            <h3>4. Limit Structure</h3>
-            <pre><code>struct Limit {
-    Price key;             // price level
-    Volume volume;         // total volume at this price
-    Count count;           // orders at this price
-    Order* head;           // first order (time-priority queue)
-    Order* tail;           // last order
-    Limit* next;           // next price level
-    Limit* prev;           // previous price level
-};</code></pre>
+                        <h3>Layer 2: C API</h3>
+                        <p>The <code>include/lib_lob.hpp</code> file provides an <code>extern "C"</code>
+                        interface that wraps the C++ class, enabling FFI from Python and other languages.</p>
 
-            <h2>Matching Algorithm</h2>
+                        <h3>Layer 3: Python ctypes</h3>
+                        <p><code>orderly_chaos/library.py</code> loads the shared library and configures
+                        ctypes function signatures. <code>orderly_chaos/orderly_chaos.py</code> provides
+                        the high-level Python interface.</p>
 
-            <h3>Price-Time Priority</h3>
-            <p>Orders are matched using the price-time priority rule:</p>
-            <ol>
-                <li>Orders at the best price are matched first (price priority)</li>
-                <li>Among orders at the same price, earlier orders are matched first (time priority)</li>
-            </ol>
+                        <h2 id="data-structures">Data Structures</h2>
 
-            <h3>Limit Order Flow</h3>
-            <pre><code>1. New limit order arrives
-2. Order is stored in the UID → Order map
-3. If price crosses the spread:
-   a. Execute market order against opposing side
-   b. Match orders at each price level (best first)
-   c. Remove filled orders
-4. If order not fully filled:
-   a. Insert remaining quantity into the LimitTree
-5. Update tree aggregates (volume, count, best pointer)</code></pre>
+                        <h3>LimitTree (Red-Black Tree)</h3>
+                        <p>Each side of the book (buy/sell) is stored in a red-black tree from the
+                        <code>vendor/binary-search-tree</code> library. The tree is augmented with:</p>
+                        <ul>
+                            <li><strong>Best pointer</strong>: O(1) access to the best price level</li>
+                            <li><strong>Volume accumulator</strong>: O(1) total volume query</li>
+                            <li><strong>Count accumulator</strong>: O(1) order count</li>
+                            <li><strong>Last best price</strong>: Tracks previous best for price movement detection</li>
+                        </ul>
 
-            <h3>Market Order Flow</h3>
-            <pre><code>1. New market order arrives (no price limit)
+                        <h3>Order Store (Hash Map)</h3>
+                        <p>An <code>std::unordered_map&lt;UID, Order&gt;</code> provides O(1) lookup
+                        by order ID for cancellation and reduction operations.</p>
+
+                        <h3>Doubly-Linked Lists</h3>
+                        <p>At each price level, orders are stored in a doubly-linked list (from
+                        <code>vendor/doubly-linked-list</code>), maintaining time-priority order with
+                        O(1) insertion and removal.</p>
+
+                        <h2 id="matching">Matching Algorithm</h2>
+
+                        <h3>Price-Time Priority</h3>
+                        <p>Orders are matched following strict price-time priority:</p>
+                        <ol>
+                            <li><strong>Price Priority</strong>: Best prices are matched first (highest bid / lowest ask)</li>
+                            <li><strong>Time Priority</strong>: Among orders at the same price, earliest orders are matched first</li>
+                        </ol>
+
+                        <h3>Limit Order Flow</h3>
+                        <pre><code>1. New limit order arrives
+2. Order stored in UID → Order hash map
+3. Check if price crosses the spread
+   → Yes: Execute market-like matching at limit price
+   → Remaining: Insert into LimitTree
+4. Update tree aggregates (volume, count, best)</code></pre>
+
+                        <h3>Market Order Flow</h3>
+                        <pre><code>1. Market order arrives (no price limit)
 2. Match against best orders on opposing side
 3. Consume liquidity level by level
 4. Remove exhausted price levels
-5. Update all affected aggregates</code></pre>
+5. Update all aggregates</code></pre>
 
-            <h2>Vendor Dependencies</h2>
-            <table class="param-table">
-                <tr><th>Library</th><th>Purpose</th><th>License</th></tr>
-                <tr><td>binary-search-tree</td><td>Red-black tree for price levels</td><td>MIT</td></tr>
-                <tr><td>cpptqdm</td><td>Progress bars for C++</td><td>MIT</td></tr>
-                <tr><td>doubly-linked-list</td><td>Order queuing at each price level</td><td>MIT</td></tr>
-                <tr><td>hopscotch_map</td><td>Alternative hash map</td><td>MIT</td></tr>
-                <tr><td>robin-map</td><td>Fast hash maps for order lookup</td><td>MIT</td></tr>
-                <tr><td>sparse-map</td><td>Memory-efficient hash maps</td><td>MIT</td></tr>
-                <tr><td>Catch2</td><td>C++ unit testing framework</td><td>BSL-1.0</td></tr>
-            </table>
+                        <h2 id="build">Build System</h2>
+                        <p>The project uses <strong>SCons</strong> as its build system, configured via
+                        <code>SConstruct</code>. Build targets:</p>
+                        <pre><code>scons            # Build shared library
+scons test       # Run C++ unit tests
+scons benchmark  # Run performance benchmarks</code></pre>
 
-            <h2>Build System</h2>
-            <p>Orderly Chaos uses SCons as its build system, configured via <code>SConstruct</code>:</p>
-            <pre><code># Build the shared library
-scons
-
-# Run C++ tests
-scons test
-
-# Run benchmarks
-scons benchmark</code></pre>
-
-            <h2>Layered Architecture</h2>
-            <div class="api-method">
-                <div class="method-signature">Layer 1: C++ Core</div>
-                <div class="method-description">
-                    The <code>LOB::LimitOrderBook</code> class with all matching logic.
-                    Headers in <code>include/</code>, sources in <code>src/</code>.
-                </div>
-            </div>
-            <div class="api-method">
-                <div class="method-signature">Layer 2: C API</div>
-                <div class="method-description">
-                    <code>extern "C"</code> functions in <code>lib_lob.hpp</code> that wrap the
-                    C++ class for FFI compatibility.
-                </div>
-            </div>
-            <div class="api-method">
-                <div class="method-signature">Layer 3: Python ctypes</div>
-                <div class="method-description">
-                    <code>library.py</code> loads the shared library via ctypes, and
-                    <code>orderly_chaos.py</code> provides the high-level Python interface.
+                        <h2>Vendor Dependencies</h2>
+                        <table class="param-table">
+                            <tr><th>Library</th><th>License</th><th>Purpose</th></tr>
+                            <tr><td>binary-search-tree</td><td>MIT</td><td>Red-black tree for price levels</td></tr>
+                            <tr><td>doubly-linked-list</td><td>MIT</td><td>Order queuing at price levels</td></tr>
+                            <tr><td>robin-map</td><td>MIT</td><td>Fast hash map for order lookup</td></tr>
+                            <tr><td>sparse-map</td><td>MIT</td><td>Memory-efficient hash maps</td></tr>
+                            <tr><td>hopscotch_map</td><td>MIT</td><td>Alternative hash map</td></tr>
+                            <tr><td>cpptqdm</td><td>MIT</td><td>Progress bars (C++)</td></tr>
+                            <tr><td>Catch2</td><td>BSL-1.0</td><td>Unit testing framework</td></tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
-    </section>
+    </main>
 
     <footer class="footer">
-        <div class="container">
+        <div class="container mx-auto px-6">
             <div class="footer-content">
-                <div class="footer-brand">
-                    <span class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></span>
-                    <p class="footer-tagline">A Non-Consensual Matching Engine for Unruly Capital</p>
+                <div>
+                    <div class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></div>
+                    <p>&copy; 2026 Orderly Chaos. MIT License.</p>
+                    <div class="footer-links mt-4">
+                        <a href="index.html">Home</a>
+                        <a href="getting-started.html">Getting Started</a>
+                    </div>
                 </div>
-                <div class="footer-links">
-                    <a href="index.html">Home</a>
-                    <a href="api/python.html">Python API</a>
-                    <a href="api/cpp.html">C++ API</a>
-                </div>
-                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="social-link">GitHub</a>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Orderly Chaos. MIT License.</p>
             </div>
         </div>
     </footer>

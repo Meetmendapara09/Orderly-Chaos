@@ -5,231 +5,158 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Examples • Orderly Chaos</title>
     <link rel="stylesheet" href="../styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="navbar">
-        <div class="container">
-            <a href="../index.html" class="logo">Orderly<span class="logo-chaos">Chaos</span></a>
-            <nav class="nav-links">
-                <a href="../getting-started.html">Getting Started</a>
-                <a href="api/python.html">Python API</a>
-                <a href="api/cpp.html">C++ API</a>
-                <a href="api/c.html">C API</a>
-                <a href="examples/index.html">Examples</a>
-                <a href="../architecture.html">Architecture</a>
-                <a href="../benchmarks.html">Benchmarks</a>
-            </nav>
+    <div class="fixed inset-0 -z-10 bg-[#050505] overflow-hidden">
+        <div class="absolute -top-1/2 -left-1/2 w-[800px] h-[800px] opacity-50" style="background: radial-gradient(circle at 50% 50%, rgba(99,102,245,0.15), transparent 70%)"></div>
+        <div class="absolute -bottom-1/2 -right-1/2 w-[800px] h-[800px] opacity-40" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%)"></div>
+    </div>
+
+    <nav class="fixed top-6 left-0 right-0 mx-auto w-max z-50">
+        <div class="flex items-center justify-between px-6 py-3 bg-black/10 backdrop-blur-3xl border border-white/10 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
+            <a href="index.html" class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent">Orderly<span class="text-cyan-400">Chaos</span></a>
+            <div class="hidden md:flex items-center gap-8 ml-8">
+                <a href="index.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Home</a>
+                <a href="getting-started.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Getting Started</a>
+                <a href="api/python.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Python API</a>
+                <a href="examples/index.html" class="text-sm font-medium text-cyan-300">Examples</a>
+                <a href="architecture.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Architecture</a>
+            </div>
         </div>
-    </header>
+    </nav>
 
-    <section class="content-section">
-        <div class="doc-content">
-            <h1>Examples & Tutorials</h1>
-            <p>Practical examples demonstrating Orderly Chaos in action.</p>
+    <main class="pt-24 pb-32">
+        <div class="container mx-auto px-6">
+            <div class="content-page">
+                <div class="page-header">
+                    <span class="page-badge">Examples</span>
+                    <h1 class="page-title">Practical Examples</h1>
+                    <p class="page-description">
+                        Real-world examples demonstrating common use cases for Orderly Chaos.
+                    </p>
+                </div>
 
-            <h2>Table of Contents</h2>
-            <ul>
-                <li><a href="#basic-trading">Basic Trading Session</a></li>
-                <li><a href="#order-book-inspection">Order Book Inspection</a></li>
-                <li><a href="#market-making">Market Making Strategy</a></li>
-                <li><a href="#matching-engine">Matching Engine Simulation</a></li>
-                <li><a href="#cpp-basic">C++ Basic Example</a></li>
-            </ul>
+                <div class="docs-layout">
+                    <nav class="toc">
+                        <div class="toc-nav">
+                            <ul>
+                                <li><a href="#basic-trading">Basic Trading Session</a></li>
+                                <li><a href="#book-inspection">Order Book Inspection</a></li>
+                                <li><a href="#market-making">Market Making Strategy</a></li>
+                                <li><a href="#matching-simulation">Matching Engine Simulation</a></li>
+                                <li><a href="#cpp-example">C++ Usage Example</a></li>
+                            </ul>
+                        </div>
+                    </nav>
 
-            <h2 id="basic-trading">1. Basic Trading Session (Python)</h2>
-            <pre><code>from orderly_chaos import LimitOrderBook
+                    <div class="doc-content">
+                        <h2 id="basic-trading">1. Basic Trading Session</h2>
+                        <p>A complete example showing how to set up a book, place orders, and query state.</p>
+                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
 
-# Create order book
+<span class="comment"># Create order book</span>
 book = LimitOrderBook()
 
-# Place initial limit orders (liquidity)
-book.limit_sell(order_id=1, quantity=200, price=10250)  # Ask 102.50
-book.limit_sell(order_id=2, quantity=150, price=10260)  # Ask 102.60
-book.limit_buy(order_id=3, quantity=100, price=10240)  # Bid 102.40
-book.limit_buy(order_id=4, quantity=300, price=10230)  # Bid 102.30
+<span class="comment"># Place limit orders</span>
+book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)
+book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)
 
-print("Initial State:")
-print(f"  Best Ask: ${book.best_sell() / 100:.2f}")
-print(f"  Best Bid: ${book.best_buy() / 100:.2f}")
-print(f"  Spread: ${(book.best_sell() - book.best_buy()) / 100:.2f}")
-print(f"  Total Orders: {book.count()}")
+<span class="comment"># Market orders</span>
+book.market_buy(order_id=<span class="number">3</span>, quantity=<span class="number">75</span>)
 
-# Place a market buy order that crosses the spread
-book.market_buy(order_id=5, quantity=250)
+<span class="comment"># Query state</span>
+print(f<span class="string">"Best Ask: ${book.best_sell() / 100:.2f}"</span>)
+print(f<span class="string">"Total Volume: {book.volume()}"</span>)
+print(f<span class="string">"Order Count: {book.count()}"</span>)
 
-print("\nAfter Market Buy (qty=250):")
-print(f"  Best Ask: ${book.best_sell() / 100:.2f}")
-print(f"  Best Bid: ${book.best_buy() / 100:.2f}")
-print(f"  Remaining Orders: {book.count()}")
+<span class="comment"># Cancel an order</span>
+book.cancel(<span class="number">1</span>)</code></pre>
 
-# Cancel remaining order
-book.cancel(2)
-
-print(f"\nFinal Order Count: {book.count()}")</code></pre>
-
-            <h2 id="order-book-inspection">2. Order Book Inspection (Python)</h2>
-            <pre><code>from orderly_chaos import LimitOrderBook
+                        <h2 id="book-inspection">2. Order Book Inspection</h2>
+                        <p>Inspect the state of the order book in detail.</p>
+                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
 
 book = LimitOrderBook()
 
-# Add orders across multiple price levels
-for i, (qty, price) in enumerate([
-    (100, 100), (200, 101), (150, 102),  # Sell side
-    (100, 99), (200, 98), (300, 97),     # Buy side
+<span class="comment"># Add orders across multiple price levels</span>
+for i, (qty, price) <span class="keyword">in</span> <span class="keyword">enumerate</span>([
+    (<span class="number">100</span>, <span class="number">100</span>), (<span class="number">200</span>, <span class="number">101</span>), (<span class="number">150</span>, <span class="number">102</span>),  <span class="comment"># Sell side</span>
+    (<span class="number">100</span>, <span class="number">99</span>),  (<span class="number">200</span>, <span class="number">98</span>),  (<span class="number">300</span>, <span class="number">97</span>),  <span class="comment"># Buy side</span>
 ]):
-    if i < 3:
-        book.limit_sell(i + 1, qty, price)
-    else:
-        book.limit_buy(i + 1, qty, price)
+    <span class="keyword">if</span> i &lt; <span class="number">3</span>:
+        book.limit_sell(i + <span class="number">1</span>, qty, price)
+    <span class="keyword">else</span>:
+        book.limit_buy(i + <span class="number">1</span>, qty, price)
 
-# Inspect book levels
-print("=== Order Book Summary ===")
-print(f"Best Ask: {book.best_sell()} (vol: {book.volume_sell_best()})")
-print(f"Best Bid: {book.best_buy()} (vol: {book.volume_buy_best()})")
-print(f"Total Sell Volume: {book.volume_sell()}")
-print(f"Total Buy Volume: {book.volume_buy()}")
-print(f"Total Volume: {book.volume()}")
+<span class="comment"># Inspect book levels</span>
+print(<span class="string">"=== Order Book Summary ==="</span>)
+print(f<span class="string">"Best Ask: {book.best_sell()}"</span>)
+print(f<span class="string">"Best Bid: {book.best_buy()}"</span>)
+print(f<span class="string">"Total Sell Volume: {book.volume_sell()}"</span>)
+print(f<span class="string">"Total Buy Volume: {book.volume_buy()}"</span>)
+print(f<span class="string">"Orders at price 101: {book.count_at(101)}"</span>)</code></pre>
 
-# Check specific price levels
-print(f"\nVolume at price 101: {book.volume_sell(101)}")
-print(f"Orders at price 99: {book.count_at(99)}")
-
-# Check order existence
-print(f"\nOrder 1 exists: {book.has(1)}")
-print(f"Order 99 exists: {book.has(99)}")</code></pre>
-
-            <h2 id="market-making">3. Market Making Strategy (Python)</h2>
-            <pre><code>from orderly_chaos import LimitOrderBook
-import random
+                        <h2 id="market-making">3. Market Making Strategy</h2>
+                        <p>Simulate a basic market making strategy posting on both sides.</p>
+                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+<span class="keyword">import</span> random
 
 book = LimitOrderBook()
-next_order_id = 1
+next_order_id = <span class="number">1</span>
 
-def post_market_making_orders(mid_price, spread=5, size=100):
-    """Post buy and sell orders around a mid-price."""
-    global next_order_id
-    
+<span class="keyword">def</span> post_market_making_orders(mid_price, spread=<span class="number">5</span>, size=<span class="number">100</span>):
+    <span class="string">"""Post buy and sell orders around a mid-price."""</span>
+    <span class="keyword">global</span> next_order_id
     buy_price = mid_price - spread
     sell_price = mid_price + spread
-    
     book.limit_buy(next_order_id, size, buy_price)
-    buy_id = next_order_id
-    next_order_id += 1
-    
+    next_order_id += <span class="number">1</span>
     book.limit_sell(next_order_id, size, sell_price)
-    sell_id = next_order_id
-    next_order_id += 1
-    
-    return buy_id, sell_id
+    next_order_id += <span class="number">1</span>
 
-def simulate_price_movement(book, steps=10):
-    """Simulate incoming market orders causing price movements."""
-    global next_order_id
-    for _ in range(steps):
-        side = random.choice([True, False])  # True=buy, False=sell
-        qty = random.randint(10, 50)
-        if side:
+<span class="keyword">def</span> simulate_price_movement(book, steps=<span class="number">10</span>):
+    <span class="string">"""Simulate incoming market orders causing price movements."""</span>
+    <span class="keyword">global</span> next_order_id
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="keyword">range</span>(steps):
+        side = random.choice([<span class="keyword">True</span>, <span class="keyword">False</span>])
+        qty = random.randint(<span class="number">10</span>, <span class="number">50</span>)
+        <span class="keyword">if</span> side:
             book.market_buy(next_order_id, qty)
-        else:
+        <span class="keyword">else</span>:
             book.market_sell(next_order_id, qty)
-        next_order_id += 1
+        next_order_id += <span class="number">1</span>
 
-# Initialize with market making orders
-buy_id, sell_id = post_market_making_orders(mid_price=10250, spread=10, size=100)
+<span class="comment"># Initialize with market making orders</span>
+post_market_making_orders(mid_price=<span class="number">10250</span>, spread=<span class="number">10</span>, size=<span class="number">100</span>)
+print(f<span class="string">"Initial mid-price: {book.price()}"</span>)
 
-print(f"Initial mid-price: {book.price()}")
-print(f"Initial spread: {book.best_sell() - book.best_buy()}")
+<span class="comment"># Simulate price movement</span>
+simulate_price_movement(book, steps=<span class="number">5</span>)
+print(f<span class="string">"After simulation: {book.price()}"</span>)</code></pre>
 
-# Simulate price movement
-simulate_price_movement(book, steps=5)
-
-print(f"\nAfter simulation:")
-print(f"  Mid-price: {book.price()}")
-print(f"  Spread: {book.best_sell() - book.best_buy()}")
-print(f"  Total volume: {book.volume()}")</code></pre>
-
-            <h2 id="matching-engine">4. Matching Engine Simulation (Python)</h2>
-            <pre><code>from orderly_chaos import LimitOrderBook
+                        <h2 id="matching-simulation">4. Matching Engine Simulation</h2>
+                        <p>Demonstrate how large orders cascade through the book.</p>
+                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
 
 book = LimitOrderBook()
 
-# Set up initial liquidity at 102.50
-book.limit_sell(1, 500, 10250)
-book.limit_buy(2, 300, 10240)
+<span class="comment"># Set up initial liquidity</span>
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>)
 
-print("=== Matching Engine Simulation ===")
-print(f"Initial state: Ask={book.best_sell()}, Bid={book.best_buy()}")
+print(<span class="string">"=== Matching Engine Simulation ==="</span>)
 
-# Place a large buy limit order that sweeps the book
-book.limit_buy(3, 1000, 10260)  # crosses ask, matches 500 @ 10250, remaining 500 posted at 10260
+<span class="comment"># Place a large buy that sweeps the ask</span>
+book.limit_buy(<span class="number">3</span>, <span class="number">200</span>, <span class="number">10260</span>)
+<span class="comment"># This matches 100 @ 10250, leaving 100 resting at 10260</span>
 
-print(f"\nAfter large buy (qty=1000, price=10260):")
-print(f"  Remaining at 10250: {book.volume_sell(10250)}")
-print(f"  New position at 10260: {book.volume_buy(10260)}")
-print(f"  Best Bid: {book.best_buy()}")
+print(f<span class="string">"After large buy: {book.count()} orders"</span>)
+print(f<span class="string">"  Best Ask: {book.best_sell()}"</span>)
+print(f<span class="string">"  Buy vol at 10260: {book.volume_buy(10260)}"</span>)
 
-# Place a market sell that hits the new bid
-book.market_sell(4, 300)
+<span class="comment"># Partial fill</span>
+book.market_sell(<span class="number">4</span>, <span class="number">30</span>)
+<span class="comment"># Matches 30 @ 10260</span>
 
-print(f"\nAfter market sell (qty=300):")
-print(f"  Remaining at 10260: {book.volume_buy(10260)}")
-print(f"  Best Bid: {book.best_buy()}")
-print(f"  Total Orders: {book.count()}")</code></pre>
-
-            <h2 id="cpp-basic">5. C++ Basic Example</h2>
-            <pre><code>#include "limit_order_book.hpp"
-#include <iostream>
-#include <iomanip>
-
-int main() {
-    LOB::LimitOrderBook book;
-
-    // Place limit orders
-    book.limit_sell(1, 200, 10250);
-    book.limit_sell(2, 150, 10260);
-    book.limit_buy(3, 100, 10240);
-    book.limit_buy(4, 300, 10230);
-
-    std::cout << "=== Order Book ===" << std::endl;
-    std::cout << std::fixed << std::setprecision(2);
-    std::cout << "Best Ask: $" << book.best_sell() / 100.0 << std::endl;
-    std::cout << "Best Bid: $" << book.best_buy() / 100.0 << std::endl;
-    std::cout << "Spread: $" << (book.best_sell() - book.best_buy()) / 100.0 << std::endl;
-
-    // Market order
-    book.market_buy(5, 250);
-
-    std::cout << "\nAfter market buy:" << std::endl;
-    std::cout << "Best Ask: $" << book.best_sell() / 100.0 << std::endl;
-    std::cout << "Best Bid: $" << book.best_buy() / 100.0 << std::endl;
-    std::cout << "Orders remaining: " << book.count() << std::endl;
-
-    return 0;
-}</code></pre>
-        </div>
-    </section>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <span class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></span>
-                    <p class="footer-tagline">A Non-Consensual Matching Engine for Unruly Capital</p>
-                </div>
-                <div class="footer-links">
-                    <a href="../index.html">Home</a>
-                    <a href="api/python.html">Python API</a>
-                    <a href="api/cpp.html">C++ API</a>
-                </div>
-                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="social-link">GitHub</a>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Orderly Chaos. MIT License.</p>
-            </div>
-        </div>
-    </footer>
-</body>
-</html>
+print(f<span class="string">"After market sell: {book.count()} orders"</span>)
+print(f<span class="string">"  Remaining buy vol: {book.volume_buy(10260)}"</span>)
