@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started • Orderly Chaos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">Orderly<span class="logo-chaos">Chaos</span></a>
+            <nav class="nav-links">
+                <a href="getting-started.html">Getting Started</a>
+                <a href="api/python.html">Python API</a>
+                <a href="api/cpp.html">C++ API</a>
+                <a href="api/c.html">C API</a>
+                <a href="examples/index.html">Examples</a>
+                <a href="architecture.html">Architecture</a>
+                <a href="benchmarks.html">Benchmarks</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="content-section">
+        <div class="doc-content">
+            <h1>Getting Started with Orderly Chaos</h1>
+            
+            <p>Orderly Chaos is a high-performance limit order book implementation with price-time priority matching,
+            designed for financial market data streaming. This guide will help you get up and running quickly.</p>
+
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#installation">Installation</a></li>
+                <li><a href="#quick-start">Quick Start</a></li>
+                <li><a href="#python-guide">Python Guide</a></li>
+                <li><a href="#cpp-guide">C++ Guide</a></li>
+                <li><a href="#c-guide">C API Guide</a></li>
+                <li><a href="#development">Development Setup</a></li>
+            </ul>
+
+            <h2 id="installation">Installation</h2>
+            
+            <h3>Python (from PyPI)</h3>
+            <pre><code>pip install orderly-chaos</code></pre>
+
+            <h3>Python (from source)</h3>
+            <pre><code>git clone https://github.com/Meetmendapara09/Orderly-Chaos.git
+cd Orderly-Chaos
+scons
+pip install -e .</code></pre>
+
+            <h3>Build Requirements</h3>
+            <p>Orderly Chaos requires the following dependencies:</p>
+            <ul>
+                <li><strong>C++ Compiler</strong>: GCC 7+ (g++ with C++17 support)</li>
+                <li><strong>Python</strong>: 3.5+ (for Python bindings)</li>
+                <li><strong>SCons</strong>: Build system (<code>pip install scons</code>)</li>
+                <li><strong>On Windows</strong>: Visual Studio 17.0 tools or MinGW-w64</li>
+            </ul>
+
+            <h2 id="quick-start">Quick Start</h2>
+            
+            <h3>Python Example</h3>
+            <pre><code>from orderly_chaos import LimitOrderBook
+
+# Create a new order book
+book = LimitOrderBook()
+
+# Place limit orders
+book.limit_sell(order_id=1, quantity=100, price=102.50)
+book.limit_buy(order_id=2, quantity=50, price=102.40)
+
+# Market orders
+book.market_buy(order_id=3, quantity=75)
+
+# Check state
+print(f"Best Ask: ${book.best_sell()}")
+print(f"Best Bid: ${book.best_buy()}")
+print(f"Total Volume: {book.volume()}")
+print(f"Order Count: {book.count()}")
+
+# Cancel an order
+book.cancel(1)</code></pre>
+
+            <h3>C++ Example</h3>
+            <pre><code>#include "limit_order_book.hpp"
+#include &lt;iostream&gt;
+
+int main() {
+    LOB::LimitOrderBook book;
+
+    // Place limit orders
+    book.limit_sell(1, 100, 10250);  // order_id=1, qty=100, price=102.50
+    book.limit_buy(2, 50, 10240);    // order_id=2, qty=50, price=102.40
+
+    // Market orders
+    book.market_buy(3, 75);          // order_id=3, qty=75
+
+    // Query state
+    std::cout << "Best Ask: " << book.best_sell() << std::endl;
+    std::cout << "Best Bid: " << book.best_buy() << std::endl;
+    std::cout << "Total Volume: " << book.volume() << std::endl;
+
+    return 0;
+}</code></pre>
+
+            <h2 id="python-guide">Python Guide</h2>
+            
+            <h3>Creating a Limit Order Book</h3>
+            <pre><code>from orderly_chaos import LimitOrderBook
+
+book = LimitOrderBook()</code></pre>
+
+            <h3>Placing Orders</h3>
+            <p>There are several methods for placing orders:</p>
+            
+            <h4>Limit Orders</h4>
+            <pre><code># Place a sell limit order
+book.limit_sell(order_id=1, quantity=100, price=102.50)
+
+# Place a buy limit order
+book.limit_buy(order_id=2, quantity=50, price=102.40)
+
+# Place using generic limit method
+# side=True for buy, side=False for sell
+book.limit(side=True, order_id=3, quantity=75, price=102.30)</code></pre>
+
+            <h4>Market Orders</h4>
+            <pre><code># Execute a market buy (matches against sell side)
+book.market_buy(order_id=4, quantity=100)
+
+# Execute a market sell (matches against buy side)
+book.market_sell(order_id=5, quantity=50)
+
+# Generic market method
+book.market(side=True, order_id=6, quantity=30)</code></pre>
+
+            <h3>Querying the Book</h3>
+            <pre><code># Best prices
+book.best_sell()     # best ask price (sell side)
+book.best_buy()      # best bid price (buy side)
+book.best(side=True) # best price for given side
+
+# Volumes
+book.volume()           # total volume across both sides
+book.volume_sell()      # total sell-side volume
+book.volume_buy()       # total buy-side volume
+book.volume(price)      # volume at a specific price level
+
+# Counts
+book.count()            # total orders in book
+book.count_sell()       # orders on sell side
+book.count_buy()        # orders on buy side
+book.count_at(price)    # orders at a specific price
+
+# Order existence
+book.has(order_id=1)    # check if order exists
+
+# Cancel orders
+book.cancel(order_id=1)
+
+# Clear book
+book.clear()</code></pre>
+
+            <h2 id="cpp-guide">C++ Guide</h2>
+            
+            <h3>Include and Link</h3>
+            <pre><code>#include "limit_order_book.hpp"
+
+// Link against lib_orderly_chaos.so (Linux/Mac) 
+// or lib_orderly_chaos.dll (Windows)</code></pre>
+
+            <h3>C++ API Example</h3>
+            <pre><code>#include "limit_order_book.hpp"
+#include &lt;iostream&gt;
+
+using namespace LOB;
+
+int main() {
+    LimitOrderBook book;
+
+    // Place limit orders
+    book.limit_sell(1, 100, 10250);
+    book.limit_buy(2, 50, 10240);
+
+    // Market orders
+    book.market_sell(3, 25);
+    book.market_buy(4, 10);
+
+    // Query
+    std::cout &lt;&lt; "Volume: " &lt;&lt; book.volume() &lt;&lt; std::endl;
+    std::cout &lt;&lt; "Count: " &lt;&lt; book.count() &lt;&lt; std::endl;
+
+    // Cancel
+    book.cancel(1);
+
+    return 0;
+}</code></pre>
+
+            <h2 id="c-guide">C API Guide</h2>
+            
+            <p>The C API provides a simple interface for other languages to interact with the engine.</p>
+
+            <pre><code>#include "lib_lob.hpp"
+
+int main() {
+    // Create book
+    void* book = new_();
+
+    // Place orders
+    limit_sell(book, 1, 100, 10250);
+    limit_buy(book, 2, 50, 10240);
+
+    // Market orders
+    market_buy(book, 3, 25);
+
+    // Query
+    Price best_ask = best_sell(book);
+    Price best_bid = best_buy(book);
+    Volume total_vol = volume(book);
+
+    // Cancel and cleanup
+    cancel(book, 1);
+    delete_(book);
+
+    return 0;
+}</code></pre>
+
+            <h2 id="development">Development Setup</h2>
+            
+            <h3>Running Tests</h3>
+            <pre><code># C++ tests
+scons test
+
+# Python tests
+python -m unittest discover .
+
+# All tests (C++ then Python)
+make test</code></pre>
+
+            <h3>Building</h3>
+            <pre><code># Build C++ shared library
+scons
+
+# Build Python package
+pip install -e .
+
+# Build deployment package
+make deployment</code></pre>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></span>
+                    <p class="footer-tagline">A Non-Consensual Matching Engine for Unruly Capital</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="api/python.html">Python API</a>
+                    <a href="api/cpp.html">C++ API</a>
+                </div>
+                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="social-link">GitHub</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Orderly Chaos. MIT License.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

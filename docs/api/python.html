@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python API • Orderly Chaos</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Orderly<span class="logo-chaos">Chaos</span></a>
+            <nav class="nav-links">
+                <a href="../getting-started.html">Getting Started</a>
+                <a href="python.html" class="active">Python API</a>
+                <a href="cpp.html">C++ API</a>
+                <a href="c.html">C API</a>
+                <a href="../examples/index.html">Examples</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="content-section">
+        <div class="doc-content">
+            <h1>Python API Reference</h1>
+            <p>The Python API for Orderly Chaos provides a high-level interface to the C++ matching engine through ctypes.</p>
+
+            <h2>Module Overview</h2>
+            <p>All classes are accessible from the <code>orderly_chaos</code> package:</p>
+            <pre><code>from orderly_chaos import LimitOrderBook</code></pre>
+
+            <h2 class="api-section">LimitOrderBook</h2>
+            <p>The main class for interacting with the order book engine.</p>
+
+            <div class="api-method">
+                <div class="method-signature">LimitOrderBook()</div>
+                <div class="method-description">
+                    Initialize a new empty limit order book.
+                </div>
+            </div>
+
+            <h3>Order Management</h3>
+
+            <div class="api-method">
+                <div class="method-signature">limit_sell(order_id: int, quantity: int, price: int) → None</div>
+                <div class="method-description">
+                    Place a sell limit order in the book. If the order crosses the spread, it will match against existing orders.
+                </div>
+                <table class="param-table">
+                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+                    <tr><td>order_id</td><td>int</td><td>Unique identifier for the order</td></tr>
+                    <tr><td>quantity</td><td>int</td><td>Number of shares in the order</td></tr>
+                    <tr><td>price</td><td>int</td><td>Limit price for the order</td></tr>
+                </table>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">limit_buy(order_id: int, quantity: int, price: int) → None</div>
+                <div class="method-description">
+                    Place a buy limit order in the book. If the order crosses the spread, it will match against existing orders.
+                </div>
+                <table class="param-table">
+                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+                    <tr><td>order_id</td><td>int</td><td>Unique identifier for the order</td></tr>
+                    <tr><td>quantity</td><td>int</td><td>Number of shares in the order</td></tr>
+                    <tr><td>price</td><td>int</td><td>Limit price for the order</td></tr>
+                </table>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">limit(side: bool, order_id: int, quantity: int, price: int) → None</div>
+                <div class="method-description">
+                    Place a limit order on either side. Use <code>side=True</code> for buy, <code>side=False</code> for sell.
+                </div>
+                <table class="param-table">
+                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+                    <tr><td>side</td><td>bool</td><td>Buy (True) or sell (False)</td></tr>
+                    <tr><td>order_id</td><td>int</td><td>Unique identifier for the order</td></tr>
+                    <tr><td>quantity</td><td>int</td><td>Number of shares in the order</td></tr>
+                    <tr><td>price</td><td>int</td><td>Limit price for the order</td></tr>
+                </table>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">cancel(order_id: int) → None</div>
+                <div class="method-description">
+                    Cancel an existing order by its ID.
+                </div>
+                <table class="param-table">
+                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+                    <tr><td>order_id</td><td>int</td><td>The ID of the order to cancel</td></tr>
+                </table>
+            </div>
+
+            <h3>Market Orders</h3>
+
+            <div class="api-method">
+                <div class="method-signature">market_sell(order_id: int, quantity: int) → None</div>
+                <div class="method-description">
+                    Execute a market sell order, matching against buy-side liquidity.
+                </div>
+                <table class="param-table">
+                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+                    <tr><td>order_id</td><td>int</td><td>Unique identifier for the order</td></tr>
+                    <tr><td>quantity</td><td>int</td><td>Number of shares to sell at market</td></tr>
+                </table>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">market_buy(order_id: int, quantity: int) → None</div>
+                <div class="method-description">
+                    Execute a market buy order, matching against sell-side liquidity.
+                </div>
+                <table class="param-table">
+                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+                    <tr><td>order_id</td><td>int</td><td>Unique identifier for the order</td></tr>
+                    <tr><td>quantity</td><td>int</td><td>Number of shares to buy at market</td></tr>
+                </table>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">market(side: bool, order_id: int, quantity: int) → None</div>
+                <div class="method-description">
+                    Execute a market order on either side. Use <code>side=True</code> for buy, <code>side=False</code> for sell.
+                </div>
+            </div>
+
+            <h3>Query Methods</h3>
+
+            <div class="api-method">
+                <div class="method-signature">has(order_id: int) → bool</div>
+                <div class="method-description">
+                    Check if an order with the given ID exists in the book.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">best_sell() → int</div>
+                <div class="method-description">
+                    Return the best (lowest) sell/ask price in the book. Returns 0 if no sell orders exist.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">best_buy() → int</div>
+                <div class="method-description">
+                    Return the best (highest) buy/bid price in the book. Returns 0 if no buy orders exist.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">best(side: bool) → int</div>
+                <div class="method-description">
+                    Return the best price for the given side. <code>side=True</code> for buy, <code>side=False</code> for sell.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">volume() → int</div>
+                <div class="method-description">
+                    Return the total volume of all orders in the book (both sides).
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">volume(price: int) → int</div>
+                <div class="method-description">
+                    Return the volume at a specific price level.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">volume_sell() → int</div>
+                <div class="method-description">
+                    Return the total volume on the sell side of the book.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">volume_buy() → int</div>
+                <div class="method-description">
+                    Return the total volume on the buy side of the book.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">count() → int</div>
+                <div class="method-description">
+                    Return the total number of orders in the book.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">count_sell() → int</div>
+                <div class="method-description">
+                    Return the number of orders on the sell side.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">count_buy() → int</div>
+                <div class="method-description">
+                    Return the number of orders on the buy side.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">count_at(price: int) → int</div>
+                <div class="method-description">
+                    Return the number of orders at a specific price level.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">clear() → None</div>
+                <div class="method-description">
+                    Remove all orders from the book, resetting it to an empty state.
+                </div>
+            </div>
+
+            <h2>Data Types</h2>
+            <table class="param-table">
+                <tr><th>Type</th><th>C Type</th><th>Description</th></tr>
+                <tr><td>UID</td><td>c_uint64</td><td>Unique order identifier</td></tr>
+                <tr><td>Quantity</td><td>c_uint32</td><td>Number of shares</td></tr>
+                <tr><td>Price</td><td>c_uint64</td><td>Price value (integer)</td></tr>
+                <tr><td>Volume</td><td>c_uint32</td><td>Total share volume</td></tr>
+                <tr><td>Count</td><td>c_uint32</td><td>Order count</td></tr>
+            </table>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></span>
+                    <p class="footer-tagline">A Non-Consensual Matching Engine for Unruly Capital</p>
+                </div>
+                <div class="footer-links">
+                    <a href="../index.html">Home</a>
+                    <a href="python.html">Python API</a>
+                    <a href="cpp.html">C++ API</a>
+                </div>
+                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="social-link">GitHub</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Orderly Chaos. MIT License.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C API • Orderly Chaos</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="container">
+            <a href="../index.html" class="logo">Orderly<span class="logo-chaos">Chaos</span></a>
+            <nav class="nav-links">
+                <a href="../getting-started.html">Getting Started</a>
+                <a href="python.html">Python API</a>
+                <a href="cpp.html">C++ API</a>
+                <a href="c.html" class="active">C API</a>
+                <a href="../examples/index.html">Examples</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="content-section">
+        <div class="doc-content">
+            <h1>C API Reference</h1>
+            <p>The C API provides a language-agnostic interface for integrating Orderly Chaos with other systems.
+            All functions use the <code>extern "C"</code> calling convention.</p>
+
+            <h2>Header File</h2>
+            <pre><code>#include "lib_lob.hpp"</code></pre>
+
+            <h2>Types</h2>
+            <table class="param-table">
+                <tr><th>Type</th><th>C Type</th><th>Description</th></tr>
+                <tr><td>LOB::UID</td><td>uint64_t</td><td>Order identifier</td></tr>
+                <tr><td>LOB::Side</td><td>bool</td><td>Order side (true=buy, false=sell)</td></tr>
+                <tr><td>LOB::Quantity</td><td>uint32_t</td><td>Number of shares</td></tr>
+                <tr><td>LOB::Price</td><td>uint64_t</td><td>Price value</td></tr>
+                <tr><td>LOB::Volume</td><td>uint32_t</td><td>Total share volume</td></tr>
+                <tr><td>LOB::Count</td><td>uint32_t</td><td>Order count</td></tr>
+                <tr><td>LOB::Order*</td><td>void*</td><td>Pointer to an order</td></tr>
+                <tr><td>LOB::LimitOrderBook*</td><td>void*</td><td>Pointer to the book</td></tr>
+            </table>
+
+            <h2>Lifecycle Functions</h2>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::LimitOrderBook* new_()</div>
+                <div class="method-description">
+                    Create a new limit order book and return a pointer to it.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">void delete_(LOB::LimitOrderBook* book)</div>
+                <div class="method-description">
+                    Delete the limit order book instance from memory.
+                </div>
+                <table class="param-table">
+                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+                    <tr><td>book</td><td>LimitOrderBook*</td><td>Pointer to the book to delete</td></tr>
+                </table>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">void clear(LOB::LimitOrderBook* book)</div>
+                <div class="method-description">
+                    Clear all orders from the book.
+                </div>
+                <table class="param-table">
+                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+                    <tr><td>book</td><td>LimitOrderBook*</td><td>Pointer to the book</td></tr>
+                </table>
+            </div>
+
+            <h2>Limit Order Functions</h2>
+
+            <div class="api-method">
+                <div class="method-signature">void limit_sell(LOB::LimitOrderBook* book, LOB::UID uid, LOB::Quantity quantity, LOB::Price price)</div>
+                <div class="method-description">
+                    Place a sell limit order. Matches against existing buy orders if the price crosses the spread.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">void limit_buy(LOB::LimitOrderBook* book, LOB::UID uid, LOB::Quantity quantity, LOB::Price price)</div>
+                <div class="method-description">
+                    Place a buy limit order. Matches against existing sell orders if the price crosses the spread.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">void limit(LOB::LimitOrderBook* book, LOB::Side side, LOB::UID uid, LOB::Quantity quantity, LOB::Price price)</div>
+                <div class="method-description">
+                    Place a limit order on the specified side.
+                </div>
+            </div>
+
+            <h2>Order Management</h2>
+
+            <div class="api-method">
+                <div class="method-signature">bool has(LOB::LimitOrderBook* book, LOB::UID uid)</div>
+                <div class="method-description">
+                    Return true if the book contains an order with the given ID.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">const LOB::Order* get(LOB::LimitOrderBook* book, LOB::UID uid)</div>
+                <div class="method-description">
+                    Get a pointer to the order with the given ID.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">void cancel(LOB::LimitOrderBook* book, LOB::UID uid)</div>
+                <div class="method-description">
+                    Cancel an existing order by its ID.
+                </div>
+            </div>
+
+            <h2>Market Order Functions</h2>
+
+            <div class="api-method">
+                <div class="method-signature">void market_sell(LOB::LimitOrderBook* book, LOB::UID uid, LOB::Quantity quantity)</div>
+                <div class="method-description">
+                    Execute a market sell, matching against buy-side liquidity.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">void market_buy(LOB::LimitOrderBook* book, LOB::UID uid, LOB::Quantity quantity)</div>
+                <div class="method-description">
+                    Execute a market buy, matching against sell-side liquidity.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">void market(LOB::LimitOrderBook* book, LOB::Side side, LOB::UID uid, LOB::Quantity quantity)</div>
+                <div class="method-description">
+                    Execute a market order on the specified side.
+                </div>
+            </div>
+
+            <h2>Price/Level Functions</h2>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Price best_sell(LOB::LimitOrderBook* book)</div>
+                <div class="method-description">
+                    Return the best (lowest) sell price. Returns 0 if no sell orders exist.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Price best_buy(LOB::LimitOrderBook* book)</div>
+                <div class="method-description">
+                    Return the best (highest) buy price. Returns 0 if no buy orders exist.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Price best(LOB::LimitOrderBook* book, LOB::Side side)</div>
+                <div class="method-description">
+                    Return the best price for the given side. <code>side=true</code> for buy, <code>side=false</code> for sell.
+                </div>
+            </div>
+
+            <h2>Volume Functions</h2>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Volume volume_sell_price(LOB::LimitOrderBook* book, LOB::Price price)</div>
+                <div class="method-description">
+                    Return the volume at a specific sell-side price.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Volume volume_sell(LOB::LimitOrderBook* book)</div>
+                <div class="method-description">
+                    Return the total volume on the sell side.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Volume volume_buy_price(LOB::LimitOrderBook* book, LOB::Price price)</div>
+                <div class="method-description">
+                    Return the volume at a specific buy-side price.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Volume volume_buy(LOB::LimitOrderBook* book)</div>
+                <div class="method-description">
+                    Return the total volume on the buy side.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Volume volume_price(LOB::LimitOrderBook* book, LOB::Price price)</div>
+                <div class="method-description">
+                    Return the total volume at a specific price across both sides.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Volume volume(LOB::LimitOrderBook* book)</div>
+                <div class="method-description">
+                    Return the total volume across both sides of the book.
+                </div>
+            </div>
+
+            <h2>Count Functions</h2>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Count count_at(LOB::LimitOrderBook* book, LOB::Price price)</div>
+                <div class="method-description">
+                    Return the number of orders at a specific price.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Count count_sell(LOB::LimitOrderBook* book)</div>
+                <div class="method-description">
+                    Return the number of orders on the sell side.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Count count_buy(LOB::LimitOrderBook* book)</div>
+                <div class="method-description">
+                    Return the number of orders on the buy side.
+                </div>
+            </div>
+
+            <div class="api-method">
+                <div class="method-signature">LOB::Count count(LOB::LimitOrderBook* book)</div>
+                <div class="method-description">
+                    Return the total number of orders in the book.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <span class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></span>
+                    <p class="footer-tagline">A Non-Consensual Matching Engine for Unruly Capital</p>
+                </div>
+                <div class="footer-links">
+                    <a href="../index.html">Home</a>
+                    <a href="python.html">Python API</a>
+                    <a href="cpp.html">C++ API</a>
+                </div>
+                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="social-link">GitHub</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Orderly Chaos. MIT License.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
