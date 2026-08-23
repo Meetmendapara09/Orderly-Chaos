@@ -12,25 +12,35 @@
         <div class="absolute -bottom-1/2 -right-1/2 w-[800px] h-[800px] opacity-40" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%)"></div>
     </div>
 
-    <nav class="fixed top-6 left-0 right-0 mx-auto w-max z-50">
-        <div class="flex items-center justify-between px-6 py-3 bg-black/10 backdrop-blur-3xl border border-white/10 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
-            <a href="index.html" class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent">Orderly<span class="text-cyan-400">Chaos</span></a>
-            <div class="hidden md:flex items-center gap-8 ml-8">
-                <a href="getting-started.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Getting Started</a>
-                <a href="api/python.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Python API</a>
-                <a href="api/cpp.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C++ API</a>
-                <a href="api/c.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C API</a>
-                <a href="examples/index.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Examples</a>
-                <a href="architecture.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Architecture</a>
-                <a href="benchmarks.html" class="text-sm font-medium text-cyan-300">Benchmarks</a>
-            </div>
+    <header class="navbar" role="banner">
+        <div class="container">
+            <a href="index.html" class="brand" aria-label="Orderly Chaos home">
+                <span class="brand-mark">OC</span>
+                OrderlyChaos
+                <small>v0.4.5</small>
+            </a>
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="getting-started.html">Getting Started</a>
+                <a href="architecture.html">Architecture</a>
+                <a href="benchmarks.html" class="active" aria-current="page">Benchmarks</a>
+                <a href="api/python.html">Python API</a>
+                <a href="api/cpp.html">C++ API</a>
+                <a href="api/c.html">C API</a>
+                <a href="examples/index.html">Examples</a>
+                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="nav-github" target="_blank" rel="noopener">GitHub ↗</a>
+            </nav>
         </div>
-    </nav>
+    </header>
 
     <main class="pt-24 pb-32">
         <div class="container mx-auto px-6">
             <div class="content-page">
                 <div class="page-header">
+                    <nav class="breadcrumb" aria-label="Breadcrumb">
+                        <a href="index.html">Home</a>
+                        <span class="sep">/</span>
+                        <span class="current">Benchmarks</span>
+                    </nav>
                     <span class="page-badge">Performance</span>
                     <h1 class="page-title">Performance Benchmarks</h1>
                     <p class="page-description">
@@ -38,6 +48,9 @@
                         the book grows. All figures are from <code>bazel test //benchmark:benchmark_lob_test</code>
                         with production flags — reproducible on your machine in one command.
                     </p>
+                    <div class="page-meta">
+                        <span>⚡ ~0.3µs / op</span><span class="dot"></span><span>📈 Reproducible</span><span class="dot"></span><span>Bazel one-liner</span>
+                    </div>
                 </div>
 
                 <div class="docs-layout">
@@ -51,6 +64,7 @@
                                 <li><a href="#memory">Memory Efficiency</a></li>
                                 <li><a href="#run-your-own">Run Your Own</a></li>
                                 <li><a href="#coverage">Testing Coverage</a></li>
+                                <li><a href="#references">Official References</a></li>
                             </ul>
                         </div>
                     </nav>
@@ -59,10 +73,17 @@
                         <h2 id="methodology">Benchmarking Methodology</h2>
                         <p>
                             Benchmarks measure the <em>real</em> C++ engine — not the Python wrapper — compiled with
-                            production flags (<code>-O2 -march=native -pipe -pedantic -Wall</code>). The same binary
-                            you build with <code>bazel build //orderly_chaos:copy_dll</code> is what gets timed.
+                            production flags (<code>-O2 -march=native -pipe -pedantic -Wall</code>, per the
+                            <a href="https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html" style="color:#06b6d4;text-decoration:underline">GCC optimize options</a>).
+                            The same binary you build with <code>bazel build //orderly_chaos:copy_dll</code> is what gets timed.
                             Results below are representative on a modern x86-64 desktop; your numbers will vary
                             slightly with CPU and OS, but the relative ordering stays the same.
+                        </p>
+                        <p>
+                            The suite runs through
+                            <a href="https://bazel.build/docs/user-manual#test-output" style="color:#06b6d4;text-decoration:underline"><code>bazel test</code></a>,
+                            which builds the benchmark target, executes it in a sandbox, and streams its latency
+                            table back with <code>--test_output=streamed</code>.
                         </p>
                         <p>Run the suite yourself (requires the <a href="getting-started.html#prerequisites" style="color:#06b6d4">prerequisites</a> from Getting Started):</p>
                         <pre><code><span class="comment"># One command — prints a latency table to your terminal</span>
@@ -152,7 +173,8 @@ bazel test //... --test_output=errors</code></pre>
                         <h2 id="run-your-own">Run Your Own Benchmarks</h2>
                         <p>
                             To reproduce the numbers above on your machine — or to measure a change you made to the
-                            engine — use the same command CI uses:
+                            engine — run the benchmark target exactly as documented in
+                            <a href="#methodology" style="color:#06b6d4">Methodology</a>:
                         </p>
                         <pre><code><span class="comment"># Full suite with streamed output (latency table + PASS/FAIL)</span>
 bazel test //benchmark:benchmark_lob_test --test_output=streamed
@@ -178,6 +200,18 @@ bazel test //test:all --test_output=errors   <span class="comment"># 3/3 suites 
                             <tr><td>Python (unittest)</td><td>15</td><td>15</td><td><code>python -m unittest discover -v</code></td></tr>
                         </table>
                         <p style="font-size:0.9em;color:#9ca3af">If any test fails, treat benchmark numbers as invalid — fix correctness before chasing speed.</p>
+
+                        <!-- References -->
+                        <h2 id="references">Official References</h2>
+                        <p>Tooling documentation behind the numbers on this page:</p>
+                        <table class="param-table">
+                            <tr><th>Topic</th><th>Link</th></tr>
+                            <tr><td><code>bazel test</code> &amp; output flags (<code>--test_output</code>)</td><td><a href="https://bazel.build/docs/user-manual#test-output" style="color:#06b6d4;text-decoration:underline">bazel.build/docs/user-manual</a></td></tr>
+                            <tr><td>Benchmarking C++ targets (<code>cc_test</code>)</td><td><a href="https://bazel.build/reference/be/c-cpp#cc_test" style="color:#06b6d4;text-decoration:underline">bazel.build/reference/be/c-cpp</a></td></tr>
+                            <tr><td>GCC optimize options (<code>-O2</code>, <code>-march=native</code>)</td><td><a href="https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html" style="color:#06b6d4;text-decoration:underline">gcc.gnu.org/onlinedocs</a></td></tr>
+                            <tr><td>Google Test primer (fixtures, assertions)</td><td><a href="https://google.github.io/googletest/primer.html" style="color:#06b6d4;text-decoration:underline">google.github.io/googletest</a></td></tr>
+                            <tr><td>Big-O complexity cheat sheet</td><td><a href="https://www.bigocheatsheet.com/" style="color:#06b6d4;text-decoration:underline">bigocheatsheet.com</a></td></tr>
+                        </table>
                     </div>
                 </div>
             </div>

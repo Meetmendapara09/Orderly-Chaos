@@ -12,29 +12,44 @@
         <div class="absolute -bottom-1/2 -right-1/2 w-[800px] h-[800px] opacity-40" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%)"></div>
     </div>
 
-    <nav class="fixed top-6 left-0 right-0 mx-auto w-max z-50">
-        <div class="flex items-center justify-between px-6 py-3 bg-black/10 backdrop-blur-3xl border border-white/10 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
-            <a href="index.html" class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent">Orderly<span class="text-cyan-400">Chaos</span></a>
-            <div class="hidden md:flex items-center gap-8 ml-8">
-                <a href="getting-started.html" class="text-sm font-medium text-cyan-300">Getting Started</a>
-                <a href="api/python.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Python API</a>
-                <a href="api/cpp.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C++ API</a>
-                <a href="api/c.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C API</a>
-                <a href="examples/index.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Examples</a>
-            </div>
+    <header class="navbar" role="banner">
+        <div class="container">
+            <a href="index.html" class="brand" aria-label="Orderly Chaos home">
+                <span class="brand-mark">OC</span>
+                OrderlyChaos
+                <small>v0.4.5</small>
+            </a>
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="getting-started.html" class="active" aria-current="page">Getting Started</a>
+                <a href="architecture.html">Architecture</a>
+                <a href="benchmarks.html">Benchmarks</a>
+                <a href="api/python.html">Python API</a>
+                <a href="api/cpp.html">C++ API</a>
+                <a href="api/c.html">C API</a>
+                <a href="examples/index.html">Examples</a>
+                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="nav-github" target="_blank" rel="noopener">GitHub ↗</a>
+            </nav>
         </div>
-    </nav>
+    </header>
 
     <main class="pt-24 pb-32">
         <div class="container mx-auto px-6">
             <div class="content-page">
                 <div class="page-header">
+                    <nav class="breadcrumb" aria-label="Breadcrumb">
+                        <a href="index.html">Home</a>
+                        <span class="sep">/</span>
+                        <span class="current">Getting Started</span>
+                    </nav>
                     <span class="page-badge">Getting Started</span>
                     <h1 class="page-title">Getting Started with Orderly Chaos</h1>
                     <p class="page-description">
                         Install the engine, build from source, and place your first order — in under five minutes.
                         No prior trading-systems knowledge required.
                     </p>
+                    <div class="page-meta">
+                        <span>⏱ 5 min setup</span><span class="dot"></span><span>📦 Bazel + Python</span><span class="dot"></span><span>Updated Aug 2026</span>
+                    </div>
                 </div>
 
                 <div class="docs-layout">
@@ -49,6 +64,7 @@
                                 <li><a href="#cpp-guide">C++ Guide</a></li>
                                 <li><a href="#c-guide">C API Guide</a></li>
                                 <li><a href="#troubleshooting">Troubleshooting</a></li>
+                                <li><a href="#references">Official References</a></li>
                                 <li><a href="#next-steps">Next Steps</a></li>
                             </ul>
                         </div>
@@ -64,10 +80,10 @@
                         </p>
                         <table class="param-table">
                             <tr><th>Tool</th><th>Required Version</th><th>Notes</th></tr>
-                            <tr><td><strong>C++ compiler</strong></td><td>GCC 7+ or Clang 6+ with <code>-std=c++17</code></td><td>Any recent GCC/Clang works. MSVC is not tested — use MinGW on Windows.</td></tr>
-                            <tr><td><strong>Python</strong></td><td>3.8+</td><td>Needed only for Python bindings. The C++ core builds without Python.</td></tr>
-                            <tr><td><strong>Bazel</strong></td><td>7+ with Bzlmod enabled</td><td>Install from <a href="https://bazel.build/install" style="color:#06b6d4;text-decoration:underline">bazel.build/install</a>. Bzlmod is on by default in Bazel 7+.</td></tr>
-                            <tr><td><strong>Windows only</strong></td><td>MinGW-w64 via <a href="https://strawberryperl.com/" style="color:#06b6d4;text-decoration:underline">Strawberry Perl</a></td><td>Custom Bazel toolchain lives in <code>toolchain/BUILD.bazel</code>. See <a href="#troubleshooting" style="color:#06b6d4">Troubleshooting</a> if your <code>g++.exe</code> is elsewhere.</td></tr>
+                            <tr><td><strong>C++ compiler</strong></td><td>GCC 7+ or Clang 6+ with <code>-std=c++17</code></td><td>Any recent GCC/Clang works (<a href="https://gcc.gnu.org/" style="color:#06b6d4;text-decoration:underline">gcc.gnu.org</a>). MSVC is not tested — use MinGW-w64 on Windows.</td></tr>
+                            <tr><td><strong>Python</strong></td><td>3.8+</td><td>Needed only for the Python bindings (<a href="https://docs.python.org/3/" style="color:#06b6d4;text-decoration:underline">docs.python.org</a>). The C++ core builds without Python.</td></tr>
+                            <tr><td><strong>Bazel</strong></td><td>7+ with Bzlmod enabled</td><td>Install via <a href="https://bazel.build/install" style="color:#06b6d4;text-decoration:underline">bazel.build/install</a> (Windows guide: <a href="https://bazel.build/install/windows" style="color:#06b6d4;text-decoration:underline">bazel.build/install/windows</a>). Bzlmod is on by default in Bazel 7+.</td></tr>
+                            <tr><td><strong>Windows only</strong></td><td>MinGW-w64 via <a href="https://strawberryperl.com/" style="color:#06b6d4;text-decoration:underline">Strawberry Perl</a>, plus <a href="https://gitforwindows.org/" style="color:#06b6d4;text-decoration:underline">Git for Windows</a> (or <a href="https://www.msys2.org/" style="color:#06b6d4;text-decoration:underline">MSYS2</a>) for <code>bash.exe</code></td><td>Bazel requires a POSIX shell on Windows — see <a href="#troubleshooting" style="color:#06b6d4">Troubleshooting</a>. The custom toolchain lives in <code>toolchain/BUILD.bazel</code>.</td></tr>
                         </table>
                         <p>Verify your setup in one shot:</p>
                         <pre><code>g++ --version        <span class="comment"># should show GCC 7+ or Clang 6+</span>
@@ -104,6 +120,13 @@ cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
 <span class="comment"># 5. Install the Python package</span>
 pip install -e .</code></pre>
                         <p><strong>What just happened?</strong> <code>//orderly_chaos:copy_dll</code> compiles the C++ core and C API into <code>lib_orderly_chaos.dll</code> (or <code>.so</code> on Linux/macOS) and copies it into the build output. The <code>cp</code> step places it where <code>orderly_chaos/library.py</code> expects it at runtime.</p>
+                        <p>
+                            <strong>First build?</strong> The very first command downloads all external dependencies
+                            declared in <code>MODULE.bazel</code> (Bzlmod resolves them automatically; you can pre-fetch with
+                            <a href="https://bazel.build/run/build#fetching-external-dependencies" style="color:#06b6d4;text-decoration:underline"><code>bazel fetch //...</code></a>).
+                            Google Test is pinned by SHA-256 via <code>http_archive</code>, so builds are hermetic —
+                            everyone gets the exact same sources. Subsequent builds are incremental and cached.
+                        </p>
 
                         <h3>Option C — C++ only (no Python)</h3>
                         <p>Just copy the headers — the engine is header-only for C++ consumers:</p>
@@ -257,7 +280,11 @@ book.clear()            <span class="comment"># remove everything</span></code><
 
                         <h3>Error: <code>BAZEL_SH</code> not set / <code>sh_toolchain</code> failed</h3>
                         <pre><code>ERROR: Cannot determine sh_toolchain ... BAZEL_SH not set</code></pre>
-                        <p>Bazel on Windows needs to know where <code>bash.exe</code> lives (from Git for Windows). Fix:</p>
+                        <p>
+                            Bazel on Windows requires a POSIX-compatible shell and needs to be told where
+                            <code>bash.exe</code> lives — from Git for Windows or MSYS2 (<strong>x86_64</strong> build, not i686/MSYS —
+                            per the official <a href="https://bazel.build/install/windows" style="color:#06b6d4;text-decoration:underline">Bazel-on-Windows guide</a>). Fix:
+                        </p>
                         <pre><code><span class="comment"># Git Bash / MSYS2 — run before every bazel command, or add to ~/.bashrc</span>
 export BAZEL_SH="C:/Program Files/Git/bin/bash.exe"
 
@@ -275,7 +302,12 @@ $env:BAZEL_SH="C:/Program Files/Git/bin/bash.exe"</code></pre>
                         <p>If your Strawberry (or standalone MinGW) is elsewhere, edit that line to your <code>g++.exe</code> directory, e.g. <code>"C:/msys64/mingw64/bin"</code>. Then <code>bazel clean</code> and rebuild.</p>
 
                         <h3>Python: <code>DLL load failed</code> or <code>FileNotFoundError</code></h3>
-                        <p><code>orderly_chaos/library.py</code> loads <code>lib_orderly_chaos.dll</code> from the package directory. If you built from source but skipped the copy step:</p>
+                        <p>
+                            <code>orderly_chaos/library.py</code> loads <code>lib_orderly_chaos.dll</code> from the package directory
+                            via <a href="https://docs.python.org/3/library/ctypes.html#ctypes.CDLL" style="color:#06b6d4;text-decoration:underline"><code>ctypes.CDLL</code></a>.
+                            Windows raises <code>OSError: [WinError 126]</code> when the DLL (or a runtime it depends on) is
+                            missing. If you built from source but skipped the copy step:
+                        </p>
                         <pre><code>cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
 pip install -e .  <span class="comment"># reinstall so Python sees it</span></code></pre>
 
@@ -285,6 +317,20 @@ pip install -e .  <span class="comment"># reinstall so Python sees it</span></co
                         <h3>Still stuck?</h3>
                         <p>Run with verbose output and open an issue with the log:</p>
                         <pre><code>bazel test //test:all --test_output=streamed --verbose_failures</code></pre>
+
+                        <!-- References -->
+                        <h2 id="references">Official References</h2>
+                        <p>Primary documentation for every tool in this guide — worth bookmarking:</p>
+                        <table class="param-table">
+                            <tr><th>Topic</th><th>Link</th></tr>
+                            <tr><td>Bazel install (all OSes)</td><td><a href="https://bazel.build/install" style="color:#06b6d4;text-decoration:underline">bazel.build/install</a></td></tr>
+                            <tr><td>Bazel on Windows (BAZEL_SH, MSYS2)</td><td><a href="https://bazel.build/install/windows" style="color:#06b6d4;text-decoration:underline">bazel.build/install/windows</a></td></tr>
+                            <tr><td>Bzlmod &amp; MODULE.bazel</td><td><a href="https://bazel.build/external/module" style="color:#06b6d4;text-decoration:underline">bazel.build/external/module</a></td></tr>
+                            <tr><td>C++ rules (<code>cc_binary</code>, <code>cc_test</code>)</td><td><a href="https://bazel.build/reference/be/c-cpp" style="color:#06b6d4;text-decoration:underline">bazel.build/reference/be/c-cpp</a></td></tr>
+                            <tr><td><code>ctypes</code> — foreign function library</td><td><a href="https://docs.python.org/3/library/ctypes.html" style="color:#06b6d4;text-decoration:underline">docs.python.org/3/library/ctypes.html</a></td></tr>
+                            <tr><td>GCC options (<code>-std=c++17</code>, <code>-O2</code>)</td><td><a href="https://gcc.gnu.org/onlinedocs/gcc/Invoking-G_002dC_002b_002b.html" style="color:#06b6d4;text-decoration:underline">gcc.gnu.org/onlinedocs</a></td></tr>
+                            <tr><td>MinGW-w64 toolchain</td><td><a href="https://www.mingw-w64.org/" style="color:#06b6d4;text-decoration:underline">mingw-w64.org</a></td></tr>
+                        </table>
 
                         <!-- Next Steps -->
                         <h2 id="next-steps">Next Steps</h2>

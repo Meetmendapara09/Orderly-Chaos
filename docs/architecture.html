@@ -5,6 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Architecture • Orderly Chaos</title>
     <link rel="stylesheet" href="styles.css">
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            securityLevel: 'loose',
+            theme: 'base',
+            themeVariables: {
+                darkMode: true,
+                background: '#0a0a14',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: '14px',
+                primaryColor: '#12121f',
+                primaryTextColor: '#e8e8f0',
+                primaryBorderColor: '#3b3b52',
+                secondaryColor: '#0f1a24',
+                secondaryTextColor: '#e8e8f0',
+                secondaryBorderColor: '#164e5a',
+                tertiaryColor: '#141425',
+                lineColor: '#06b6d4',
+                textColor: '#a0a0b0',
+                mainBkg: '#12121f',
+                nodeBorder: '#3b3b52',
+                clusterBkg: 'rgba(255,255,255,0.02)',
+                clusterBorder: 'rgba(255,255,255,0.08)',
+                edgeLabelBackground: '#0a0a14',
+                titleColor: '#e8e8f0'
+            },
+            flowchart: { curve: 'basis', padding: 14, htmlLabels: true }
+        });
+    </script>
 </head>
 <body>
     <div class="fixed inset-0 -z-10 bg-[#050505] overflow-hidden">
@@ -12,24 +42,35 @@
         <div class="absolute -bottom-1/2 -right-1/2 w-[800px] h-[800px] opacity-40" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%)"></div>
     </div>
 
-    <nav class="fixed top-6 left-0 right-0 mx-auto w-max z-50">
-        <div class="flex items-center justify-between px-6 py-3 bg-black/10 backdrop-blur-3xl border border-white/10 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
-            <a href="index.html" class="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent">Orderly<span class="text-cyan-400">Chaos</span></a>
-            <div class="hidden md:flex items-center gap-8 ml-8">
-                <a href="getting-started.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Getting Started</a>
-                <a href="api/python.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Python API</a>
-                <a href="api/cpp.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C++ API</a>
-                <a href="api/c.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">C API</a>
-                <a href="examples/index.html" class="text-sm font-medium text-gray-300 hover:text-white transition-all">Examples</a>
-                <a href="architecture.html" class="text-sm font-medium text-cyan-300">Architecture</a>
-            </div>
+    <header class="navbar" role="banner">
+        <div class="container">
+            <a href="index.html" class="brand" aria-label="Orderly Chaos home">
+                <span class="brand-mark">OC</span>
+                OrderlyChaos
+                <small>v0.4.5</small>
+            </a>
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="getting-started.html">Getting Started</a>
+                <a href="architecture.html" class="active" aria-current="page">Architecture</a>
+                <a href="benchmarks.html">Benchmarks</a>
+                <a href="api/python.html">Python API</a>
+                <a href="api/cpp.html">C++ API</a>
+                <a href="api/c.html">C API</a>
+                <a href="examples/index.html">Examples</a>
+                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="nav-github" target="_blank" rel="noopener">GitHub ↗</a>
+            </nav>
         </div>
-    </nav>
+    </header>
 
     <main class="pt-24 pb-32">
         <div class="container mx-auto px-6">
             <div class="content-page">
                 <div class="page-header">
+                    <nav class="breadcrumb" aria-label="Breadcrumb">
+                        <a href="index.html">Home</a>
+                        <span class="sep">/</span>
+                        <span class="current">Architecture</span>
+                    </nav>
                     <span class="page-badge">Architecture</span>
                     <h1 class="page-title">System Architecture</h1>
                     <p class="page-description">
@@ -38,6 +79,9 @@
                         (C++ core → C API → Python), and why the hot path stays fast with <strong>O(1)</strong>
                         best-price reads and incremental volume tracking.
                     </p>
+                    <div class="page-meta">
+                        <span>🏗 C++ Core</span><span class="dot"></span><span>⚡ O(1) hot path</span><span class="dot"></span><span>3 layers</span>
+                    </div>
                 </div>
 
                 <div class="docs-layout">
@@ -50,6 +94,7 @@
                                 <li><a href="#matching">Matching Algorithm</a></li>
                                 <li><a href="#build">Build System</a></li>
                                 <li><a href="#dependencies">Dependencies</a></li>
+                                <li><a href="#references">Official References</a></li>
                             </ul>
                         </div>
                     </nav>
@@ -76,23 +121,17 @@
                             Three layers, each with a single job. You pick the layer that matches your needs —
                             they all run the same engine underneath:
                         </p>
-                        <pre><code>┌──────────────────────────────────────────┐
-│  Python Layer                            │
-│  orderly_chaos.LimitOrderBook            │
-│  Pythonic methods, pip-installable       │
-└────────┬─────────────────────────────────┘
-         │ ctypes FFI  (no C extension build needed)
-┌────────┴─────────────────────────────────┐
-│  C API Layer  (include/lib_lob.hpp)      │
-│  extern "C" functions — callable from    │
-│  Python, Rust, Go, or any C FFI          │
-└────────┬─────────────────────────────────┘
-         │ direct C++ call — zero overhead
-┌────────┴─────────────────────────────────┐
-│  C++ Core Layer  (include/*.hpp)         │
-│  LOB::LimitOrderBook — the whole book,   │
-│  header-only, -O2 -march=native          │
-└──────────────────────────────────────────┘</code></pre>
+                        <pre class="mermaid">
+flowchart TB
+    PY["&#127753; Python Layer&lt;br/&gt;&lt;b&gt;orderly_chaos.LimitOrderBook&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Pythonic methods · pip-installable&lt;/i&gt;"]
+    CAPI["&#128279; C API Layer&lt;br/&gt;&lt;b&gt;include/lib_lob.hpp&lt;/b&gt;&lt;br/&gt;&lt;i&gt;extern &amp;quot;C&amp;quot; · callable from any C FFI&lt;/i&gt;"]
+    CORE["&amp;#9889; C++ Core Layer&lt;br/&gt;&lt;b&gt;LOB::LimitOrderBook&lt;/b&gt;&lt;br/&gt;&lt;i&gt;header-only · -O2 -march=native&lt;/i&gt;"]
+    PY -- "ctypes FFI&lt;br/&gt;no C extension build" --> CAPI
+    CAPI -- "direct C++ call&lt;br/&gt;zero overhead" --> CORE
+    style PY fill:#0f1a24,stroke:#164e5a,stroke-width:1.5px
+    style CAPI fill:#141425,stroke:#3b3b52,stroke-width:1.5px
+    style CORE fill:#12121f,stroke:#06b6d4,stroke-width:1.5px
+                        </pre>
 
                         <h3>Layer 1: C++ Core — where speed lives</h3>
                         <p>
@@ -105,20 +144,23 @@
 
                         <h3>Layer 2: C API — the stable bridge</h3>
                         <p>
-                            <code>include/lib_lob.hpp</code> exposes the same operations as <code>extern "C"</code> functions
+                            <code>include/lib_lob.hpp</code> exposes the same operations as <a href="https://en.cppreference.com/w/cpp/language/language-linkage" style="color:#06b6d4;text-decoration:underline"><code>extern "C"</code></a> functions
                             (<code>new_()</code>, <code>limit_sell()</code>, <code>best_sell()</code>, <code>delete_()</code>, …).
                             Because the ABI is plain C, any language that can call C can use the engine without
-                            rewriting it. The functions are thin wrappers — they forward directly to the C++ methods
-                            with no extra allocation or copying.
+                            rewriting it — Python, Rust, Go, Java, C#. The functions are thin wrappers — they forward
+                            directly to the C++ methods with no extra allocation or copying.
                         </p>
 
                         <h3>Layer 3: Python ctypes — no compiled extension</h3>
                         <p>
                             <code>orderly_chaos/library.py</code> loads <code>lib_orderly_chaos.dll</code> (or <code>.so</code> on Linux/macOS)
-                            with <code>ctypes</code> and declares each C function's argument and return types.
+                            with <a href="https://docs.python.org/3/library/ctypes.html#ctypes.CDLL" style="color:#06b6d4;text-decoration:underline"><code>ctypes.CDLL</code></a>
+                            and declares each function's prototype through <a href="https://docs.python.org/3/library/ctypes.html#functions-and-prototypes" style="color:#06b6d4;text-decoration:underline"><code>argtypes</code>/<code>restype</code></a>,
+                            which gives type-checked, documented calls instead of raw pointer soup.
                             <code>orderly_chaos/orderly_chaos.py</code> then wraps those raw calls in a Pythonic
                             <code>LimitOrderBook</code> class. No Cython, no pybind11, no compiler needed on the
-                            Python side after the DLL is built.
+                            Python side after the DLL is built — and the GIL is released during each call, so the
+                            engine runs at native speed inside a multi-threaded host.
                         </p>
 
                         <!-- Data Structures -->
@@ -132,7 +174,9 @@
                         <h3>LimitTree — a red-black tree with cached aggregates</h3>
                         <p>
                             Each side of the book (buy/sell) is a <code>LimitTree</code> (<code>limit_tree.hpp:157</code>).
-                            Underneath is a red-black tree from <code>vendor/binary-search-tree</code>, keyed by price.
+                            Underneath is a <a href="https://en.wikipedia.org/wiki/Red%E2%80%93black_tree" style="color:#06b6d4;text-decoration:underline">red-black tree</a>
+                            (self-balancing BST — guaranteed <strong>O(log n)</strong> insert/remove, no degenerate paths)
+                            from <code>vendor/binary-search-tree</code>, keyed by price.
                             The tree is augmented with three cached values that are updated incrementally on every
                             insert/remove, so reads are constant time:
                         </p>
@@ -187,31 +231,56 @@
                         </ol>
 
                         <h3>Limit order flow</h3>
-                        <pre><code>1. New limit order arrives (e.g., buy 100 @ 10250)
-2. Check if price crosses the spread
-     best ask is 10240 and 10250 &gt;= 10240  →  YES, it crosses
-3. Match immediately against the best asks, level by level,
-     consuming orders in FIFO order within each level
-4. If quantity remains after matching, insert the remainder
-     into the buy LimitTree at price 10250
-5. Update cached aggregates (volume, count, best) incrementally</code></pre>
+                        <pre class="mermaid">
+flowchart TD
+    A(["New limit order arrives&lt;br/&gt;buy 100 @ 10250"]) --> B{"Price crosses spread?&lt;br/&gt;10250 &amp;ge; best ask 10240"}
+    B -- "Yes" --> C["Match immediately vs best asks&lt;br/&gt;level by level · FIFO within level"]
+    C --> D{"Quantity remaining?"}
+    D -- "Yes" --> E["Rest remainder in buy LimitTree&lt;br/&gt;O(log n) new price · O(1) existing"]
+    D -- "No" --> F["Update cached aggregates&lt;br/&gt;volume · count · best"]
+    E --> F
+    B -- "No" --> G["Order rests in buy tree unchanged"]
+    G --> F
+    style A fill:#12121f,stroke:#3b3b52
+    style B fill:#1a1626,stroke:#8b5cf6,stroke-width:1.5px
+    style C fill:#0f1a24,stroke:#164e5a
+    style E fill:#0f1a24,stroke:#164e5a
+    style G fill:#0f1a24,stroke:#164e5a
+    style F fill:#12121f,stroke:#06b6d4,stroke-width:1.5px
+                        </pre>
                         <p>If the price does <em>not</em> cross, step 3 is skipped — the order simply rests in its side's tree.</p>
 
                         <h3>Market order flow</h3>
-                        <pre><code>1. Market order arrives (no price limit — e.g., buy 200)
-2. Match against best orders on the opposite side
-3. Consume liquidity level by level, FIFO within each level
-4. Remove each price level that becomes empty (O(log n) per level)
-5. Update all aggregates
-6. If the market order still has quantity left and the book is empty,
-     the remainder is discarded (no resting — market orders never sit in the book)</code></pre>
+                        <pre class="mermaid">
+flowchart TD
+    A(["Market order arrives&lt;br/&gt;buy 200 · no price limit"]) --> B["Match against best orders&lt;br/&gt;on the opposite side"]
+    B --> C["Consume liquidity&lt;br/&gt;level by level · FIFO within level"]
+    C --> D{"Price level now empty?"}
+    D -- "Yes" --> E["Remove level from tree&lt;br/&gt;O(log n)"]
+    E --> F{"Quantity left?"}
+    D -- "No" --> F
+    F -- "Yes · liquidity remains" --> C
+    F -- "Yes · book empty" --> G["Discard remainder&lt;br/&gt;market orders never rest"]
+    F -- "No" --> H["Update all aggregates"]
+    G --> H
+    style A fill:#12121f,stroke:#3b3b52
+    style B fill:#0f1a24,stroke:#164e5a
+    style C fill:#0f1a24,stroke:#164e5a
+    style E fill:#141425,stroke:#3b3b52
+    style G fill:#1a1626,stroke:#f59e0b
+    style H fill:#12121f,stroke:#06b6d4,stroke-width:1.5px
+                        </pre>
 
                         <!-- Build System -->
                         <h2 id="build">Build System — Bazel with Bzlmod</h2>
                         <p>
-                            The project uses <strong>Bazel 7+</strong> with Bzlmod (the new module system). Dependencies
-                            are declared in <code>MODULE.bazel</code> and fetched automatically — no manual
-                            <code>git submodule</code> or vendoring for Google Test.
+                            The project uses <strong>Bazel 7+</strong> with
+                            <a href="https://bazel.build/external/module" style="color:#06b6d4;text-decoration:underline">Bzlmod</a>
+                            (the new module system, default since Bazel 7). Dependencies are declared in
+                            <code>MODULE.bazel</code> and fetched automatically on first build (or pre-fetched with
+                            <code>bazel fetch //...</code>) — no manual <code>git submodule</code> or vendoring for Google Test.
+                            The archive is pinned by SHA-256 in an <a href="https://bazel.build/rules/lib/repo/http" style="color:#06b6d4;text-decoration:underline"><code>http_archive</code></a>,
+                            so every machine builds from bit-identical sources.
                         </p>
                         <pre><code>bazel test //test:all                          <span class="comment"># C++ unit tests (Google Test)</span>
 bazel test //benchmark:benchmark_lob_test      <span class="comment"># performance benchmarks</span>
@@ -239,6 +308,20 @@ bazel test //...                               <span class="comment"># everythin
                             <tr><td>googletest</td><td>BSD-3</td><td>C++ unit testing framework</td><td>fetched via <code>http_archive</code> in <code>MODULE.bazel</code> (not vendored)</td></tr>
                         </table>
                         <p>Google Test used to be vendored under <code>vendor/googletest/</code> — it is now fetched by Bazel on demand, keeping the repository lean.</p>
+
+                        <!-- References -->
+                        <h2 id="references">Official References</h2>
+                        <p>Standards, libraries, and specifications behind the design:</p>
+                        <table class="param-table">
+                            <tr><th>Topic</th><th>Link</th></tr>
+                            <tr><td>Bzlmod — external dependencies overview</td><td><a href="https://bazel.build/external/module" style="color:#06b6d4;text-decoration:underline">bazel.build/external/module</a></td></tr>
+                            <tr><td><code>http_archive</code> repository rule (hermetic SHA-256 pinning)</td><td><a href="https://bazel.build/rules/lib/repo/http" style="color:#06b6d4;text-decoration:underline">bazel.build/rules/lib/repo/http</a></td></tr>
+                            <tr><td>C++ toolchain configuration (<code>cc_toolchain</code>)</td><td><a href="https://bazel.build/docs/cc-toolchain" style="color:#06b6d4;text-decoration:underline">bazel.build/docs/cc-toolchain</a></td></tr>
+                            <tr><td><code>ctypes.CDLL</code>, <code>argtypes</code>/<code>restype</code> prototypes</td><td><a href="https://docs.python.org/3/library/ctypes.html" style="color:#06b6d4;text-decoration:underline">docs.python.org/3/library/ctypes.html</a></td></tr>
+                            <tr><td>Language linkage — <code>extern "C"</code></td><td><a href="https://en.cppreference.com/w/cpp/language/language-linkage" style="color:#06b6d4;text-decoration:underline">en.cppreference.com</a></td></tr>
+                            <tr><td>Red-black trees — guaranteed O(log n) BSTs</td><td><a href="https://en.wikipedia.org/wiki/Red%E2%80%93black_tree" style="color:#06b6d4;text-decoration:underline">Wikipedia: Red–black tree</a></td></tr>
+                            <tr><td>Price-time priority in continuous auctions</td><td><a href="https://en.wikipedia.org/wiki/Order_book_(trading)" style="color:#06b6d4;text-decoration:underline">Wikipedia: Order book (trading)</a></td></tr>
+                        </table>
                     </div>
                 </div>
             </div>
