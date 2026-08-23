@@ -1,0 +1,95 @@
+# Continuous integration for Orderly Chaos.
+#
+# Two jobs on ubuntu-latest:
+#   1. cpp     - GoogleTest suites + performance benchmark via Bazel
+#   2. python  - build the ctypes shared library and run unittest discovery
+#
+# Notes:
+#   * Bazelisk installs Bazel; USE_BAZEL_VERSION pins the LTS 7 series
+#     (the project targets Bazel 7+ with Bzlmod).
+#   * The repository .bazelrc carries Windows-only MinGW options
+#     (-static* linkopts, windows_unix_root). On Linux every Bazel
+#     invocation passes --bazelrc=/dev/null and restates the needed
+#     compiler flags explicitly.
+#   * //orderly_chaos:copy_dll emits lib_orderly_chaos.dll on every
+#     platform, while orderly_chaos/library.py globs *.so on POSIX,
+#     so the Python job renames the artifact before testing.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  USE_BAZEL_VERSION: 7.4.1
+
+jobs:
+  cpp:
+    name: C++ tests & benchmark (ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Bazelisk
+        run: npm install -g @bazel/bazelisk
+
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bazel
+          key: bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel', '**/*.bzl', '**/BUILD.bazel') }}
+          restore-keys: bazel-${{ runner.os }}-
+
+      - name: Run unit tests (GoogleTest)
+        run: >
+          bazel --bazelrc=/dev/null test //test:all
+          --cxxopt=-std=c++17 --copt=-O2
+          --test_output=errors
+
+      - name: Run performance benchmark
+        run: >
+          bazel --bazelrc=/dev/null test //benchmark:benchmark_lob_test
+          --cxxopt=-std=c++17 --copt=-O2
+          --test_output=streamed
+
+  python:
+    name: Python bindings (ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Bazelisk
+        run: npm install -g @bazel/bazelisk
+
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bazel
+          key: bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel', '**/*.bzl', '**/BUILD.bazel') }}
+          restore-keys: bazel-${{ runner.os }}-
+
+      - name: Build ctypes shared library
+        run: >
+          bazel --bazelrc=/dev/null build //orderly_chaos:copy_dll
+          --cxxopt=-std=c++17 --copt=-O2
+
+      - name: Place library next to the Python package
+        run: |
+          cp bazel-bin/orderly_chaos/lib_orderly_chaos.* orderly_chaos/
+          cd orderly_chaos
+          for f in lib_orderly_chaos*.dll; do
+            [ -e "$f" ] && mv "$f" "${f%.dll}.so"
+          done
+
+      - name: Install package in editable mode
+        run: pip install -e .
+
+      - name: Run Python unit tests
+        run: python -m unittest discover -v .
