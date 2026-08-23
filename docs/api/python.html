@@ -79,6 +79,10 @@
                                     <tr><td>quantity</td><td>int</td><td>Number of shares to sell</td></tr>
                                     <tr><td>price</td><td>int</td><td>Limit price for the order</td></tr>
                                 </table>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)
+<span class="keyword">assert</span> book.best_sell() == <span class="number">10250</span></code></pre>
                             </div>
                         </div>
 
@@ -92,6 +96,10 @@
                                     <tr><td>quantity</td><td>int</td><td>Number of shares to buy</td></tr>
                                     <tr><td>price</td><td>int</td><td>Limit price for the order</td></tr>
                                 </table>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)
+<span class="keyword">assert</span> book.best_buy() == <span class="number">10240</span></code></pre>
                             </div>
                         </div>
 
@@ -99,6 +107,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">limit(side: bool, order_id: int, quantity: int, price: int) → None</div>
                                 <div class="method-description">Place a limit order on the specified side. <code>True</code> for buy, <code>False</code> for sell.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit(<span class="keyword">True</span>, order_id=<span class="number">3</span>, quantity=<span class="number">75</span>, price=<span class="number">10240</span>)   <span class="comment"># buy</span>
+book.limit(<span class="keyword">False</span>, order_id=<span class="number">4</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)  <span class="comment"># sell</span>
+<span class="keyword">assert</span> book.count() == <span class="number">2</span></code></pre>
                             </div>
                         </div>
 
@@ -108,6 +121,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">market_sell(order_id: int, quantity: int) → None</div>
                                 <div class="method-description">Execute a market sell order, matching against buy-side liquidity.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_buy(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>)
+book.market_sell(order_id=<span class="number">2</span>, quantity=<span class="number">40</span>)  <span class="comment"># sells 40 into bid</span>
+<span class="keyword">assert</span> book.volume_buy() == <span class="number">60</span></code></pre>
                             </div>
                         </div>
 
@@ -115,6 +133,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">market_buy(order_id: int, quantity: int) → None</div>
                                 <div class="method-description">Execute a market buy order, matching against sell-side liquidity.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+book.market_buy(order_id=<span class="number">2</span>, quantity=<span class="number">40</span>)  <span class="comment"># buys 40 from ask</span>
+<span class="keyword">assert</span> book.volume_sell() == <span class="number">60</span></code></pre>
                             </div>
                         </div>
 
@@ -122,6 +145,13 @@
                             <div class="method-inner">
                                 <div class="method-signature">market(side: bool, order_id: int, quantity: int) → None</div>
                                 <div class="method-description">Execute a market order on the specified side. <code>True</code> for buy, <code>False</code> for sell.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+book.limit_buy(<span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>)
+book.market(<span class="keyword">True</span>, <span class="number">3</span>, <span class="number">25</span>)   <span class="comment"># market buy 25</span>
+book.market(<span class="keyword">False</span>, <span class="number">4</span>, <span class="number">25</span>)  <span class="comment"># market sell 25</span>
+<span class="keyword">assert</span> book.volume() == <span class="number">150</span></code></pre>
                             </div>
                         </div>
 
@@ -131,6 +161,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">has(order_id: int) → bool</div>
                                 <div class="method-description">Return <code>True</code> if an order with the given ID exists in the book.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+<span class="keyword">assert</span> book.has(<span class="number">1</span>) <span class="keyword">is True</span>
+<span class="keyword">assert</span> book.has(<span class="number">99</span>) <span class="keyword">is False</span></code></pre>
                             </div>
                         </div>
 
@@ -138,6 +173,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">best_sell() → int</div>
                                 <div class="method-description">Return the best (lowest) sell/ask price. Returns 0 if no sell orders exist.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+book.limit_sell(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>)
+<span class="keyword">assert</span> book.best_sell() == <span class="number">10250</span></code></pre>
                             </div>
                         </div>
 
@@ -145,6 +185,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">best_buy() → int</div>
                                 <div class="method-description">Return the best (highest) buy/bid price. Returns 0 if no buy orders exist.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_buy(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>)
+book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10230</span>)
+<span class="keyword">assert</span> book.best_buy() == <span class="number">10240</span></code></pre>
                             </div>
                         </div>
 
@@ -152,6 +197,12 @@
                             <div class="method-inner">
                                 <div class="method-signature">best(side: bool) → int</div>
                                 <div class="method-description">Return the best price for the given side. <code>True</code> for buy, <code>False</code> for sell.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+book.limit_buy(<span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>)
+<span class="keyword">assert</span> book.best(<span class="keyword">False</span>) == <span class="number">10250</span>  <span class="comment"># best ask</span>
+<span class="keyword">assert</span> book.best(<span class="keyword">True</span>) == <span class="number">10240</span>   <span class="comment"># best bid</span></code></pre>
                             </div>
                         </div>
 
@@ -159,6 +210,13 @@
                             <div class="method-inner">
                                 <div class="method-signature">volume(price: int | None = None) → int</div>
                                 <div class="method-description">Return the volume at a specific price, or total volume if no price is given.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+book.limit_buy(<span class="number">2</span>, <span class="number">75</span>, <span class="number">10240</span>)
+<span class="keyword">assert</span> book.volume(<span class="number">10250</span>) == <span class="number">100</span>
+<span class="keyword">assert</span> book.volume() == <span class="number">175</span>  <span class="comment"># total across both sides</span>
+print(book.price())  <span class="comment"># midpoint: (10250+10240)//2 = 10245</span></code></pre>
                             </div>
                         </div>
 
@@ -166,6 +224,12 @@
                             <div class="method-inner">
                                 <div class="method-signature">volume_sell(price: int | None = None) → int</div>
                                 <div class="method-description">Return the sell-side volume at a specific price, or total sell-side volume.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+book.limit_sell(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>)
+<span class="keyword">assert</span> book.volume_sell(<span class="number">10250</span>) == <span class="number">100</span>
+<span class="keyword">assert</span> book.volume_sell() == <span class="number">150</span></code></pre>
                             </div>
                         </div>
 
@@ -173,6 +237,12 @@
                             <div class="method-inner">
                                 <div class="method-signature">volume_buy(price: int | None = None) → int</div>
                                 <div class="method-description">Return the buy-side volume at a specific price, or total buy-side volume.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_buy(<span class="number">1</span>, <span class="number">80</span>, <span class="number">10240</span>)
+book.limit_buy(<span class="number">2</span>, <span class="number">60</span>, <span class="number">10230</span>)
+<span class="keyword">assert</span> book.volume_buy(<span class="number">10240</span>) == <span class="number">80</span>
+<span class="keyword">assert</span> book.volume_buy() == <span class="number">140</span></code></pre>
                             </div>
                         </div>
 
@@ -180,6 +250,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">count() → int</div>
                                 <div class="method-description">Return the total number of orders in the book.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)
+book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)
+<span class="keyword">assert</span> book.count() == <span class="number">2</span></code></pre>
                             </div>
                         </div>
 
@@ -187,6 +262,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">count_sell() → int</div>
                                 <div class="method-description">Return the number of orders on the sell side.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+book.limit_sell(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>)
+<span class="keyword">assert</span> book.count_sell() == <span class="number">2</span></code></pre>
                             </div>
                         </div>
 
@@ -194,6 +274,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">count_buy() → int</div>
                                 <div class="method-description">Return the number of orders on the buy side.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_buy(<span class="number">1</span>, <span class="number">50</span>, <span class="number">10240</span>)
+<span class="keyword">assert</span> book.count_buy() == <span class="number">1</span></code></pre>
                             </div>
                         </div>
 
@@ -201,6 +285,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">count_at(price: int) → int</div>
                                 <div class="method-description">Return the number of orders at a specific price level.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+book.limit_sell(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10250</span>)
+<span class="keyword">assert</span> book.count_at(<span class="number">10250</span>) == <span class="number">2</span></code></pre>
                             </div>
                         </div>
 
@@ -210,6 +299,12 @@
                             <div class="method-inner">
                                 <div class="method-signature">cancel(order_id: int) → None</div>
                                 <div class="method-description">Cancel an existing order by its ID.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+book.cancel(<span class="number">1</span>)
+<span class="keyword">assert</span> book.count() == <span class="number">0</span>
+<span class="keyword">assert</span> book.has(<span class="number">1</span>) <span class="keyword">is False</span></code></pre>
                             </div>
                         </div>
 
@@ -217,6 +312,13 @@
                             <div class="method-inner">
                                 <div class="method-signature">clear() → None</div>
                                 <div class="method-description">Remove all orders from the book, resetting it to an empty state.</div>
+                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+book = LimitOrderBook()
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
+book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>)
+book.clear()
+<span class="keyword">assert</span> book.count() == <span class="number">0</span>
+<span class="keyword">assert</span> book.volume() == <span class="number">0</span></code></pre>
                             </div>
                         </div>
 

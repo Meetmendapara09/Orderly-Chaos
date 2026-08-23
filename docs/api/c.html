@@ -68,6 +68,9 @@
                             <div class="method-inner">
                                 <div class="method-signature">LOB::LimitOrderBook* new_()</div>
                                 <div class="method-description">Create and return a pointer to a new, empty limit order book.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_(); <span class="comment">// create</span>
+<span class="keyword">assert</span>(count(book) == <span class="number">0</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -75,6 +78,9 @@
                             <div class="method-inner">
                                 <div class="method-signature">void delete_(LOB::LimitOrderBook* book)</div>
                                 <div class="method-description">Delete the limit order book, freeing all associated memory.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+delete_(book); <span class="comment">// frees all orders</span></code></pre>
                                 <table class="param-table">
                                     <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
                                     <tr><td>book</td><td>LimitOrderBook*</td><td>Pointer to the book to delete</td></tr>
@@ -86,6 +92,12 @@
                             <div class="method-inner">
                                 <div class="method-signature">void clear(LOB::LimitOrderBook* book)</div>
                                 <div class="method-description">Clear all orders from the book.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
+clear(book);
+<span class="keyword">assert</span>(count(book) == <span class="number">0</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -95,6 +107,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">void limit_sell(LOB::LimitOrderBook* book, UID uid, Quantity quantity, Price price)</div>
                                 <div class="method-description">Place a sell limit order at the given price.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+<span class="keyword">assert</span>(best_sell(book) == <span class="number">10250</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -102,6 +118,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">void limit_buy(LOB::LimitOrderBook* book, UID uid, Quantity quantity, Price price)</div>
                                 <div class="method-description">Place a buy limit order at the given price.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
+<span class="keyword">assert</span>(best_buy(book) == <span class="number">10240</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -109,6 +129,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">void limit(LOB::LimitOrderBook* book, Side side, UID uid, Quantity quantity, Price price)</div>
                                 <div class="method-description">Place a limit order on the specified side.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit(book, <span class="keyword">true</span>, <span class="number">3</span>, <span class="number">75</span>, <span class="number">10240</span>); <span class="comment">// buy</span>
+limit(book, <span class="keyword">false</span>, <span class="number">4</span>, <span class="number">100</span>, <span class="number">10250</span>); <span class="comment">// sell</span>
+<span class="keyword">assert</span>(count(book) == <span class="number">2</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -118,6 +143,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">void market_sell(LOB::LimitOrderBook* book, UID uid, Quantity quantity)</div>
                                 <div class="method-description">Execute a market sell against buy-side liquidity.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_buy(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>);
+market_sell(book, <span class="number">2</span>, <span class="number">40</span>);
+<span class="keyword">assert</span>(volume_buy(book) == <span class="number">60</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -125,6 +155,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">void market_buy(LOB::LimitOrderBook* book, UID uid, Quantity quantity)</div>
                                 <div class="method-description">Execute a market buy against sell-side liquidity.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+market_buy(book, <span class="number">2</span>, <span class="number">40</span>);
+<span class="keyword">assert</span>(volume_sell(book) == <span class="number">60</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -132,6 +167,12 @@
                             <div class="method-inner">
                                 <div class="method-signature">void market(LOB::LimitOrderBook* book, Side side, UID uid, Quantity quantity)</div>
                                 <div class="method-description">Execute a market order on the specified side.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+limit_buy(book, <span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>);
+market(book, <span class="keyword">true</span>, <span class="number">3</span>, <span class="number">25</span>);
+<span class="keyword">assert</span>(volume(book) == <span class="number">150</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -141,6 +182,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">bool has(LOB::LimitOrderBook* book, UID uid)</div>
                                 <div class="method-description">Return true if the book contains an order with the given ID.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+<span class="keyword">assert</span>(has(book, <span class="number">1</span>) == <span class="keyword">true</span>);
+<span class="keyword">assert</span>(has(book, <span class="number">99</span>) == <span class="keyword">false</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -148,6 +194,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">const LOB::Order* get(LOB::LimitOrderBook* book, UID uid)</div>
                                 <div class="method-description">Get a pointer to the order with the given ID.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+<span class="keyword">const</span> LOB::Order* o = get(book, <span class="number">1</span>);
+<span class="keyword">assert</span>(o-&gt;price == <span class="number">10250</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -155,6 +206,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">void cancel(LOB::LimitOrderBook* book, UID uid)</div>
                                 <div class="method-description">Cancel an existing order by its ID.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+cancel(book, <span class="number">1</span>);
+<span class="keyword">assert</span>(count(book) == <span class="number">0</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -164,6 +220,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">Price best_sell(LOB::LimitOrderBook* book)</div>
                                 <div class="method-description">Return the best (lowest) sell/ask price. O(1).</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+limit_sell(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>);
+<span class="keyword">assert</span>(best_sell(book) == <span class="number">10250</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -171,6 +232,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">Price best_buy(LOB::LimitOrderBook* book)</div>
                                 <div class="method-description">Return the best (highest) buy/bid price. O(1).</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_buy(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>);
+limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10230</span>);
+<span class="keyword">assert</span>(best_buy(book) == <span class="number">10240</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -178,6 +244,12 @@
                             <div class="method-inner">
                                 <div class="method-signature">Price best(LOB::LimitOrderBook* book, Side side)</div>
                                 <div class="method-description">Return the best price for the given side.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+limit_buy(book, <span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>);
+<span class="keyword">assert</span>(best(book, <span class="keyword">false</span>) == <span class="number">10250</span>);
+<span class="keyword">assert</span>(best(book, <span class="keyword">true</span>) == <span class="number">10240</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -185,6 +257,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">Volume volume_sell_price(LOB::LimitOrderBook* book, Price price)</div>
                                 <div class="method-description">Return the volume at a specific sell-side price.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+<span class="keyword">assert</span>(volume_sell_price(book, <span class="number">10250</span>) == <span class="number">100</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -192,6 +268,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">Volume volume_sell(LOB::LimitOrderBook* book)</div>
                                 <div class="method-description">Return the total sell-side volume.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+limit_sell(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>);
+<span class="keyword">assert</span>(volume_sell(book) == <span class="number">150</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -199,6 +280,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">Volume volume_buy_price(LOB::LimitOrderBook* book, Price price)</div>
                                 <div class="method-description">Return the volume at a specific buy-side price.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_buy(book, <span class="number">1</span>, <span class="number">80</span>, <span class="number">10240</span>);
+<span class="keyword">assert</span>(volume_buy_price(book, <span class="number">10240</span>) == <span class="number">80</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -206,6 +291,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">Volume volume_buy(LOB::LimitOrderBook* book)</div>
                                 <div class="method-description">Return the total buy-side volume.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_buy(book, <span class="number">1</span>, <span class="number">80</span>, <span class="number">10240</span>);
+limit_buy(book, <span class="number">2</span>, <span class="number">60</span>, <span class="number">10230</span>);
+<span class="keyword">assert</span>(volume_buy(book) == <span class="number">140</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -213,6 +303,12 @@
                             <div class="method-inner">
                                 <div class="method-signature">Volume volume_price(LOB::LimitOrderBook* book, Price price)</div>
                                 <div class="method-description">Return the volume at a specific price across both sides.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+limit_buy(book, <span class="number">2</span>, <span class="number">75</span>, <span class="number">10240</span>);
+<span class="keyword">assert</span>(volume_price(book, <span class="number">10250</span>) == <span class="number">100</span>);
+<span class="keyword">assert</span>(volume(book) == <span class="number">175</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -220,6 +316,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">Volume volume(LOB::LimitOrderBook* book)</div>
                                 <div class="method-description">Return the total volume across both sides.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+limit_buy(book, <span class="number">2</span>, <span class="number">75</span>, <span class="number">10240</span>);
+<span class="keyword">assert</span>(volume(book) == <span class="number">175</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -227,6 +328,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">Count count_at(LOB::LimitOrderBook* book, Price price)</div>
                                 <div class="method-description">Return the number of orders at a specific price.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+limit_sell(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10250</span>);
+<span class="keyword">assert</span>(count_at(book, <span class="number">10250</span>) == <span class="number">2</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -234,6 +340,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">Count count_sell(LOB::LimitOrderBook* book)</div>
                                 <div class="method-description">Return the order count on the sell side.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+limit_sell(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>);
+<span class="keyword">assert</span>(count_sell(book) == <span class="number">2</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -241,6 +352,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">Count count_buy(LOB::LimitOrderBook* book)</div>
                                 <div class="method-description">Return the order count on the buy side.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_buy(book, <span class="number">1</span>, <span class="number">50</span>, <span class="number">10240</span>);
+<span class="keyword">assert</span>(count_buy(book) == <span class="number">1</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
 
@@ -248,6 +363,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">Count count(LOB::LimitOrderBook* book)</div>
                                 <div class="method-description">Return the total number of orders in the book.</div>
+                                <pre><code><span class="keyword">auto</span>* book = new_();
+limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
+<span class="keyword">assert</span>(count(book) == <span class="number">2</span>);
+delete_(book);</code></pre>
                             </div>
                         </div>
                     </div>

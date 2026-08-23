@@ -78,6 +78,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">void limit_sell(UID order_id, Quantity quantity, Price price)</div>
                                 <div class="method-description">Add a new sell limit order. Matches against buy orders if price crosses the spread.</div>
+                                <pre><code><span class="keyword">#include</span> <span class="string">"limit_order_book.hpp"</span>
+LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+<span class="keyword">assert</span>(book.best_sell() == <span class="number">10250</span>);</code></pre>
                                 <table class="param-table">
                                     <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
                                     <tr><td>order_id</td><td>UID</td><td>Unique order identifier</td></tr>
@@ -91,6 +95,9 @@
                             <div class="method-inner">
                                 <div class="method-signature">void limit_buy(UID order_id, Quantity quantity, Price price)</div>
                                 <div class="method-description">Add a new buy limit order. Matches against sell orders if price crosses the spread.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
+<span class="keyword">assert</span>(book.best_buy() == <span class="number">10240</span>);</code></pre>
                             </div>
                         </div>
 
@@ -98,6 +105,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">void limit(Side side, UID order_id, Quantity quantity, Price price)</div>
                                 <div class="method-description">Add a limit order to the specified side.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit(LOB::Side::Buy, <span class="number">3</span>, <span class="number">75</span>, <span class="number">10240</span>); <span class="comment">// buy</span>
+book.limit(LOB::Side::Sell, <span class="number">4</span>, <span class="number">100</span>, <span class="number">10250</span>); <span class="comment">// sell</span>
+<span class="keyword">assert</span>(book.count() == <span class="number">2</span>);</code></pre>
                             </div>
                         </div>
 
@@ -107,6 +118,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">void market_sell(UID order_id, Quantity quantity)</div>
                                 <div class="method-description">Execute a market sell order against buy-side liquidity.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_buy(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>);
+book.market_sell(<span class="number">2</span>, <span class="number">40</span>); <span class="comment">// sells 40 into bid</span>
+<span class="keyword">assert</span>(book.volume_buy() == <span class="number">60</span>);</code></pre>
                             </div>
                         </div>
 
@@ -114,6 +129,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">void market_buy(UID order_id, Quantity quantity)</div>
                                 <div class="method-description">Execute a market buy order against sell-side liquidity.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+book.market_buy(<span class="number">2</span>, <span class="number">40</span>); <span class="comment">// buys 40 from ask</span>
+<span class="keyword">assert</span>(book.volume_sell() == <span class="number">60</span>);</code></pre>
                             </div>
                         </div>
 
@@ -121,6 +140,12 @@
                             <div class="method-inner">
                                 <div class="method-signature">void market(Side side, UID order_id, Quantity quantity)</div>
                                 <div class="method-description">Execute a market order on the specified side.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+book.limit_buy(<span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>);
+book.market(LOB::Side::Buy, <span class="number">3</span>, <span class="number">25</span>);
+book.market(LOB::Side::Sell, <span class="number">4</span>, <span class="number">25</span>);
+<span class="keyword">assert</span>(book.volume() == <span class="number">150</span>);</code></pre>
                             </div>
                         </div>
 
@@ -130,6 +155,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">bool has(UID order_id) const</div>
                                 <div class="method-description">Check if an order with the given ID exists. O(1) average time.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+<span class="keyword">assert</span>(book.has(<span class="number">1</span>) == <span class="keyword">true</span>);
+<span class="keyword">assert</span>(book.has(<span class="number">99</span>) == <span class="keyword">false</span>);</code></pre>
                             </div>
                         </div>
 
@@ -137,6 +166,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">const Order& get(UID order_id)</div>
                                 <div class="method-description">Get a reference to the order with the given ID.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+<span class="keyword">const</span> LOB::Order& o = book.get(<span class="number">1</span>);
+<span class="keyword">assert</span>(o.price == <span class="number">10250</span>);</code></pre>
                             </div>
                         </div>
 
@@ -144,6 +177,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">Price best_sell() const</div>
                                 <div class="method-description">Return the best (lowest) sell/ask price. Returns 0 if empty. O(1).</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+book.limit_sell(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>);
+<span class="keyword">assert</span>(book.best_sell() == <span class="number">10250</span>);</code></pre>
                             </div>
                         </div>
 
@@ -151,6 +188,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">Price best_buy() const</div>
                                 <div class="method-description">Return the best (highest) buy/bid price. Returns 0 if empty. O(1).</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_buy(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>);
+book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10230</span>);
+<span class="keyword">assert</span>(book.best_buy() == <span class="number">10240</span>);</code></pre>
                             </div>
                         </div>
 
@@ -158,6 +199,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">Price best(Side side) const</div>
                                 <div class="method-description">Return the best price for the given side.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+book.limit_buy(<span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>);
+<span class="keyword">assert</span>(book.best(LOB::Side::Sell) == <span class="number">10250</span>);
+<span class="keyword">assert</span>(book.best(LOB::Side::Buy) == <span class="number">10240</span>);</code></pre>
                             </div>
                         </div>
 
@@ -165,6 +211,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">Price price() const</div>
                                 <div class="method-description">Return the current midpoint price. O(1).</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+book.limit_buy(<span class="number">2</span>, <span class="number">75</span>, <span class="number">10240</span>);
+<span class="keyword">assert</span>(book.price() == <span class="number">10245</span>); <span class="comment">// (10250+10240)/2</span></code></pre>
                             </div>
                         </div>
 
@@ -172,6 +222,9 @@
                             <div class="method-inner">
                                 <div class="method-signature">Price last_best_sell() const</div>
                                 <div class="method-description">Return the last best sell price before the most recent change.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+<span class="keyword">auto</span> prev = book.last_best_sell();</code></pre>
                             </div>
                         </div>
 
@@ -179,15 +232,61 @@
                             <div class="method-inner">
                                 <div class="method-signature">Price last_best_buy() const</div>
                                 <div class="method-description">Return the last best buy price before the most recent change.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_buy(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>);
+<span class="keyword">auto</span> prev = book.last_best_buy();</code></pre>
                             </div>
                         </div>
 
+
+                        <h3 id="volume-count">Volume & Count</h3>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">Volume volume() const</div>
+                                <div class="method-description">Total volume across both sides.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+book.limit_buy(<span class="number">2</span>, <span class="number">75</span>, <span class="number">10240</span>);
+<span class="keyword">assert</span>(book.volume() == <span class="number">175</span>);
+<span class="keyword">assert</span>(book.volume(<span class="number">10250</span>) == <span class="number">100</span>);</code></pre>
+                            </div>
+                        </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">Volume volume_sell() const / volume_sell(Price price) const</div>
+                                <div class="method-description">Sell-side volume, total or at price.</div>
+                                <pre><code><span class="keyword">assert</span>(book.volume_sell() == <span class="number">100</span>);
+<span class="keyword">assert</span>(book.volume_sell(<span class="number">10250</span>) == <span class="number">100</span>);</code></pre>
+                            </div>
+                        </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">Volume volume_buy() const / volume_buy(Price price) const</div>
+                                <div class="method-description">Buy-side volume, total or at price.</div>
+                                <pre><code><span class="keyword">assert</span>(book.volume_buy() == <span class="number">75</span>);
+<span class="keyword">assert</span>(book.volume_buy(<span class="number">10240</span>) == <span class="number">75</span>);</code></pre>
+                            </div>
+                        </div>
+                        <div class="api-method">
+                            <div class="method-inner">
+                                <div class="method-signature">Count count() const</div>
+                                <div class="method-description">Total number of orders.</div>
+                                <pre><code><span class="keyword">assert</span>(book.count() == <span class="number">2</span>);
+<span class="keyword">assert</span>(book.count_sell() == <span class="number">1</span>);
+<span class="keyword">assert</span>(book.count_buy() == <span class="number">1</span>);
+<span class="keyword">assert</span>(book.count_at(<span class="number">10250</span>) == <span class="number">1</span>);</code></pre>
+                            </div>
+                        </div>
                         <h3 id="management">Management Methods</h3>
 
                         <div class="api-method">
                             <div class="method-inner">
                                 <div class="method-signature">void cancel(UID order_id)</div>
                                 <div class="method-description">Cancel an existing order. O(log n) due to tree removal.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+book.cancel(<span class="number">1</span>);
+<span class="keyword">assert</span>(book.count() == <span class="number">0</span>);</code></pre>
                             </div>
                         </div>
 
@@ -195,6 +294,10 @@
                             <div class="method-inner">
                                 <div class="method-signature">void reduce(UID order_id, Quantity quantity)</div>
                                 <div class="method-description">Reduce the quantity of an existing order by the specified amount.</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+book.reduce(<span class="number">1</span>, <span class="number">40</span>);
+<span class="keyword">assert</span>(book.volume_sell() == <span class="number">60</span>);</code></pre>
                             </div>
                         </div>
 
@@ -202,6 +305,11 @@
                             <div class="method-inner">
                                 <div class="method-signature">void clear()</div>
                                 <div class="method-description">Remove all orders from both sides of the book. O(n).</div>
+                                <pre><code>LOB::LimitOrderBook book;
+book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
+book.clear();
+<span class="keyword">assert</span>(book.count() == <span class="number">0</span>);</code></pre>
                             </div>
                         </div>
 

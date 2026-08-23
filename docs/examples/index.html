@@ -159,4 +159,73 @@ book.market_sell(<span class="number">4</span>, <span class="number">30</span>)
 <span class="comment"># Matches 30 @ 10260</span>
 
 print(f<span class="string">"After market sell: {book.count()} orders"</span>)
-print(f<span class="string">"  Remaining buy vol: {book.volume_buy(10260)}"</span>)
+print(f<span class="string">"  Remaining buy vol: {book.volume_buy(10260)}"</span>)</code></pre>
+
+                        <h2 id="cpp-example">5. C++ Usage Example</h2>
+                        <p>Same workflow in native C++ &mdash; zero overhead, direct header inclusion.</p>
+                        <pre><code><span class="keyword">#include</span> <span class="string">"limit_order_book.hpp"</span>
+<span class="keyword">#include</span> <span class="string">&lt;cassert&gt;</span>
+
+<span class="keyword">int</span> main() {
+    LOB::LimitOrderBook book;
+
+    <span class="comment">// Place limit orders &mdash; 10240 bid / 10250 ask</span>
+    book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+    book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
+    <span class="keyword">assert</span>(book.best_sell() == <span class="number">10250</span>);
+    <span class="keyword">assert</span>(book.best_buy() == <span class="number">10240</span>);
+    <span class="keyword">assert</span>(book.price() == <span class="number">10245</span>); <span class="comment">// midpoint</span>
+
+    <span class="comment">// Market order &mdash; buy 40 from ask</span>
+    book.market_buy(<span class="number">3</span>, <span class="number">40</span>);
+    <span class="keyword">assert</span>(book.volume_sell() == <span class="number">60</span>);
+
+    <span class="comment">// Cancel and clear</span>
+    book.cancel(<span class="number">2</span>);
+    <span class="keyword">assert</span>(book.count_buy() == <span class="number">0</span>);
+    book.clear();
+    <span class="keyword">assert</span>(book.count() == <span class="number">0</span>);
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</code></pre>
+
+                        <h2 id="c-example">6. C API (FFI) Example</h2>
+                        <p>C-compatible extern "C" layer for FFI &mdash; same engine, C calling convention.</p>
+                        <pre><code><span class="keyword">#include</span> <span class="string">"lib_lob.hpp"</span>
+<span class="keyword">#include</span> <span class="string">&lt;cassert&gt;</span>
+
+<span class="keyword">int</span> main() {
+    <span class="keyword">auto</span>* book = new_();
+    limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
+    limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
+    <span class="keyword">assert</span>(best_sell(book) == <span class="number">10250</span>);
+    <span class="keyword">assert</span>(volume(book) == <span class="number">150</span>);
+    market_buy(book, <span class="number">3</span>, <span class="number">40</span>);
+    <span class="keyword">assert</span>(volume_sell(book) == <span class="number">60</span>);
+    cancel(book, <span class="number">2</span>);
+    clear(book);
+    <span class="keyword">assert</span>(count(book) == <span class="number">0</span>);
+    delete_(book);
+    <span class="keyword">return</span> <span class="number">0</span>;
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container mx-auto px-6">
+            <div class="footer-content">
+                <div>
+                    <div class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></div>
+                    <p>&copy; 2026 Orderly Chaos. MIT License.</p>
+                    <div class="footer-links mt-4">
+                        <a href="../index.html">Home</a>
+                        <a href="../getting-started.html">Getting Started</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
