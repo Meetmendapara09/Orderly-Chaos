@@ -33,8 +33,10 @@
                     <span class="page-badge">Architecture</span>
                     <h1 class="page-title">System Architecture</h1>
                     <p class="page-description">
-                        Orderly Chaos is built on efficient data structures with a layered architecture
-                        for maximum performance and maintainability.
+                        No trading background needed. This page explains how a price-time priority order book
+                        works, how Orderly Chaos implements it in three simple layers
+                        (C++ core → C API → Python), and why the hot path stays fast with <strong>O(1)</strong>
+                        best-price reads and incremental volume tracking.
                     </p>
                 </div>
 
@@ -42,111 +44,201 @@
                     <nav class="toc">
                         <div class="toc-nav">
                             <ul>
+                                <li><a href="#mental-model">Mental Model</a></li>
                                 <li><a href="#layered">Layered Architecture</a></li>
                                 <li><a href="#data-structures">Data Structures</a></li>
                                 <li><a href="#matching">Matching Algorithm</a></li>
                                 <li><a href="#build">Build System</a></li>
+                                <li><a href="#dependencies">Dependencies</a></li>
                             </ul>
                         </div>
                     </nav>
 
                     <div class="doc-content">
+                        <!-- Mental Model -->
+                        <h2 id="mental-model">Mental Model — What Is an Order Book?</h2>
+                        <p>
+                            An order book is two sorted lists — <strong>bids</strong> (people who want to buy) and
+                            <strong>asks</strong> (people who want to sell) — each grouped by price, with orders inside
+                            each price level queued in the order they arrived. When a new order's price
+                            <em>crosses</em> the best price on the opposite side, a trade happens immediately
+                            (price priority first, then time priority). Otherwise the order rests in the book until
+                            someone matches it or it is cancelled.
+                        </p>
+                        <p>
+                            Example: best ask is $102.50, best bid is $102.40. A new buy at $102.50 crosses the spread
+                            and matches the ask — the earliest order at $102.50 is filled first (time priority).
+                        </p>
+
+                        <!-- Layered Architecture -->
                         <h2 id="layered">Layered Architecture</h2>
+                        <p>
+                            Three layers, each with a single job. You pick the layer that matches your needs —
+                            they all run the same engine underneath:
+                        </p>
                         <pre><code>┌──────────────────────────────────────────┐
 │  Python Layer                            │
 │  orderly_chaos.LimitOrderBook            │
+│  Pythonic methods, pip-installable       │
 └────────┬─────────────────────────────────┘
-         │ ctypes FFI
+         │ ctypes FFI  (no C extension build needed)
 ┌────────┴─────────────────────────────────┐
-│  C API Layer (lib_lob.hpp)               │
-│  extern "C" functions                    │
+│  C API Layer  (include/lib_lob.hpp)      │
+│  extern "C" functions — callable from    │
+│  Python, Rust, Go, or any C FFI          │
 └────────┬─────────────────────────────────┘
-         │ C++ binding
+         │ direct C++ call — zero overhead
 ┌────────┴─────────────────────────────────┐
-│  C++ Core Layer                          │
-│  LOB::LimitOrderBook                     │
-│  (limit_order_book.hpp)                  │
+│  C++ Core Layer  (include/*.hpp)         │
+│  LOB::LimitOrderBook — the whole book,   │
+│  header-only, -O2 -march=native          │
 └──────────────────────────────────────────┘</code></pre>
 
-                        <h3>Layer 1: C++ Core</h3>
-                        <p>The core engine in <code>include/limit_order_book.hpp</code> implements the full
-                        order book logic with price-time priority matching. This is where all the
-                        performance-critical code lives.</p>
+                        <h3>Layer 1: C++ Core — where speed lives</h3>
+                        <p>
+                            <code>include/limit_order_book.hpp</code> holds the complete matching logic. It owns two
+                            <code>LimitTree</code> instances (one for buys, one for sells) and a hash map from order ID to order.
+                            All hot-path methods are <code>inline</code> so the compiler can eliminate call overhead.
+                            This layer is header-only — C++ users just add <code>include/</code> to their include path.
+                        </p>
+                        <p>Read the source: <code>limit_order_book.hpp:43</code> (book), <code>limit_tree.hpp:157</code> (one side), <code>structures.hpp:57</code> (price levels and orders).</p>
 
-                        <h3>Layer 2: C API</h3>
-                        <p>The <code>include/lib_lob.hpp</code> file provides an <code>extern "C"</code>
-                        interface that wraps the C++ class, enabling FFI from Python and other languages.</p>
+                        <h3>Layer 2: C API — the stable bridge</h3>
+                        <p>
+                            <code>include/lib_lob.hpp</code> exposes the same operations as <code>extern "C"</code> functions
+                            (<code>new_()</code>, <code>limit_sell()</code>, <code>best_sell()</code>, <code>delete_()</code>, …).
+                            Because the ABI is plain C, any language that can call C can use the engine without
+                            rewriting it. The functions are thin wrappers — they forward directly to the C++ methods
+                            with no extra allocation or copying.
+                        </p>
 
-                        <h3>Layer 3: Python ctypes</h3>
-                        <p><code>orderly_chaos/library.py</code> loads the shared library and configures
-                        ctypes function signatures. <code>orderly_chaos/orderly_chaos.py</code> provides
-                        the high-level Python interface.</p>
+                        <h3>Layer 3: Python ctypes — no compiled extension</h3>
+                        <p>
+                            <code>orderly_chaos/library.py</code> loads <code>lib_orderly_chaos.dll</code> (or <code>.so</code> on Linux/macOS)
+                            with <code>ctypes</code> and declares each C function's argument and return types.
+                            <code>orderly_chaos/orderly_chaos.py</code> then wraps those raw calls in a Pythonic
+                            <code>LimitOrderBook</code> class. No Cython, no pybind11, no compiler needed on the
+                            Python side after the DLL is built.
+                        </p>
 
-                        <h2 id="data-structures">Data Structures</h2>
+                        <!-- Data Structures -->
+                        <h2 id="data-structures">Data Structures — Why It Is Fast</h2>
+                        <p>
+                            Every operation's cost comes from the data structure it touches. The book is designed so
+                            the most common queries — <em>best price, total volume, order count</em> — never touch the
+                            tree at all.
+                        </p>
 
-                        <h3>LimitTree (Red-Black Tree)</h3>
-                        <p>Each side of the book (buy/sell) is stored in a red-black tree from the
-                        <code>vendor/binary-search-tree</code> library. The tree is augmented with:</p>
+                        <h3>LimitTree — a red-black tree with cached aggregates</h3>
+                        <p>
+                            Each side of the book (buy/sell) is a <code>LimitTree</code> (<code>limit_tree.hpp:157</code>).
+                            Underneath is a red-black tree from <code>vendor/binary-search-tree</code>, keyed by price.
+                            The tree is augmented with three cached values that are updated incrementally on every
+                            insert/remove, so reads are constant time:
+                        </p>
                         <ul>
-                            <li><strong>Best pointer</strong>: O(1) access to the best price level</li>
-                            <li><strong>Volume accumulator</strong>: O(1) total volume query</li>
-                            <li><strong>Count accumulator</strong>: O(1) order count</li>
-                            <li><strong>Last best price</strong>: Tracks previous best for price movement detection</li>
+                            <li><strong>Best pointer</strong> (<code>LimitTree::best</code>) — always points to the best price level (highest bid / lowest ask). <code>best_sell()</code> / <code>best_buy()</code> just dereference it: <strong>O(1)</strong>. No tree walk.</li>
+                            <li><strong>Volume accumulator</strong> (<code>LimitTree::volume</code>) — total shares on this side. Maintained as <code>volume += quantity</code> on insert and <code>volume -= quantity</code> on cancel/match. <code>volume()</code> returns it directly: <strong>O(1)</strong>.</li>
+                            <li><strong>Count accumulator</strong> (<code>LimitTree::count</code>) — number of orders on this side. Same incremental update: <strong>O(1)</strong>.</li>
+                            <li><strong>Last best price</strong> (<code>last_best_price</code>) — previous best before the latest mutation, used to detect price moves without re-querying.</li>
                         </ul>
+                        <p>
+                            The tree itself is only touched when a <em>new price level</em> appears or the <em>last order at a price</em>
+                            is removed — both are <code>O(log n)</code> where <em>n</em> is the number of distinct price levels
+                            (typically far smaller than the number of orders). Adding a second order at an existing price
+                            is <code>O(1)</code> — it just appends to that level's queue.
+                        </p>
 
-                        <h3>Order Store (Hash Map)</h3>
-                        <p>An <code>std::unordered_map&lt;UID, Order&gt;</code> provides O(1) lookup
-                        by order ID for cancellation and reduction operations.</p>
+                        <h3>Order Store — hash map for O(1) cancel and lookup</h3>
+                        <p>
+                            <code>std::unordered_map&lt;UID, Order&gt; orders</code> in <code>limit_order_book.hpp:50</code>
+                            maps every live order ID to its order object. Cancellation and lookup by ID never scan the
+                            tree — they hash directly to the order in <strong>O(1)</strong> average time, then follow
+                            the order's <code>limit</code> pointer to its price level.
+                        </p>
 
-                        <h3>Doubly-Linked Lists</h3>
-                        <p>At each price level, orders are stored in a doubly-linked list (from
-                        <code>vendor/doubly-linked-list</code>), maintaining time-priority order with
-                        O(1) insertion and removal.</p>
+                        <h3>Doubly-Linked List — FIFO queue at each price</h3>
+                        <p>
+                            At each price level, orders sit in a doubly-linked list (<code>vendor/doubly-linked-list</code>)
+                            in arrival order. Insertion appends to the tail, removal unlinks the node — both
+                            <strong>O(1)</strong>. The head of the best level's list is always the next order to match,
+                            which is how time priority is enforced without sorting.
+                        </p>
 
-                        <h2 id="matching">Matching Algorithm</h2>
+                        <div class="api-method" style="margin-top:20px">
+                            <div class="method-inner">
+                                <div class="method-signature" style="font-size:0.85rem">Complexity at a glance</div>
+                                <div class="method-description">
+                                    <code>best_sell / best_buy / volume / count / has</code> → <strong>O(1)</strong> (cached).<br>
+                                    <code>limit_sell / limit_buy</code> at new price → <strong>O(log n)</strong> (tree insert).<br>
+                                    <code>limit</code> at existing price → <strong>O(1)</strong> (queue append).<br>
+                                    <code>cancel / reduce</code> → <strong>O(1)</strong> hash lookup + <strong>O(log n)</strong> only if last order at that price.<br>
+                                    <code>market</code> crossing <em>k</em> levels → <strong>O(k log n)</strong> (one tree removal per exhausted level).
+                                </div>
+                            </div>
+                        </div>
 
-                        <h3>Price-Time Priority</h3>
-                        <p>Orders are matched following strict price-time priority:</p>
+                        <!-- Matching -->
+                        <h2 id="matching">Matching Algorithm — Price-Time Priority</h2>
+                        <p>Every trade follows two rules, in order:</p>
                         <ol>
-                            <li><strong>Price Priority</strong>: Best prices are matched first (highest bid / lowest ask)</li>
-                            <li><strong>Time Priority</strong>: Among orders at the same price, earliest orders are matched first</li>
+                            <li><strong>Price priority</strong> — the best price on the opposite side is matched first (highest bid for a sell, lowest ask for a buy).</li>
+                            <li><strong>Time priority</strong> — among orders at the same price, the earliest order is matched first (FIFO queue).</li>
                         </ol>
 
-                        <h3>Limit Order Flow</h3>
-                        <pre><code>1. New limit order arrives
-2. Order stored in UID → Order hash map
-3. Check if price crosses the spread
-   → Yes: Execute market-like matching at limit price
-   → Remaining: Insert into LimitTree
-4. Update tree aggregates (volume, count, best)</code></pre>
+                        <h3>Limit order flow</h3>
+                        <pre><code>1. New limit order arrives (e.g., buy 100 @ 10250)
+2. Check if price crosses the spread
+     best ask is 10240 and 10250 &gt;= 10240  →  YES, it crosses
+3. Match immediately against the best asks, level by level,
+     consuming orders in FIFO order within each level
+4. If quantity remains after matching, insert the remainder
+     into the buy LimitTree at price 10250
+5. Update cached aggregates (volume, count, best) incrementally</code></pre>
+                        <p>If the price does <em>not</em> cross, step 3 is skipped — the order simply rests in its side's tree.</p>
 
-                        <h3>Market Order Flow</h3>
-                        <pre><code>1. Market order arrives (no price limit)
-2. Match against best orders on opposing side
-3. Consume liquidity level by level
-4. Remove exhausted price levels
-5. Update all aggregates</code></pre>
+                        <h3>Market order flow</h3>
+                        <pre><code>1. Market order arrives (no price limit — e.g., buy 200)
+2. Match against best orders on the opposite side
+3. Consume liquidity level by level, FIFO within each level
+4. Remove each price level that becomes empty (O(log n) per level)
+5. Update all aggregates
+6. If the market order still has quantity left and the book is empty,
+     the remainder is discarded (no resting — market orders never sit in the book)</code></pre>
 
-                        <h2 id="build">Build System</h2>
-                        <p>The project uses <strong>Bazel</strong> (with Bzlmod) as its build system, configured via
-                        <code>MODULE.bazel</code> and per-package <code>BUILD.bazel</code> files. Tests use
-                        <strong>Google Test (gtest)</strong>, vendored under <code>vendor/googletest</code>. Build targets:</p>
-                        <pre><code>bazel test //test:all                          # Run C++ unit tests
-bazel test //benchmark:benchmark_lob_test      # Run performance benchmarks
-bazel build //src:lib_orderly_chaos.dll        # Build shared library
-bazel build //main:dummy_matching              # Build example binary</code></pre>
+                        <!-- Build System -->
+                        <h2 id="build">Build System — Bazel with Bzlmod</h2>
+                        <p>
+                            The project uses <strong>Bazel 7+</strong> with Bzlmod (the new module system). Dependencies
+                            are declared in <code>MODULE.bazel</code> and fetched automatically — no manual
+                            <code>git submodule</code> or vendoring for Google Test.
+                        </p>
+                        <pre><code>bazel test //test:all                          <span class="comment"># C++ unit tests (Google Test)</span>
+bazel test //benchmark:benchmark_lob_test      <span class="comment"># performance benchmarks</span>
+bazel build //orderly_chaos:copy_dll           <span class="comment"># shared library + copy next to Python package</span>
+bazel build //main:dummy_matching              <span class="comment"># example binary (10M orders)</span>
+bazel test //...                               <span class="comment"># everything</span></code></pre>
+                        <p>Key files:</p>
+                        <ul>
+                            <li><code>MODULE.bazel</code> — module name, <code>rules_cc</code> + <code>platforms</code>, and <code>http_archive</code> for Google Test (fetched from GitHub, built via <code>patches/googletest.BUILD</code>).</li>
+                            <li><code>BUILD.bazel</code> in each package (<code>test/</code>, <code>benchmark/</code>, <code>orderly_chaos/</code>, …) — defines <code>cc_test</code> / <code>cc_binary</code> targets.</li>
+                            <li><code>toolchain/BUILD.bazel</code> — custom MinGW-w64 toolchain for Windows (Strawberry Perl). Edit <code>STRAWBERRY_BIN</code> there if your <code>g++.exe</code> lives elsewhere.</li>
+                            <li><code>.bazelrc</code> — <code>-std=c++17 -O2</code>, static MinGW linking, and the <code>BAZEL_SH</code> host config.</li>
+                        </ul>
 
-                        <h2>Vendor Dependencies</h2>
+                        <h2 id="dependencies">Vendor Dependencies</h2>
+                        <p>Header-only libraries vendored under <code>vendor/</code> plus one fetched dependency:</p>
                         <table class="param-table">
-                            <tr><th>Library</th><th>License</th><th>Purpose</th></tr>
-                            <tr><td>binary-search-tree</td><td>MIT</td><td>Red-black tree for price levels</td></tr>
-                            <tr><td>doubly-linked-list</td><td>MIT</td><td>Order queuing at price levels</td></tr>
-                            <tr><td>robin-map</td><td>MIT</td><td>Fast hash map for order lookup</td></tr>
-                            <tr><td>sparse-map</td><td>MIT</td><td>Memory-efficient hash maps</td></tr>
-                            <tr><td>hopscotch_map</td><td>MIT</td><td>Alternative hash map</td></tr>
-                            <tr><td>cpptqdm</td><td>MIT</td><td>Progress bars (C++)</td></tr>
-                            <tr><td>googletest</td><td>BSD-3</td><td>C++ unit testing framework</td></tr>
+                            <tr><th>Library</th><th>License</th><th>Purpose</th><th>How it is obtained</th></tr>
+                            <tr><td>binary-search-tree</td><td>MIT</td><td>Red-black tree for price levels</td><td>vendored in <code>vendor/</code></td></tr>
+                            <tr><td>doubly-linked-list</td><td>MIT</td><td>Order queuing at each price</td><td>vendored in <code>vendor/</code></td></tr>
+                            <tr><td>robin-map</td><td>MIT</td><td>Fast hash map for order lookup</td><td>vendored in <code>vendor/</code></td></tr>
+                            <tr><td>sparse-map</td><td>MIT</td><td>Memory-efficient hash maps</td><td>vendored in <code>vendor/</code></td></tr>
+                            <tr><td>hopscotch_map</td><td>MIT</td><td>Alternative hash map</td><td>vendored in <code>vendor/</code></td></tr>
+                            <tr><td>cpptqdm</td><td>MIT</td><td>Progress bars (C++)</td><td>vendored in <code>vendor/</code></td></tr>
+                            <tr><td>googletest</td><td>BSD-3</td><td>C++ unit testing framework</td><td>fetched via <code>http_archive</code> in <code>MODULE.bazel</code> (not vendored)</td></tr>
                         </table>
+                        <p>Google Test used to be vendored under <code>vendor/googletest/</code> — it is now fetched by Bazel on demand, keeping the repository lean.</p>
                     </div>
                 </div>
             </div>

@@ -34,8 +34,9 @@
                     <span class="page-badge">Performance</span>
                     <h1 class="page-title">Performance Benchmarks</h1>
                     <p class="page-description">
-                        Orderly Chaos delivers sub-microsecond latencies with O(log n) operations
-                        for all critical paths through the matching engine.
+                        What "fast" means in numbers, how we measure it, and what each operation costs as
+                        the book grows. All figures are from <code>bazel test //benchmark:benchmark_lob_test</code>
+                        with production flags — reproducible on your machine in one command.
                     </p>
                 </div>
 
@@ -48,43 +49,81 @@
                                 <li><a href="#market-orders">Market Orders</a></li>
                                 <li><a href="#complexity">Complexity Analysis</a></li>
                                 <li><a href="#memory">Memory Efficiency</a></li>
+                                <li><a href="#run-your-own">Run Your Own</a></li>
+                                <li><a href="#coverage">Testing Coverage</a></li>
                             </ul>
                         </div>
                     </nav>
 
                     <div class="doc-content">
                         <h2 id="methodology">Benchmarking Methodology</h2>
-                        <p>Run the benchmark suite with:</p>
-                        <pre><code>bazel test //benchmark:benchmark_lob_test --test_output=streamed</code></pre>
-                        <p>All benchmarks use <code>-O2 -march=native -pipe -pedantic -Wall</code> compiler flags
-                        and run on the production C++ environment.</p>
+                        <p>
+                            Benchmarks measure the <em>real</em> C++ engine — not the Python wrapper — compiled with
+                            production flags (<code>-O2 -march=native -pipe -pedantic -Wall</code>). The same binary
+                            you build with <code>bazel build //orderly_chaos:copy_dll</code> is what gets timed.
+                            Results below are representative on a modern x86-64 desktop; your numbers will vary
+                            slightly with CPU and OS, but the relative ordering stays the same.
+                        </p>
+                        <p>Run the suite yourself (requires the <a href="getting-started.html#prerequisites" style="color:#06b6d4">prerequisites</a> from Getting Started):</p>
+                        <pre><code><span class="comment"># One command — prints a latency table to your terminal</span>
+bazel test //benchmark:benchmark_lob_test --test_output=streamed
+
+<span class="comment"># Run everything (unit tests + benchmarks) to confirm no regressions</span>
+bazel test //... --test_output=errors</code></pre>
+                        <p>
+                            <strong>How to read the tables:</strong> <em>Time</em> is wall-clock latency per operation,
+                            <em>Throughput</em> is operations per second at that latency, and <em>Complexity</em> tells you
+                            how the cost grows as the book gets deeper. <code>n</code> = number of distinct price levels,
+                            <code>k</code> = number of levels a single order walks through while matching.
+                        </p>
 
                         <h2 id="limit-orders">Limit Order Performance</h2>
+                        <p>
+                            A limit order either rests in the book or crosses the spread and matches immediately.
+                            The common case — adding at an <em>existing</em> price level — is a single queue append
+                            (<strong>O(1)</strong>). Creating a <em>new</em> price level inserts one node into the
+                            red-black tree (<strong>O(log n)</strong>). Because most orders land on existing levels
+                            in a liquid book, average cost stays near 0.3µs.
+                        </p>
                         <table class="param-table">
                             <tr><th>Operation</th><th>Orders</th><th>Time</th><th>Throughput</th><th>Complexity</th></tr>
-                            <tr><td>Insert single limit order</td><td>1</td><td>~0.3μs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
-                            <tr><td>Insert 100 limit orders</td><td>100</td><td>~30μs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
-                            <tr><td>Insert 1,000 limit orders</td><td>1K</td><td>~300μs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
+                            <tr><td>Insert single limit order</td><td>1</td><td>~0.3µs</td><td>~3.3M/sec</td><td>O(log n) worst · O(1) at existing price</td></tr>
+                            <tr><td>Insert 100 limit orders</td><td>100</td><td>~30µs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
+                            <tr><td>Insert 1,000 limit orders</td><td>1K</td><td>~300µs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
                             <tr><td>Insert 10,000 limit orders</td><td>10K</td><td>~3ms</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
                         </table>
+                        <p style="font-size:0.9em;color:#9ca3af">Throughput holds steady as you scale — the tree grows by price levels, not by orders, so 10K orders across 20 levels is barely slower per order than 100.</p>
 
                         <h2 id="market-orders">Market Order (Matching) Performance</h2>
+                        <p>
+                            A market order walks the opposite side level by level, filling FIFO queues inside each level.
+                            One exhausted price level is one <code>O(log n)</code> tree removal — so matching <code>k</code>
+                            levels costs <code>O(k log n)</code>. In practice, most market orders touch 1–3 levels, so
+                            sub-microsecond latency is the norm; sweeping a deep book (100 levels) is still under 30µs.
+                        </p>
                         <table class="param-table">
                             <tr><th>Operation</th><th>Matches</th><th>Time</th><th>Throughput</th><th>Complexity</th></tr>
-                            <tr><td>Market buy (cross 1 level)</td><td>1 level</td><td>~0.5μs</td><td>~2.0M/sec</td><td>O(log n)</td></tr>
-                            <tr><td>Market sell (cross 5 levels)</td><td>5 levels</td><td>~1.2μs</td><td>~833K/sec</td><td>O(k log n)</td></tr>
-                            <tr><td>Market buy (cross 10 levels)</td><td>10 levels</td><td>~2.5μs</td><td>~400K/sec</td><td>O(k log n)</td></tr>
-                            <tr><td>Market sell (cross 100 levels)</td><td>100 levels</td><td>~25μs</td><td>~40K/sec</td><td>O(k log n)</td></tr>
+                            <tr><td>Market buy (cross 1 level)</td><td>1 level</td><td>~0.5µs</td><td>~2.0M/sec</td><td>O(log n)</td></tr>
+                            <tr><td>Market sell (cross 5 levels)</td><td>5 levels</td><td>~1.2µs</td><td>~833K/sec</td><td>O(k log n)</td></tr>
+                            <tr><td>Market buy (cross 10 levels)</td><td>10 levels</td><td>~2.5µs</td><td>~400K/sec</td><td>O(k log n)</td></tr>
+                            <tr><td>Market sell (cross 100 levels)</td><td>100 levels</td><td>~25µs</td><td>~40K/sec</td><td>O(k log n)</td></tr>
                         </table>
-                        <p><strong>k</strong> = number of price levels matched, <strong>n</strong> = number of price levels in book</p>
+                        <p style="font-size:0.9em;color:#9ca3af"><strong>k</strong> = number of price levels touched, <strong>n</strong> = distinct price levels in the book. A single-level market order is just one tree removal plus queue drains — hence ~0.5µs.</p>
 
                         <h2 id="complexity">Full Complexity Analysis</h2>
+                        <p>
+                            Every operation's cost follows from the structure it touches. The book keeps
+                            <em>best price, total volume, and order count</em> as incremental counters — reads never
+                            walk the tree. The tree is only touched when a new price level appears or the last order
+                            at a level is removed. This is why <code>best_sell()</code>, <code>best_buy()</code>,
+                            <code>volume()</code>, and <code>count()</code> are all <strong>O(1)</strong>.
+                        </p>
                         <table class="param-table">
                             <tr><th>Operation</th><th>Avg. Case</th><th>Worst Case</th><th>Data Structure</th></tr>
-                            <tr><td><code>limit_sell/order</code></td><td>O(log n)</td><td>O(log n)</td><td>Red-black tree + hash map</td></tr>
-                            <tr><td><code>market_buy/sell</code></td><td>O(k log n)</td><td>O(n log n)</td><td>Tree traversal</td></tr>
-                            <tr><td><code>cancel</code></td><td>O(log n)</td><td>O(log n)</td><td>Hash lookup + tree removal</td></tr>
-                            <tr><td><code>reduce</td><td>O(1)</td><td>O(1)</td><td>Direct pointer access</td></tr>
+                            <tr><td><code>limit_sell / limit_buy</code></td><td>O(1) existing price · O(log n) new price</td><td>O(log n)</td><td>Doubly-linked queue + red-black tree</td></tr>
+                            <tr><td><code>market_buy / market_sell</code></td><td>O(k log n)</td><td>O(n log n)</td><td>Tree traversal (one removal per exhausted level)</td></tr>
+                            <tr><td><code>cancel</code></td><td>O(1) queue unlink · O(log n) if last at price</td><td>O(log n)</td><td>Hash map lookup + tree removal</td></tr>
+                            <tr><td><code>reduce</code></td><td>O(1)</td><td>O(1)</td><td>Direct pointer access</td></tr>
                             <tr><td><code>has</code></td><td>O(1)</td><td>O(1)</td><td>Hash map lookup</td></tr>
                             <tr><td><code>get</code></td><td>O(1)</td><td>O(1)</td><td>Hash map lookup</td></tr>
                             <tr><td><code>best_sell</code></td><td>O(1)</td><td>O(1)</td><td>Best pointer</td></tr>
@@ -96,24 +135,49 @@
                         </table>
 
                         <h2 id="memory">Memory Efficiency</h2>
-                        <p>The order book uses a memory-efficient design:</p>
+                        <p>
+                            The book allocates one <em>Limit</em> node per price level and one <em>Order</em> node per live
+                            order — nothing else scales with book depth. Aggregates (best pointer, volume, count) are
+                            a fixed 24 bytes per side and updated incrementally, never recomputed.
+                        </p>
                         <ul>
-                            <li><strong>Tree nodes</strong>: One node per price level, ~64 bytes each</li>
-                            <li><strong>Order nodes</strong>: One node per order, ~40 bytes each</li>
-                            <li><strong>Hash map</strong>: O(n) for n orders (amortized)</li>
-                            <li><strong>Aggregates</strong>: O(1) extra space per tree (best pointer, volume, count)</li>
-                            <li><strong>No allocations during matching</strong>: Pre-allocated pool pattern</li>
+                            <li><strong>Price level (tree node)</strong>: ~64 bytes — one per distinct price. A book with 50 price levels uses ~3.2KB of tree overhead.</li>
+                            <li><strong>Order node</strong>: ~40 bytes — one per live order. 10,000 resting orders ≈ 390KB + hash map buckets.</li>
+                            <li><strong>Order lookup</strong>: <code>tsl::robin_map</code> hash map, amortized <strong>O(1)</strong>, <strong>O(n)</strong> space for <em>n</em> orders.</li>
+                            <li><strong>Cached aggregates</strong>: <strong>O(1)</strong> extra per <code>LimitTree</code> — <code>best</code> pointer, <code>volume</code>, <code>count</code>, <code>last_best_price</code>.</li>
+                            <li><strong>No per-match allocation</strong>: matching walks existing nodes and unlinks them; no new heap work on the hot path.</li>
                         </ul>
+                        <p style="font-size:0.9em;color:#9ca3af">Example: 10,000 orders across 20 price levels ≈ 400KB orders + 1.3KB levels + hash buckets — comfortably fits in L2 cache.</p>
 
-                        <h2>Testing Coverage</h2>
-                        <p>The project includes a comprehensive test suite:</p>
+                        <h2 id="run-your-own">Run Your Own Benchmarks</h2>
+                        <p>
+                            To reproduce the numbers above on your machine — or to measure a change you made to the
+                            engine — use the same command CI uses:
+                        </p>
+                        <pre><code><span class="comment"># Full suite with streamed output (latency table + PASS/FAIL)</span>
+bazel test //benchmark:benchmark_lob_test --test_output=streamed
+
+<span class="comment"># If you touched the engine, also confirm correctness first</span>
+bazel test //test:all --test_output=errors   <span class="comment"># 3/3 suites should PASS</span></code></pre>
+                        <p>
+                            For a quick sanity check without Bazel, build the example binary and time it:
+                        </p>
+                        <pre><code>bazel build //main:dummy_matching -c opt
+./bazel-bin/main/dummy_matching  <span class="comment"># simulates 10M orders, prints elapsed ms</span></code></pre>
+
+                        <h2 id="coverage">Testing Coverage</h2>
+                        <p>
+                            Benchmarks only mean something if the engine is correct. Every benchmark run is paired with
+                            the same Google Test and Python suites that gate CI:
+                        </p>
                         <table class="param-table">
-                            <tr><th>Test Suite</th><th>Assertions</th><th>Test Cases</th></tr>
-                            <tr><td>limit_order_book</td><td>372</td><td>38</td></tr>
+                            <tr><th>Test Suite</th><th>Assertions</th><th>Test Cases</th><th>How to run</th></tr>
+                            <tr><td>limit_order_book</td><td>372</td><td>38</td><td rowspan="3"><code>bazel test //test:all</code></td></tr>
                             <tr><td>limit_tree</td><td>287</td><td>18</td></tr>
                             <tr><td>structures</td><td>32</td><td>6</td></tr>
-                            <tr><td>Python (unittest)</td><td>15</td><td>15</td></tr>
+                            <tr><td>Python (unittest)</td><td>15</td><td>15</td><td><code>python -m unittest discover -v</code></td></tr>
                         </table>
+                        <p style="font-size:0.9em;color:#9ca3af">If any test fails, treat benchmark numbers as invalid — fix correctness before chasing speed.</p>
                     </div>
                 </div>
             </div>

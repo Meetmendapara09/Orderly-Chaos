@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Getting Started • Orderly Chaos</title>
-    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="fixed inset-0 -z-10 bg-[#050505] overflow-hidden">
@@ -32,7 +32,8 @@
                     <span class="page-badge">Getting Started</span>
                     <h1 class="page-title">Getting Started with Orderly Chaos</h1>
                     <p class="page-description">
-                        Everything you need to know to start using Orderly Chaos for your trading and market data applications.
+                        Install the engine, build from source, and place your first order — in under five minutes.
+                        No prior trading-systems knowledge required.
                     </p>
                 </div>
 
@@ -40,100 +41,165 @@
                     <nav class="toc">
                         <div class="toc-nav">
                             <ul>
+                                <li><a href="#prerequisites">Prerequisites</a></li>
                                 <li><a href="#installation">Installation</a></li>
                                 <li><a href="#quick-start">Quick Start</a></li>
+                                <li><a href="#verify">Verify the Build</a></li>
                                 <li><a href="#python-guide">Python Guide</a></li>
                                 <li><a href="#cpp-guide">C++ Guide</a></li>
                                 <li><a href="#c-guide">C API Guide</a></li>
-                                <li><a href="#development">Development</a></li>
+                                <li><a href="#troubleshooting">Troubleshooting</a></li>
+                                <li><a href="#next-steps">Next Steps</a></li>
                             </ul>
                         </div>
                     </nav>
 
                     <div class="doc-content">
+                        <!-- Prerequisites -->
+                        <h2 id="prerequisites">Prerequisites</h2>
+                        <p>
+                            Orderly Chaos is a C++17 engine with Python bindings built by Bazel. You need a
+                            compiler, Python, and Bazel — everything else is fetched automatically. Check each
+                            requirement before you start:
+                        </p>
+                        <table class="param-table">
+                            <tr><th>Tool</th><th>Required Version</th><th>Notes</th></tr>
+                            <tr><td><strong>C++ compiler</strong></td><td>GCC 7+ or Clang 6+ with <code>-std=c++17</code></td><td>Any recent GCC/Clang works. MSVC is not tested — use MinGW on Windows.</td></tr>
+                            <tr><td><strong>Python</strong></td><td>3.8+</td><td>Needed only for Python bindings. The C++ core builds without Python.</td></tr>
+                            <tr><td><strong>Bazel</strong></td><td>7+ with Bzlmod enabled</td><td>Install from <a href="https://bazel.build/install" style="color:#06b6d4;text-decoration:underline">bazel.build/install</a>. Bzlmod is on by default in Bazel 7+.</td></tr>
+                            <tr><td><strong>Windows only</strong></td><td>MinGW-w64 via <a href="https://strawberryperl.com/" style="color:#06b6d4;text-decoration:underline">Strawberry Perl</a></td><td>Custom Bazel toolchain lives in <code>toolchain/BUILD.bazel</code>. See <a href="#troubleshooting" style="color:#06b6d4">Troubleshooting</a> if your <code>g++.exe</code> is elsewhere.</td></tr>
+                        </table>
+                        <p>Verify your setup in one shot:</p>
+                        <pre><code>g++ --version        <span class="comment"># should show GCC 7+ or Clang 6+</span>
+python --version     <span class="comment"># should show 3.8+</span>
+bazel --version      <span class="comment"># should show 7.x or 8.x</span>
+<span class="comment"># Windows: confirm MinGW is where the toolchain expects it</span>
+ls "D:/Strawberry/c/bin/g++.exe"  <span class="comment"># or wherever your g++ lives</span></code></pre>
+
+                        <!-- Installation -->
                         <h2 id="installation">Installation</h2>
+                        <p>Choose the path that fits you. Most users want <strong>Option A</strong>.</p>
 
-                        <h3>Python (from PyPI)</h3>
+                        <h3>Option A — Python from PyPI (fastest)</h3>
+                        <p>If you just want to use the engine from Python, no build needed:</p>
                         <pre><code>pip install orderly-chaos</code></pre>
+                        <p>Then jump to <a href="#quick-start" style="color:#06b6d4">Quick Start</a>.</p>
 
-                        <h3>Python (from source)</h3>
-                        <pre><code>git clone https://github.com/Meetmendapara09/Orderly-Chaos.git
+                        <h3>Option B — Build from source (all platforms)</h3>
+                        <p>Clone, build the shared library, and install the Python package in editable mode. Every command below is copy-paste ready.</p>
+                        <pre><code><span class="comment"># 1. Clone</span>
+git clone https://github.com/Meetmendapara09/Orderly-Chaos.git
 cd Orderly-Chaos
+
+<span class="comment"># 2. Tell Bazel where bash lives (Windows + Git Bash users — required once per shell)</span>
+<span class="comment">#    If you use Command Prompt:  set BAZEL_SH=C:\Program Files\Git\bin\bash.exe</span>
+export BAZEL_SH="C:/Program Files/Git/bin/bash.exe"   <span class="comment"># Git Bash / MSYS2</span>
+
+<span class="comment"># 3. Build the shared library</span>
 bazel build //orderly_chaos:copy_dll
+
+<span class="comment"># 4. Copy the DLL next to the Python package (so ctypes can find it)</span>
 cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
+
+<span class="comment"># 5. Install the Python package</span>
 pip install -e .</code></pre>
+                        <p><strong>What just happened?</strong> <code>//orderly_chaos:copy_dll</code> compiles the C++ core and C API into <code>lib_orderly_chaos.dll</code> (or <code>.so</code> on Linux/macOS) and copies it into the build output. The <code>cp</code> step places it where <code>orderly_chaos/library.py</code> expects it at runtime.</p>
 
-                        <h3>Build Requirements</h3>
-                        <p>The following dependencies are required:</p>
-                        <ul>
-                            <li><strong>C++ Compiler</strong>: GCC 7+ or Clang with C++17 support</li>
-                            <li><strong>Python</strong>: 3.5+ (for Python bindings)</li>
-                            <li><strong>Bazel</strong>: 7+ build system with Bzlmod (<a href="https://bazel.build/install">install guide</a>)</li>
-                            <li><strong>On Windows</strong>: MinGW-w64 (custom toolchain in <code>toolchain/</code>) or MSVC</li>
-                        </ul>
+                        <h3>Option C — C++ only (no Python)</h3>
+                        <p>Just copy the headers — the engine is header-only for C++ consumers:</p>
+                        <pre><code>cp -r include/ your_project/include/</code></pre>
+                        <p>Then <code>#include "limit_order_book.hpp"</code> and compile with <code>-std=c++17 -O2</code>. No Bazel required for this path.</p>
 
+                        <!-- Quick Start -->
                         <h2 id="quick-start">Quick Start</h2>
+                        <p>Prices are integers (e.g., cents). Pass <code>10250</code> for $102.50 — this avoids floating-point rounding in matching.</p>
 
-                        <h3>Python</h3>
+                        <h3>Python — your first book in 6 lines</h3>
                         <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
 
 book = LimitOrderBook()
 
-<span class="comment"># Place limit orders</span>
-book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)
-book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)
+<span class="comment"># Place two limit orders that do not cross</span>
+book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)  <span class="comment"># ask $102.50</span>
+book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)   <span class="comment"># bid $102.40</span>
 
-<span class="comment"># Market orders</span>
+<span class="comment"># A market buy that lifts 75 shares from the ask</span>
 book.market_buy(order_id=<span class="number">3</span>, quantity=<span class="number">75</span>)
 
-<span class="comment"># Query state</span>
-print(f<span class="string">"Best Ask: ${book.best_sell() / 100:.2f}"</span>)
-print(f<span class="string">"Total Volume: {book.volume()}"</span>)</code></pre>
+<span class="comment"># Inspect the book</span>
+print(f<span class="string">"Best Ask: ${book.best_sell() / 100:.2f}"</span>)   <span class="comment"># 102.50 (25 shares remain)</span>
+print(f<span class="string">"Best Bid: ${book.best_buy() / 100:.2f}"</span>)    <span class="comment"># 102.40</span>
+print(f<span class="string">"Total Volume: {book.volume()}"</span>)             <span class="comment"># 75</span></code></pre>
 
-                        <h3>C++</h3>
+                        <h3>C++ — same flow, zero overhead</h3>
                         <pre><code>#include <span class="string">"limit_order_book.hpp"</span>
-<span class="keyword">#include</span> <span class="string">&lt;iostream&gt;</span>
+#include <span class="string">&lt;iostream&gt;</span>
 
 <span class="keyword">int</span> main() {
     LOB::LimitOrderBook book;
 
     book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
     book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
+    book.market_buy(<span class="number">3</span>, <span class="number">75</span>);
 
-    std::cout <span class="keyword">&lt;&lt;</span> <span class="string">"Volume: "</span> <span class="keyword">&lt;&lt;</span> book.volume();
+    std::cout <span class="keyword">&lt;&lt;</span> <span class="string">"Best ask: "</span> <span class="keyword">&lt;&lt;</span> book.best_sell() <span class="keyword">&lt;&lt;</span> std::endl; <span class="comment">// 10250</span>
+    std::cout <span class="keyword">&lt;&lt;</span> <span class="string">"Volume: "</span> <span class="keyword">&lt;&lt;</span> book.volume() <span class="keyword">&lt;&lt;</span> std::endl;     <span class="comment">// 75</span>
     <span class="keyword">return</span> <span class="number">0</span>;
 }</code></pre>
+                        <p>Compile with: <code>g++ -std=c++17 -O2 -Iinclude main.cpp -o book</code></p>
 
+                        <!-- Verify -->
+                        <h2 id="verify">Verify the Build</h2>
+                        <p>Run these before you change anything — they confirm the toolchain is correct:</p>
+                        <pre><code><span class="comment"># C++ unit tests (Google Test, 3 suites)</span>
+bazel test //test:all --test_output=errors
+<span class="comment"># expect: 3/3 PASSED — limit_order_book, limit_tree, structures</span>
+
+<span class="comment"># Performance benchmark</span>
+bazel test //benchmark:benchmark_lob_test --test_output=streamed
+<span class="comment"># expect: 1/1 PASSED — prints latency table</span>
+
+<span class="comment"># Python tests (after pip install -e .)</span>
+python -m unittest discover -v
+<span class="comment"># expect: 15 tests OK</span></code></pre>
+
+                        <!-- Python Guide -->
                         <h2 id="python-guide">Python Guide</h2>
+                        <p>All operations go through <code>LimitOrderBook</code>. Order IDs must be unique — reusing an ID without cancelling first will throw.</p>
 
-                        <h3>Creating a Limit Order Book</h3>
+                        <h3>Creating a book</h3>
                         <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()</code></pre>
+book = LimitOrderBook()  <span class="comment"># empty book, zero volume</span></code></pre>
 
-                        <h3>Placing Orders</h3>
-                        <pre><code><span class="comment"># Limit orders</span>
+                        <h3>Placing limit orders</h3>
+                        <pre><code><span class="comment"># Explicit side methods (recommended for readability)</span>
 book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)
 book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)
-book.limit(<span class="keyword">side</span>=<span class="keyword">True</span>, order_id=<span class="number">3</span>, quantity=<span class="number">75</span>, price=<span class="number">10230</span>)
 
-<span class="comment"># Market orders</span>
-book.market_buy(order_id=<span class="number">4</span>, quantity=<span class="number">25</span>)
-book.market_sell(order_id=<span class="number">5</span>, quantity=<span class="number">25</span>)</code></pre>
+<span class="comment"># Generic method — side=True means buy, False means sell</span>
+book.limit(side=<span class="keyword">True</span>, order_id=<span class="number">3</span>, quantity=<span class="number">75</span>, price=<span class="number">10230</span>)</code></pre>
+                        <p>If a new limit order <em>crosses the spread</em> (e.g., you buy at or above the best ask), it matches immediately like a market order for the crossing portion. Any leftover quantity rests in the book.</p>
 
-                        <h3>Querying the Book</h3>
-                        <pre><code>book.best_sell()        <span class="comment"># best ask price</span>
-book.best_buy()         <span class="comment"># best bid price</span>
-book.best(<span class="keyword">True</span>)              <span class="comment"># best price for side</span>
-book.volume()           <span class="comment"># total volume</span>
-book.volume(<span class="number">10250</span>)           <span class="comment"># volume at price</span>
-book.count()            <span class="comment"># order count</span>
-book.has(1)             <span class="comment"># check order exists</span>
-book.cancel(1)          <span class="comment"># cancel order</span>
-book.clear()            <span class="comment"># clear all orders</span></code></pre>
+                        <h3>Market orders</h3>
+                        <pre><code>book.market_buy(order_id=<span class="number">4</span>, quantity=<span class="number">25</span>)   <span class="comment"># lifts from the ask side</span>
+book.market_sell(order_id=<span class="number">5</span>, quantity=<span class="number">25</span>)  <span class="comment"># hits the bid side</span></code></pre>
 
+                        <h3>Querying the book</h3>
+                        <pre><code>book.best_sell()        <span class="comment"># lowest ask, 0 if no asks</span>
+book.best_buy()         <span class="comment"># highest bid, 0 if no bids</span>
+book.best(<span class="keyword">True</span>)              <span class="comment"># generic: True=bid, False=ask</span>
+book.volume()           <span class="comment"># total shares in book</span>
+book.volume(<span class="number">10250</span>)           <span class="comment"># shares resting at price 10250</span>
+book.count()            <span class="comment"># total number of orders</span>
+book.has(<span class="number">1</span>)             <span class="comment"># True if order 1 still rests</span>
+book.cancel(<span class="number">1</span>)          <span class="comment"># remove order 1</span>
+book.clear()            <span class="comment"># remove everything</span></code></pre>
+
+                        <!-- C++ Guide -->
                         <h2 id="cpp-guide">C++ Guide</h2>
-                        <pre><code><span class="keyword">#include</span> <span class="string">"limit_order_book.hpp"</span>
-<span class="keyword">#include</span> <span class="string">&lt;iostream&gt;</span>
+                        <p>Include one header. All types live in namespace <code>LOB</code>.</p>
+                        <pre><code>#include <span class="string">"limit_order_book.hpp"</span>
+#include <span class="string">&lt;iostream&gt;</span>
 
 <span class="keyword">using</span> <span class="keyword">namespace</span> LOB;
 
@@ -144,47 +210,93 @@ book.clear()            <span class="comment"># clear all orders</span></code></
     book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
     book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
 
-    <span class="comment">// Market orders</span>
+    <span class="comment">// Market order — consumes from opposite side</span>
     book.market_buy(<span class="number">3</span>, <span class="number">25</span>);
 
-    <span class="comment">// Query</span>
+    <span class="comment">// Query — all O(1) except count_at (O(log n))</span>
     std::cout <span class="keyword">&lt;&lt;</span> book.best_sell() <span class="keyword">&lt;&lt;</span> std::endl;
     std::cout <span class="keyword">&lt;&lt;</span> book.volume() <span class="keyword">&lt;&lt;</span> std::endl;
+    std::cout <span class="keyword">&lt;&lt;</span> book.count() <span class="keyword">&lt;&lt;</span> std::endl;
 
-    <span class="comment">// Cancel</span>
+    <span class="comment">// Manage orders</span>
     book.cancel(<span class="number">1</span>);
-    <span class="comment">// Clear</span>
     book.clear();
 
     <span class="keyword">return</span> <span class="number">0</span>;
 }</code></pre>
+                        <p>Key C++ notes: price and quantity are integer types (<code>Price</code> = <code>uint64_t</code>, <code>Quantity</code> = <code>uint32_t</code>). The book owns its orders — use <code>has()</code>/<code>get()</code> to inspect before cancelling.</p>
 
+                        <!-- C API Guide -->
                         <h2 id="c-guide">C API Guide</h2>
-                        <pre><code><span class="keyword">#include</span> <span class="string">"lib_lob.hpp"</span>
+                        <p>The C API (<code>include/lib_lob.hpp</code>) wraps the same engine with <code>extern "C"</code> so any language with a C FFI can call it. Python's <code>ctypes</code> layer is built on top of it.</p>
+                        <pre><code>#include <span class="string">"lib_lob.hpp"</span>
 
 <span class="keyword">int</span> main() {
-    <span class="comment">// Create book</span>
+    <span class="comment">// Create — returns an opaque pointer</span>
     LOB::LimitOrderBook* book = new_();
 
-    <span class="comment">// Place orders</span>
+    <span class="comment">// Place orders (same semantics as C++)</span>
     limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
     limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
-
-    <span class="comment">// Market orders</span>
     market_buy(book, <span class="number">3</span>, <span class="number">25</span>);
 
     <span class="comment">// Query</span>
     LOB::Price best_ask = best_sell(book);
     LOB::Volume vol = volume(book);
 
-    <span class="comment">// Cancel and cleanup</span>
+    <span class="comment">// Cancel and free — you own the book pointer</span>
     cancel(book, <span class="number">1</span>);
     delete_(book);
 
     <span class="keyword">return</span> <span class="number">0</span>;
 }</code></pre>
+                        <p>Every <code>new_()</code> must be paired with <code>delete_()</code>. See <a href="api/c.html" style="color:#06b6d4">C API reference</a> for the full function list.</p>
 
-                        <h2 id="development">Development Setup</h2>
+                        <!-- Troubleshooting -->
+                        <h2 id="troubleshooting">Troubleshooting</h2>
+
+                        <h3>Error: <code>BAZEL_SH</code> not set / <code>sh_toolchain</code> failed</h3>
+                        <pre><code>ERROR: Cannot determine sh_toolchain ... BAZEL_SH not set</code></pre>
+                        <p>Bazel on Windows needs to know where <code>bash.exe</code> lives (from Git for Windows). Fix:</p>
+                        <pre><code><span class="comment"># Git Bash / MSYS2 — run before every bazel command, or add to ~/.bashrc</span>
+export BAZEL_SH="C:/Program Files/Git/bin/bash.exe"
+
+<span class="comment"># Command Prompt</span>
+set BAZEL_SH=C:\Program Files\Git\bin\bash.exe
+
+<span class="comment"># PowerShell</span>
+$env:BAZEL_SH="C:/Program Files/Git/bin/bash.exe"</code></pre>
+                        <p>Verify: <code>echo $BAZEL_SH</code> should print the path, and <code>ls "$BAZEL_SH"</code> should exist.</p>
+
+                        <h3>Error: <code>g++.exe</code> not found / toolchain misconfigured</h3>
+                        <pre><code>error: could not find g++.exe in STRAWBERRY_BIN</code></pre>
+                        <p>The Bazel toolchain hard-codes the MinGW path in <code>toolchain/BUILD.bazel:14</code>:</p>
+                        <pre><code>STRAWBERRY_BIN = "D:/Strawberry/c/bin"  <span class="comment"># default</span></code></pre>
+                        <p>If your Strawberry (or standalone MinGW) is elsewhere, edit that line to your <code>g++.exe</code> directory, e.g. <code>"C:/msys64/mingw64/bin"</code>. Then <code>bazel clean</code> and rebuild.</p>
+
+                        <h3>Python: <code>DLL load failed</code> or <code>FileNotFoundError</code></h3>
+                        <p><code>orderly_chaos/library.py</code> loads <code>lib_orderly_chaos.dll</code> from the package directory. If you built from source but skipped the copy step:</p>
+                        <pre><code>cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
+pip install -e .  <span class="comment"># reinstall so Python sees it</span></code></pre>
+
+                        <h3>Python version too old</h3>
+                        <p>The bindings require Python 3.8+. If <code>python --version</code> shows 3.7 or older, upgrade Python or use a virtual environment with a newer interpreter. The C++ core still builds fine without Python.</p>
+
+                        <h3>Still stuck?</h3>
+                        <p>Run with verbose output and open an issue with the log:</p>
+                        <pre><code>bazel test //test:all --test_output=streamed --verbose_failures</code></pre>
+
+                        <!-- Next Steps -->
+                        <h2 id="next-steps">Next Steps</h2>
+                        <ul>
+                            <li><strong>Explore the APIs:</strong> <a href="api/python.html" style="color:#06b6d4">Python API</a> · <a href="api/cpp.html" style="color:#06b6d4">C++ API</a> · <a href="api/c.html" style="color:#06b6d4">C API</a></li>
+                            <li><strong>Understand the engine:</strong> <a href="architecture.html" style="color:#06b6d4">Architecture</a> — layered design, data structures, matching rules.</li>
+                            <li><strong>Measure it:</strong> <a href="benchmarks.html" style="color:#06b6d4">Benchmarks</a> — methodology, complexity table, and how to run your own.</li>
+                            <li><strong>Run examples:</strong> <a href="examples/index.html" style="color:#06b6d4">Examples</a> — runnable snippets for common workflows.</li>
+                        </ul>
+
+                        <h2 id="development">Development</h2>
+                        <p>Common commands for contributors:</p>
                         <pre><code><span class="comment"># Run C++ tests (Bazel + Google Test)</span>
 bazel test //test:all
 
@@ -193,10 +305,10 @@ bazel build //orderly_chaos:copy_dll
 
 <span class="comment"># Run Python tests</span>
 cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
-python -m unittest discover .
+python -m unittest discover -v
 
-<span class="comment"># Build deployment package</span>
-make deployment</code></pre>
+<span class="comment"># Full suite (C++ + Python + benchmarks)</span>
+bazel test //... --test_output=errors</code></pre>
                     </div>
                 </div>
             </div>
