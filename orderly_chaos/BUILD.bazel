@@ -1,0 +1,6 @@
+genrule(
+    name = "copy_dll",
+    srcs = ["//src:lib_orderly_chaos.dll"],
+    outs = ["lib_orderly_chaos.dll"],
+    cmd = "cp $(location //src:lib_orderly_chaos.dll) $@",
+)

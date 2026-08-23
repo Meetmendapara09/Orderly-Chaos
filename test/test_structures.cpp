@@ -2,108 +2,87 @@
 //
 // Copyright (c) 2020 Christian Kauten
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-//
+// Converted from Catch2 to Google Test
 
-#define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <gtest/gtest.h>
 #include "structures.hpp"
 
 using namespace LOB;
 
-TEST_CASE("should invert Side::Sell") {
-    REQUIRE(Side::Buy == !Side::Sell);
+// ---------------------------------------------------------------------------
+// MARK: Side
+// ---------------------------------------------------------------------------
+
+TEST(Structures, invert_side_sell) {
+    EXPECT_TRUE(Side::Buy == !Side::Sell);
 }
 
-TEST_CASE("should invert Side::Buy") {
-    REQUIRE(Side::Sell == !Side::Buy);
+TEST(Structures, invert_side_buy) {
+    EXPECT_TRUE(Side::Sell == !Side::Buy);
 }
 
 // ---------------------------------------------------------------------------
 // MARK: Order
 // ---------------------------------------------------------------------------
 
-TEST_CASE("initialize default Order") {
+TEST(Structures, initialize_default_order) {
     Order order;
-    REQUIRE(order.next == nullptr);
-    REQUIRE(order.prev == nullptr);
-    REQUIRE(order.uid == 0);
-    REQUIRE(order.side == Side::Sell);
-    REQUIRE(order.quantity == 0);
-    REQUIRE(order.price == 0);
-    REQUIRE(order.limit == nullptr);
+    EXPECT_TRUE(order.next == nullptr);
+    EXPECT_TRUE(order.prev == nullptr);
+    EXPECT_EQ(order.uid, 0);
+    EXPECT_EQ(order.side, Side::Sell);
+    EXPECT_EQ(order.quantity, 0);
+    EXPECT_EQ(order.price, 0);
+    EXPECT_TRUE(order.limit == nullptr);
 }
 
-SCENARIO("initialize Order") {
-    GIVEN("arbitrary legal parameters") {
-        UID uid = 5;
-        auto side = Side::Buy;
-        Quantity quantity = 100;
-        Price price = 5746;
-        WHEN("an Order is initialized") {
-            Order order = {uid, side, quantity, price};
-            THEN("the order is created with parameters") {
-                REQUIRE(order.next == nullptr);
-                REQUIRE(order.prev == nullptr);
-                REQUIRE(order.uid == uid);
-                REQUIRE(order.side == side);
-                REQUIRE(order.quantity == quantity);
-                REQUIRE(order.price == price);
-                REQUIRE(order.limit == nullptr);
-            }
-        }
-    }
+TEST(Structures, initialize_order_with_parameters) {
+    UID uid = 5;
+    auto side = Side::Buy;
+    Quantity quantity = 100;
+    Price price = 5746;
+    Order order = {uid, side, quantity, price};
+    EXPECT_TRUE(order.next == nullptr);
+    EXPECT_TRUE(order.prev == nullptr);
+    EXPECT_EQ(order.uid, uid);
+    EXPECT_EQ(order.side, side);
+    EXPECT_EQ(order.quantity, quantity);
+    EXPECT_EQ(order.price, price);
+    EXPECT_TRUE(order.limit == nullptr);
 }
 
 // ---------------------------------------------------------------------------
 // MARK: Limit
 // ---------------------------------------------------------------------------
 
-TEST_CASE("initialize default Limit") {
+TEST(Structures, initialize_default_limit) {
     Limit limit;
-    REQUIRE(limit.key == 0);
-    REQUIRE(limit.parent == nullptr);
-    REQUIRE(limit.left == nullptr);
-    REQUIRE(limit.right == nullptr);
-    REQUIRE(limit.count == 0);
-    REQUIRE(limit.volume == 0);
-    REQUIRE(limit.order_head == nullptr);
-    REQUIRE(limit.order_tail == nullptr);
+    EXPECT_EQ(limit.key, 0);
+    EXPECT_TRUE(limit.parent == nullptr);
+    EXPECT_TRUE(limit.left == nullptr);
+    EXPECT_TRUE(limit.right == nullptr);
+    EXPECT_EQ(limit.count, 0);
+    EXPECT_EQ(limit.volume, 0);
+    EXPECT_TRUE(limit.order_head == nullptr);
+    EXPECT_TRUE(limit.order_tail == nullptr);
 }
 
-SCENARIO("initialize Limit") {
-    GIVEN("arbitrary legal parameters and a new order") {
-        Quantity quantity = 100;
-        Price price = 5;
-        Order order = {5, Side::Buy, quantity, price};
-        WHEN("a Limit is initialized") {
-            Limit limit{&order};
-            THEN("the limit is created with parameters") {
-                REQUIRE(limit.key == price);
-                REQUIRE(limit.parent == nullptr);
-                REQUIRE(limit.left == nullptr);
-                REQUIRE(limit.right == nullptr);
-                REQUIRE(limit.count == 1);
-                REQUIRE(limit.volume == quantity);
-                REQUIRE(limit.order_head == &order);
-                REQUIRE(limit.order_tail == &order);
-            }
-        }
-    }
+TEST(Structures, initialize_limit_with_parameters) {
+    Quantity quantity = 100;
+    Price price = 5;
+    Order order = {5, Side::Buy, quantity, price};
+    Limit limit{&order};
+    EXPECT_EQ(limit.key, price);
+    EXPECT_TRUE(limit.parent == nullptr);
+    EXPECT_TRUE(limit.left == nullptr);
+    EXPECT_TRUE(limit.right == nullptr);
+    EXPECT_EQ(limit.count, 1);
+    EXPECT_EQ(limit.volume, quantity);
+    EXPECT_EQ(limit.order_head, &order);
+    EXPECT_EQ(limit.order_tail, &order);
+}
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

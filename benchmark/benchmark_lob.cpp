@@ -1,20 +1,16 @@
 // Benchmark the Limit Order Book (LOB).
 // Copyright 2019 Christian Kauten
 //
+// Converted from Catch2 benchmarks to Google Test
 
-#define CATCH_CONFIG_MAIN
-#define CATCH_CONFIG_ENABLE_BENCHMARKING
 #include <random>
 #include <vector>
-#include <unordered_set>
-#include <string>
-#include <sstream>
+#include <chrono>
 #include <iostream>
-#include "catch.hpp"
+#include <gtest/gtest.h>
 #include "limit_order_book.hpp"
 
 using namespace LOB;
-using Catch::Benchmark::Chronometer;
 
 //
 // MARK: new limits
@@ -24,31 +20,40 @@ inline void spam_limits(LimitOrderBook& book, int count) {
     for (int i = 0; i < count; i++) book.limit(Side::Buy, i, 50, i);
 }
 
-TEST_CASE("Spam new Limits") {
-    BENCHMARK_ADVANCED("send 1 new limits")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_limits(book, 1);
-        });
-    };
-    BENCHMARK_ADVANCED("send 10 new limits")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_limits(book, 10);
-        });
-    };
-    BENCHMARK_ADVANCED("send 100 new limits")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_limits(book, 100);
-        });
-    };
-    BENCHMARK_ADVANCED("send 1000 new limits")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_limits(book, 1000);
-        });
-    };
+TEST(Benchmark, SpamNewLimits_1) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_limits(book, 1);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send 1 new limits: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamNewLimits_10) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_limits(book, 10);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send 10 new limits: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamNewLimits_100) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_limits(book, 100);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send 100 new limits: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamNewLimits_1000) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_limits(book, 1000);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send 1000 new limits: " << duration.count() << " us" << std::endl;
 }
 
 //
@@ -60,31 +65,40 @@ inline void spam_orders(LimitOrderBook& book, int count, int variance = 5) {
         book.limit(Side::Buy, i, 50, i % variance);
 }
 
-TEST_CASE("Spam new Orders") {
-    BENCHMARK_ADVANCED("send 1 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_orders(book, 1);
-        });
-    };
-    BENCHMARK_ADVANCED("send 10 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_orders(book, 10);
-        });
-    };
-    BENCHMARK_ADVANCED("send 100 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_orders(book, 100);
-        });
-    };
-    BENCHMARK_ADVANCED("send 1000 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_orders(book, 1000);
-        });
-    };
+TEST(Benchmark, SpamOrders_1) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_orders(book, 1);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send 1 orders: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamOrders_10) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_orders(book, 10);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send 10 orders: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamOrders_100) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_orders(book, 100);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send 100 orders: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamOrders_1000) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_orders(book, 1000);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send 1000 orders: " << duration.count() << " us" << std::endl;
 }
 
 //
@@ -108,31 +122,40 @@ inline void spam_orders_random_cancels(
     }
 }
 
-TEST_CASE("Spam orders and randomly cancel orders") {
-    BENCHMARK_ADVANCED("send and cancel 10 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_orders_random_cancels(book, 10);
-        });
-    };
-    BENCHMARK_ADVANCED("send and cancel 100 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_orders_random_cancels(book, 100);
-        });
-    };
-    BENCHMARK_ADVANCED("send and cancel 1000 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_orders_random_cancels(book, 1000);
-        });
-    };
-    BENCHMARK_ADVANCED("send and cancel 10000 orders")(Chronometer cron) {
-        auto book = LimitOrderBook();
-        cron.measure([&]() {
-            spam_orders_random_cancels(book, 10000);
-        });
-    };
+TEST(Benchmark, SpamOrdersRandomCancels_10) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_orders_random_cancels(book, 10);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send and cancel 10 orders: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamOrdersRandomCancels_100) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_orders_random_cancels(book, 100);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send and cancel 100 orders: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamOrdersRandomCancels_1000) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_orders_random_cancels(book, 1000);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send and cancel 1000 orders: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamOrdersRandomCancels_10000) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_orders_random_cancels(book, 10000);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "send and cancel 10000 orders: " << duration.count() << " us" << std::endl;
 }
 
 //
@@ -155,24 +178,36 @@ inline void spam_limit_random_orders(
         auto price_ = static_cast<uint64_t>(price(generator));
         auto quantity_ = static_cast<uint32_t>(quantity(generator));
         book.limit(Side::Buy, i, 100, price_);
-        if (i % order_every == 0)  // random submit a market order
+        if (i % order_every == 0)
             book.market(Side::Sell, i, quantity_);
     }
 }
 
-TEST_CASE("Spam limit orders and occasional market orders") {
-    BENCHMARK("1000 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_random_orders(book, 1000);
-    };
-    BENCHMARK("10000 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_random_orders(book, 10000);
-    };
-    BENCHMARK("100000 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_random_orders(book, 100000);
-    };
+TEST(Benchmark, SpamLimitOrders_1000) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_limit_random_orders(book, 1000);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "1000 limit orders: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamLimitOrders_10000) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_limit_random_orders(book, 10000);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "10000 limit orders: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamLimitOrders_100000) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_limit_random_orders(book, 100000);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "100000 limit orders: " << duration.count() << " us" << std::endl;
 }
 
 inline void spam_limit_many_market_orders(
@@ -194,21 +229,43 @@ inline void spam_limit_many_market_orders(
     }
 }
 
-TEST_CASE("Spam limit orders and constant market orders") {
-    BENCHMARK("10 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_many_market_orders(book, 10);
-    };
-    BENCHMARK("100 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_many_market_orders(book, 100);
-    };
-    BENCHMARK("1000 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_many_market_orders(book, 1000);
-    };
-    BENCHMARK("10000 limit orders") {
-        auto book = LimitOrderBook();
-        spam_limit_many_market_orders(book, 10000);
-    };
+TEST(Benchmark, SpamLimitOrdersWithMarket_10) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_limit_many_market_orders(book, 10);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "10 limit orders: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamLimitOrdersWithMarket_100) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_limit_many_market_orders(book, 100);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "100 limit orders: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamLimitOrdersWithMarket_1000) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_limit_many_market_orders(book, 1000);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "1000 limit orders: " << duration.count() << " us" << std::endl;
+}
+
+TEST(Benchmark, SpamLimitOrdersWithMarket_10000) {
+    auto book = LimitOrderBook();
+    auto start = std::chrono::high_resolution_clock::now();
+    spam_limit_many_market_orders(book, 10000);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "10000 limit orders: " << duration.count() << " us" << std::endl;
+}
+
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

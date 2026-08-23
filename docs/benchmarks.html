@@ -55,7 +55,7 @@
                     <div class="doc-content">
                         <h2 id="methodology">Benchmarking Methodology</h2>
                         <p>Run the benchmark suite with:</p>
-                        <pre><code>scons benchmark</code></pre>
+                        <pre><code>bazel test //benchmark:benchmark_lob_test --test_output=streamed</code></pre>
                         <p>All benchmarks use <code>-O2 -march=native -pipe -pedantic -Wall</code> compiler flags
                         and run on the production C++ environment.</p>
 

@@ -1,0 +1,13 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_test(
+    name = "benchmark_lob_test",
+    srcs = ["benchmark_lob.cpp"],
+    data = ["//toolchain:mingw_runtime"],
+    deps = [
+        "//include:orderly_chaos_lib",
+        "//vendor/googletest:gtest",
+    ],
+)

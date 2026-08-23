@@ -1,24 +1,24 @@
 # an alias to the python command
 PYTHON=python3
 
-# build the LaiNES code, test the Python interface, and build
-# the deployment package
-all: test deployment
+# build the library, test the C++ and Python interfaces
+all: test
 
 #
 # MARK: Development
 #
 
-# test the CPP code
-test_lib_limit_order_book:
-	scons test
+# test the C++ code (Bazel + Google Test)
+test_cpp:
+	bazel test //test:all
 
-# build the CPP code
-lib_limit_order_book: test_lib_limit_order_book
-	scons
+# build the shared library consumed by the Python package
+lib_orderly_chaos:
+	bazel build //orderly_chaos:copy_dll
 
 # run the Python test suite
-test: lib_limit_order_book
+test: test_cpp lib_orderly_chaos
+	cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
 	${PYTHON} -m unittest discover .
 
 #
@@ -33,9 +33,7 @@ clean_python_build:
 	find . -name "__pycache__" -delete
 
 clean_cpp_build:
-	find . -name ".sconsign.dblite" -delete
-	find . -name "build" | rm -rf
-	find . -name "lib_limit_order_book.so" -delete
+	bazel clean
 
 # clean the build directory
 clean: clean_dist clean_python_build clean_cpp_build

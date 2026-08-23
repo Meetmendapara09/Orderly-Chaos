@@ -1,0 +1,17 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "orderly_chaos_core",
+    srcs = ["lib_lob.cpp"],
+    deps = ["//include:orderly_chaos_lib"],
+)
+
+# Shared library consumed by the Python ctypes wrapper
+cc_binary(
+    name = "lib_orderly_chaos.dll",
+    srcs = ["lib_lob.cpp"],
+    linkshared = 1,
+    deps = ["//include:orderly_chaos_lib"],
+)

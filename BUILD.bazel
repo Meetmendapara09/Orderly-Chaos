@@ -1,0 +1,18 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "tests",
+    actual = "//test:limit_order_book_test",
+)
+
+alias(
+    name = "benchmarks",
+    actual = "//benchmark:benchmark_lob_test",
+)
+
+alias(
+    name = "python_dll",
+    actual = "//orderly_chaos:copy_dll",
+)

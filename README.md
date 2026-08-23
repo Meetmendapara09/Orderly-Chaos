@@ -26,7 +26,7 @@ pip install orderly-chaos
 
 ### Windows
 
-You'll need to install the Visual-Studio 17.0 tools for Windows installation. The [Visual Studio Community](https://visualstudio.microsoft.com/downloads/) package provides these tools for free.
+Building on Windows uses the MinGW-w64 toolchain (e.g. the one bundled with [Strawberry Perl](https://strawberryperl.com/)) via a custom Bazel toolchain registered in [toolchain/BUILD.bazel](toolchain/BUILD.bazel). Adjust `STRAWBERRY_BIN` there if your g++ lives elsewhere.
 
 ## Development
 
@@ -40,17 +40,25 @@ make test
 
 #### C++
 
-To run the C++ unit-test suite, run:
+To run the C++ unit-test suite (Bazel + Google Test), run:
 
 ```shell
-scons test
+bazel test //test:all
 ```
 
 #### Python
 
-To run the Python unit-test suite, run:
+To build the shared library and run the Python unit-test suite, run:
 
 ```shell
+make test
+```
+
+or manually:
+
+```shell
+bazel build //orderly_chaos:copy_dll
+cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
 python -m unittest discover .
 ```
 
@@ -58,8 +66,8 @@ python -m unittest discover .
 
 #### C++
 
-To run the C++ benchmark code, run:
+To run the C++ benchmark suite, run:
 
 ```shell
-scons benchmark
+bazel test //benchmark:benchmark_lob_test --test_output=streamed
 ```

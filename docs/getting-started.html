@@ -59,7 +59,8 @@
                         <h3>Python (from source)</h3>
                         <pre><code>git clone https://github.com/Meetmendapara09/Orderly-Chaos.git
 cd Orderly-Chaos
-scons
+bazel build //orderly_chaos:copy_dll
+cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
 pip install -e .</code></pre>
 
                         <h3>Build Requirements</h3>
@@ -67,8 +68,8 @@ pip install -e .</code></pre>
                         <ul>
                             <li><strong>C++ Compiler</strong>: GCC 7+ or Clang with C++17 support</li>
                             <li><strong>Python</strong>: 3.5+ (for Python bindings)</li>
-                            <li><strong>SCons</strong>: Build system (<code>pip install scons</code>)</li>
-                            <li><strong>On Windows</strong>: Visual Studio 17.0 tools or MinGW-w64</li>
+                            <li><strong>Bazel</strong>: 7+ build system with Bzlmod (<a href="https://bazel.build/install">install guide</a>)</li>
+                            <li><strong>On Windows</strong>: MinGW-w64 (custom toolchain in <code>toolchain/</code>) or MSVC</li>
                         </ul>
 
                         <h2 id="quick-start">Quick Start</h2>
@@ -184,13 +185,14 @@ book.clear()            <span class="comment"># clear all orders</span></code></
 }</code></pre>
 
                         <h2 id="development">Development Setup</h2>
-                        <pre><code><span class="comment"># Build C++ library</span>
-scons
+                        <pre><code><span class="comment"># Run C++ tests (Bazel + Google Test)</span>
+bazel test //test:all
 
-<span class="comment"># Run C++ tests</span>
-scons test
+<span class="comment"># Build the shared library</span>
+bazel build //orderly_chaos:copy_dll
 
 <span class="comment"># Run Python tests</span>
+cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
 python -m unittest discover .
 
 <span class="comment"># Build deployment package</span>

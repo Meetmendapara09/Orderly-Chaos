@@ -128,11 +128,13 @@
 5. Update all aggregates</code></pre>
 
                         <h2 id="build">Build System</h2>
-                        <p>The project uses <strong>SCons</strong> as its build system, configured via
-                        <code>SConstruct</code>. Build targets:</p>
-                        <pre><code>scons            # Build shared library
-scons test       # Run C++ unit tests
-scons benchmark  # Run performance benchmarks</code></pre>
+                        <p>The project uses <strong>Bazel</strong> (with Bzlmod) as its build system, configured via
+                        <code>MODULE.bazel</code> and per-package <code>BUILD.bazel</code> files. Tests use
+                        <strong>Google Test (gtest)</strong>, vendored under <code>vendor/googletest</code>. Build targets:</p>
+                        <pre><code>bazel test //test:all                          # Run C++ unit tests
+bazel test //benchmark:benchmark_lob_test      # Run performance benchmarks
+bazel build //src:lib_orderly_chaos.dll        # Build shared library
+bazel build //main:dummy_matching              # Build example binary</code></pre>
 
                         <h2>Vendor Dependencies</h2>
                         <table class="param-table">
@@ -143,7 +145,7 @@ scons benchmark  # Run performance benchmarks</code></pre>
                             <tr><td>sparse-map</td><td>MIT</td><td>Memory-efficient hash maps</td></tr>
                             <tr><td>hopscotch_map</td><td>MIT</td><td>Alternative hash map</td></tr>
                             <tr><td>cpptqdm</td><td>MIT</td><td>Progress bars (C++)</td></tr>
-                            <tr><td>Catch2</td><td>BSL-1.0</td><td>Unit testing framework</td></tr>
+                            <tr><td>googletest</td><td>BSD-3</td><td>C++ unit testing framework</td></tr>
                         </table>
                     </div>
                 </div>

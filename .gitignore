@@ -150,26 +150,33 @@ ENV/
 
 
 
-# MARK: scons Files
-# https://github.com/github/gitignore/blob/master/SCons.gitignore
+# MARK: Bazel Files
+# https://github.com/bazelbuild/intellij/blob/master/docs/README.md
+# Getting started with Bazel
 
-.sconsign.dblite
-.scon*
-config.log
+# Bazel specific
+bazel-*
+*/bazel-*
+BAZEL_BLAKE2_SRC
+.bazelrc
+.bazelignore
+.bazelproject
 
 # Orderly Chaos build artifacts
+_orderly_chaos.so
+_orderly_chaos.dll
+lib_orderly_chaos.a
 _limit_order_book.so
 _limit_order_book.dll
-_limitly_chaos.so
-_orderly_chaos.so
 lib_limit_order_book.a
-lib_orderly_chaos.a
-_orderly_chaos.dll
 
 # MinGW runtime DLLs (platform-specific)
 orderly_chaos/libgcc_s_seh-1.dll
 orderly_chaos/libstdc++-6.dll
 orderly_chaos/libwinpthread-1.dll
+
+# Catch2 vendor
+vendor/Catch2/
 
 
 
@@ -206,5 +213,4 @@ Temporary Items
 # Kilo Models
 .kilo/
 .kilo
-
 .agents/
