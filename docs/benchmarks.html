@@ -1,36 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Benchmarks • Orderly Chaos</title>
+    <title>Benchmarks â€¢ Orderly Chaos</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <div class="fixed inset-0 -z-10 bg-[#050505] overflow-hidden">
-        <div class="absolute -top-1/2 -left-1/2 w-[800px] h-[800px] opacity-50" style="background: radial-gradient(circle at 50% 50%, rgba(99,102,245,0.15), transparent 70%)"></div>
-        <div class="absolute -bottom-1/2 -right-1/2 w-[800px] h-[800px] opacity-40" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%)"></div>
-    </div>
-
-    <header class="navbar" role="banner">
-        <div class="container">
-            <a href="index.html" class="brand" aria-label="Orderly Chaos home">
-                <span class="brand-mark">OC</span>
-                OrderlyChaos
-                <small>v0.4.5</small>
-            </a>
-            <nav class="nav-links" aria-label="Main navigation">
-                <a href="getting-started.html">Getting Started</a>
-                <a href="architecture.html">Architecture</a>
-                <a href="benchmarks.html" class="active" aria-current="page">Benchmarks</a>
-                <a href="api/python.html">Python API</a>
-                <a href="api/cpp.html">C++ API</a>
-                <a href="api/c.html">C API</a>
-                <a href="examples/index.html">Examples</a>
-                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="nav-github" target="_blank" rel="noopener">GitHub ↗</a>
-            </nav>
-        </div>
-    </header>
+<body data-page="benchmarks">
+    <header id="header-slot" class="navbar" role="banner"></header>
 
     <main class="pt-24 pb-32">
         <div class="container mx-auto px-6">
@@ -46,10 +23,10 @@
                     <p class="page-description">
                         What "fast" means in numbers, how we measure it, and what each operation costs as
                         the book grows. All figures are from <code>bazel test //benchmark:benchmark_lob_test</code>
-                        with production flags — reproducible on your machine in one command.
+                        with production flags â€” reproducible on your machine in one command.
                     </p>
                     <div class="page-meta">
-                        <span>⚡ ~0.3µs / op</span><span class="dot"></span><span>📈 Reproducible</span><span class="dot"></span><span>Bazel one-liner</span>
+                        <span>âš¡ ~0.3Âµs / op</span><span class="dot"></span><span>ðŸ“ˆ Reproducible</span><span class="dot"></span><span>Bazel one-liner</span>
                     </div>
                 </div>
 
@@ -72,21 +49,21 @@
                     <div class="doc-content">
                         <h2 id="methodology">Benchmarking Methodology</h2>
                         <p>
-                            Benchmarks measure the <em>real</em> C++ engine — not the Python wrapper — compiled with
+                            Benchmarks measure the <em>real</em> C++ engine â€” not the Python wrapper â€” compiled with
                             production flags (<code>-O2 -march=native -pipe -pedantic -Wall</code>, per the
-                            <a href="https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html" style="color:#06b6d4;text-decoration:underline">GCC optimize options</a>).
+                            <a href="https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html" style="color:#1078a3;text-decoration:underline">GCC optimize options</a>).
                             The same binary you build with <code>bazel build //orderly_chaos:copy_dll</code> is what gets timed.
                             Results below are representative on a modern x86-64 desktop; your numbers will vary
                             slightly with CPU and OS, but the relative ordering stays the same.
                         </p>
                         <p>
                             The suite runs through
-                            <a href="https://bazel.build/docs/user-manual#test-output" style="color:#06b6d4;text-decoration:underline"><code>bazel test</code></a>,
+                            <a href="https://bazel.build/docs/user-manual#test-output" style="color:#1078a3;text-decoration:underline"><code>bazel test</code></a>,
                             which builds the benchmark target, executes it in a sandbox, and streams its latency
                             table back with <code>--test_output=streamed</code>.
                         </p>
-                        <p>Run the suite yourself (requires the <a href="getting-started.html#prerequisites" style="color:#06b6d4">prerequisites</a> from Getting Started):</p>
-                        <pre><code><span class="comment"># One command — prints a latency table to your terminal</span>
+                        <p>Run the suite yourself (requires the <a href="getting-started.html#prerequisites" style="color:#1078a3">prerequisites</a> from Getting Started):</p>
+                        <pre><code><span class="comment"># One command â€” prints a latency table to your terminal</span>
 bazel test //benchmark:benchmark_lob_test --test_output=streamed
 
 <span class="comment"># Run everything (unit tests + benchmarks) to confirm no regressions</span>
@@ -101,49 +78,49 @@ bazel test //... --test_output=errors</code></pre>
                         <h2 id="limit-orders">Limit Order Performance</h2>
                         <p>
                             A limit order either rests in the book or crosses the spread and matches immediately.
-                            The common case — adding at an <em>existing</em> price level — is a single queue append
+                            The common case â€” adding at an <em>existing</em> price level â€” is a single queue append
                             (<strong>O(1)</strong>). Creating a <em>new</em> price level inserts one node into the
                             red-black tree (<strong>O(log n)</strong>). Because most orders land on existing levels
-                            in a liquid book, average cost stays near 0.3µs.
+                            in a liquid book, average cost stays near 0.3Âµs.
                         </p>
                         <table class="param-table">
                             <tr><th>Operation</th><th>Orders</th><th>Time</th><th>Throughput</th><th>Complexity</th></tr>
-                            <tr><td>Insert single limit order</td><td>1</td><td>~0.3µs</td><td>~3.3M/sec</td><td>O(log n) worst · O(1) at existing price</td></tr>
-                            <tr><td>Insert 100 limit orders</td><td>100</td><td>~30µs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
-                            <tr><td>Insert 1,000 limit orders</td><td>1K</td><td>~300µs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
+                            <tr><td>Insert single limit order</td><td>1</td><td>~0.3Âµs</td><td>~3.3M/sec</td><td>O(log n) worst Â· O(1) at existing price</td></tr>
+                            <tr><td>Insert 100 limit orders</td><td>100</td><td>~30Âµs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
+                            <tr><td>Insert 1,000 limit orders</td><td>1K</td><td>~300Âµs</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
                             <tr><td>Insert 10,000 limit orders</td><td>10K</td><td>~3ms</td><td>~3.3M/sec</td><td>O(log n)</td></tr>
                         </table>
-                        <p style="font-size:0.9em;color:#9ca3af">Throughput holds steady as you scale — the tree grows by price levels, not by orders, so 10K orders across 20 levels is barely slower per order than 100.</p>
+                        <p style="font-size:0.9em;color:#9ca3af">Throughput holds steady as you scale â€” the tree grows by price levels, not by orders, so 10K orders across 20 levels is barely slower per order than 100.</p>
 
                         <h2 id="market-orders">Market Order (Matching) Performance</h2>
                         <p>
                             A market order walks the opposite side level by level, filling FIFO queues inside each level.
-                            One exhausted price level is one <code>O(log n)</code> tree removal — so matching <code>k</code>
-                            levels costs <code>O(k log n)</code>. In practice, most market orders touch 1–3 levels, so
-                            sub-microsecond latency is the norm; sweeping a deep book (100 levels) is still under 30µs.
+                            One exhausted price level is one <code>O(log n)</code> tree removal â€” so matching <code>k</code>
+                            levels costs <code>O(k log n)</code>. In practice, most market orders touch 1â€“3 levels, so
+                            sub-microsecond latency is the norm; sweeping a deep book (100 levels) is still under 30Âµs.
                         </p>
                         <table class="param-table">
                             <tr><th>Operation</th><th>Matches</th><th>Time</th><th>Throughput</th><th>Complexity</th></tr>
-                            <tr><td>Market buy (cross 1 level)</td><td>1 level</td><td>~0.5µs</td><td>~2.0M/sec</td><td>O(log n)</td></tr>
-                            <tr><td>Market sell (cross 5 levels)</td><td>5 levels</td><td>~1.2µs</td><td>~833K/sec</td><td>O(k log n)</td></tr>
-                            <tr><td>Market buy (cross 10 levels)</td><td>10 levels</td><td>~2.5µs</td><td>~400K/sec</td><td>O(k log n)</td></tr>
-                            <tr><td>Market sell (cross 100 levels)</td><td>100 levels</td><td>~25µs</td><td>~40K/sec</td><td>O(k log n)</td></tr>
+                            <tr><td>Market buy (cross 1 level)</td><td>1 level</td><td>~0.5Âµs</td><td>~2.0M/sec</td><td>O(log n)</td></tr>
+                            <tr><td>Market sell (cross 5 levels)</td><td>5 levels</td><td>~1.2Âµs</td><td>~833K/sec</td><td>O(k log n)</td></tr>
+                            <tr><td>Market buy (cross 10 levels)</td><td>10 levels</td><td>~2.5Âµs</td><td>~400K/sec</td><td>O(k log n)</td></tr>
+                            <tr><td>Market sell (cross 100 levels)</td><td>100 levels</td><td>~25Âµs</td><td>~40K/sec</td><td>O(k log n)</td></tr>
                         </table>
-                        <p style="font-size:0.9em;color:#9ca3af"><strong>k</strong> = number of price levels touched, <strong>n</strong> = distinct price levels in the book. A single-level market order is just one tree removal plus queue drains — hence ~0.5µs.</p>
+                        <p style="font-size:0.9em;color:#9ca3af"><strong>k</strong> = number of price levels touched, <strong>n</strong> = distinct price levels in the book. A single-level market order is just one tree removal plus queue drains â€” hence ~0.5Âµs.</p>
 
                         <h2 id="complexity">Full Complexity Analysis</h2>
                         <p>
                             Every operation's cost follows from the structure it touches. The book keeps
-                            <em>best price, total volume, and order count</em> as incremental counters — reads never
+                            <em>best price, total volume, and order count</em> as incremental counters â€” reads never
                             walk the tree. The tree is only touched when a new price level appears or the last order
                             at a level is removed. This is why <code>best_sell()</code>, <code>best_buy()</code>,
                             <code>volume()</code>, and <code>count()</code> are all <strong>O(1)</strong>.
                         </p>
                         <table class="param-table">
                             <tr><th>Operation</th><th>Avg. Case</th><th>Worst Case</th><th>Data Structure</th></tr>
-                            <tr><td><code>limit_sell / limit_buy</code></td><td>O(1) existing price · O(log n) new price</td><td>O(log n)</td><td>Doubly-linked queue + red-black tree</td></tr>
+                            <tr><td><code>limit_sell / limit_buy</code></td><td>O(1) existing price Â· O(log n) new price</td><td>O(log n)</td><td>Doubly-linked queue + red-black tree</td></tr>
                             <tr><td><code>market_buy / market_sell</code></td><td>O(k log n)</td><td>O(n log n)</td><td>Tree traversal (one removal per exhausted level)</td></tr>
-                            <tr><td><code>cancel</code></td><td>O(1) queue unlink · O(log n) if last at price</td><td>O(log n)</td><td>Hash map lookup + tree removal</td></tr>
+                            <tr><td><code>cancel</code></td><td>O(1) queue unlink Â· O(log n) if last at price</td><td>O(log n)</td><td>Hash map lookup + tree removal</td></tr>
                             <tr><td><code>reduce</code></td><td>O(1)</td><td>O(1)</td><td>Direct pointer access</td></tr>
                             <tr><td><code>has</code></td><td>O(1)</td><td>O(1)</td><td>Hash map lookup</td></tr>
                             <tr><td><code>get</code></td><td>O(1)</td><td>O(1)</td><td>Hash map lookup</td></tr>
@@ -158,23 +135,23 @@ bazel test //... --test_output=errors</code></pre>
                         <h2 id="memory">Memory Efficiency</h2>
                         <p>
                             The book allocates one <em>Limit</em> node per price level and one <em>Order</em> node per live
-                            order — nothing else scales with book depth. Aggregates (best pointer, volume, count) are
+                            order â€” nothing else scales with book depth. Aggregates (best pointer, volume, count) are
                             a fixed 24 bytes per side and updated incrementally, never recomputed.
                         </p>
                         <ul>
-                            <li><strong>Price level (tree node)</strong>: ~64 bytes — one per distinct price. A book with 50 price levels uses ~3.2KB of tree overhead.</li>
-                            <li><strong>Order node</strong>: ~40 bytes — one per live order. 10,000 resting orders ≈ 390KB + hash map buckets.</li>
+                            <li><strong>Price level (tree node)</strong>: ~64 bytes â€” one per distinct price. A book with 50 price levels uses ~3.2KB of tree overhead.</li>
+                            <li><strong>Order node</strong>: ~40 bytes â€” one per live order. 10,000 resting orders â‰ˆ 390KB + hash map buckets.</li>
                             <li><strong>Order lookup</strong>: <code>tsl::robin_map</code> hash map, amortized <strong>O(1)</strong>, <strong>O(n)</strong> space for <em>n</em> orders.</li>
-                            <li><strong>Cached aggregates</strong>: <strong>O(1)</strong> extra per <code>LimitTree</code> — <code>best</code> pointer, <code>volume</code>, <code>count</code>, <code>last_best_price</code>.</li>
+                            <li><strong>Cached aggregates</strong>: <strong>O(1)</strong> extra per <code>LimitTree</code> â€” <code>best</code> pointer, <code>volume</code>, <code>count</code>, <code>last_best_price</code>.</li>
                             <li><strong>No per-match allocation</strong>: matching walks existing nodes and unlinks them; no new heap work on the hot path.</li>
                         </ul>
-                        <p style="font-size:0.9em;color:#9ca3af">Example: 10,000 orders across 20 price levels ≈ 400KB orders + 1.3KB levels + hash buckets — comfortably fits in L2 cache.</p>
+                        <p style="font-size:0.9em;color:#9ca3af">Example: 10,000 orders across 20 price levels â‰ˆ 400KB orders + 1.3KB levels + hash buckets â€” comfortably fits in L2 cache.</p>
 
                         <h2 id="run-your-own">Run Your Own Benchmarks</h2>
                         <p>
-                            To reproduce the numbers above on your machine — or to measure a change you made to the
-                            engine — run the benchmark target exactly as documented in
-                            <a href="#methodology" style="color:#06b6d4">Methodology</a>:
+                            To reproduce the numbers above on your machine â€” or to measure a change you made to the
+                            engine â€” run the benchmark target exactly as documented in
+                            <a href="#methodology" style="color:#1078a3">Methodology</a>:
                         </p>
                         <pre><code><span class="comment"># Full suite with streamed output (latency table + PASS/FAIL)</span>
 bazel test //benchmark:benchmark_lob_test --test_output=streamed
@@ -199,18 +176,18 @@ bazel test //test:all --test_output=errors   <span class="comment"># 3/3 suites 
                             <tr><td>structures</td><td>32</td><td>6</td></tr>
                             <tr><td>Python (unittest)</td><td>15</td><td>15</td><td><code>python -m unittest discover -v</code></td></tr>
                         </table>
-                        <p style="font-size:0.9em;color:#9ca3af">If any test fails, treat benchmark numbers as invalid — fix correctness before chasing speed.</p>
+                        <p style="font-size:0.9em;color:#9ca3af">If any test fails, treat benchmark numbers as invalid â€” fix correctness before chasing speed.</p>
 
                         <!-- References -->
                         <h2 id="references">Official References</h2>
                         <p>Tooling documentation behind the numbers on this page:</p>
                         <table class="param-table">
                             <tr><th>Topic</th><th>Link</th></tr>
-                            <tr><td><code>bazel test</code> &amp; output flags (<code>--test_output</code>)</td><td><a href="https://bazel.build/docs/user-manual#test-output" style="color:#06b6d4;text-decoration:underline">bazel.build/docs/user-manual</a></td></tr>
-                            <tr><td>Benchmarking C++ targets (<code>cc_test</code>)</td><td><a href="https://bazel.build/reference/be/c-cpp#cc_test" style="color:#06b6d4;text-decoration:underline">bazel.build/reference/be/c-cpp</a></td></tr>
-                            <tr><td>GCC optimize options (<code>-O2</code>, <code>-march=native</code>)</td><td><a href="https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html" style="color:#06b6d4;text-decoration:underline">gcc.gnu.org/onlinedocs</a></td></tr>
-                            <tr><td>Google Test primer (fixtures, assertions)</td><td><a href="https://google.github.io/googletest/primer.html" style="color:#06b6d4;text-decoration:underline">google.github.io/googletest</a></td></tr>
-                            <tr><td>Big-O complexity cheat sheet</td><td><a href="https://www.bigocheatsheet.com/" style="color:#06b6d4;text-decoration:underline">bigocheatsheet.com</a></td></tr>
+                            <tr><td><code>bazel test</code> &amp; output flags (<code>--test_output</code>)</td><td><a href="https://bazel.build/docs/user-manual#test-output" style="color:#1078a3;text-decoration:underline">bazel.build/docs/user-manual</a></td></tr>
+                            <tr><td>Benchmarking C++ targets (<code>cc_test</code>)</td><td><a href="https://bazel.build/reference/be/c-cpp#cc_test" style="color:#1078a3;text-decoration:underline">bazel.build/reference/be/c-cpp</a></td></tr>
+                            <tr><td>GCC optimize options (<code>-O2</code>, <code>-march=native</code>)</td><td><a href="https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html" style="color:#1078a3;text-decoration:underline">gcc.gnu.org/onlinedocs</a></td></tr>
+                            <tr><td>Google Test primer (fixtures, assertions)</td><td><a href="https://google.github.io/googletest/primer.html" style="color:#1078a3;text-decoration:underline">google.github.io/googletest</a></td></tr>
+                            <tr><td>Big-O complexity cheat sheet</td><td><a href="https://www.bigocheatsheet.com/" style="color:#1078a3;text-decoration:underline">bigocheatsheet.com</a></td></tr>
                         </table>
                     </div>
                 </div>
@@ -218,21 +195,8 @@ bazel test //test:all --test_output=errors   <span class="comment"># 3/3 suites 
         </div>
     </main>
 
-    <footer class="footer">
-        <div class="container mx-auto px-6">
-            <div class="footer-content">
-                <div>
-                    <div class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></div>
-                    <p>&copy; 2026 Orderly Chaos. MIT License.</p>
-                    <div class="footer-links mt-4">
-                        <a href="index.html">Home</a>
-                        <a href="architecture.html">Architecture</a>
-                        <a href="getting-started.html">Getting Started</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <footer id="footer-slot" class="footer"></footer>
+    <script src="components.js" defer></script>
     <script src="copy-code.js" defer></script>
 </body>
 </html>

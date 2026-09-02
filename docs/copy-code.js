@@ -8,15 +8,15 @@
 
     var STYLE =
         "pre{position:relative}" +
-        ".copy-btn{position:absolute;top:10px;right:10px;padding:5px 12px;" +
+        ".copy-btn{position:absolute;top:8px;right:8px;padding:4px 10px;" +
         "font:600 11px/1 ui-sans-serif,system-ui,-apple-system,sans-serif;letter-spacing:.03em;" +
-        "color:#c7c9d9;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);" +
-        "border-radius:7px;cursor:pointer;opacity:0;z-index:2;" +
+        "color:#b9bbb0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);" +
+        "border-radius:4px;cursor:pointer;opacity:0;z-index:2;" +
         "transition:opacity .15s ease,background .15s ease,color .15s ease,border-color .15s ease;" +
         "-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}" +
         "pre:hover>.copy-btn,.copy-btn:focus-visible,.copy-btn.copied{opacity:1}" +
-        ".copy-btn:hover{background:rgba(99,102,245,.28);border-color:rgba(129,140,248,.55);color:#fff}" +
-        ".copy-btn.copied{background:rgba(16,185,129,.18);border-color:rgba(52,211,153,.55);color:#34d399}" +
+        ".copy-btn:hover{background:rgba(247,165,1,.22);border-color:rgba(247,165,1,.5);color:#fff}" +
+        ".copy-btn.copied{background:rgba(44,140,102,.22);border-color:rgba(44,140,102,.55);color:#34d399}" +
         ".copy-btn svg{width:12px;height:12px;vertical-align:-2px;margin-right:5px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}" +
         "@media (hover:none){.copy-btn{opacity:.85}}" +
         "@media (prefers-reduced-motion:reduce){.copy-btn{transition:none}}";

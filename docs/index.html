@@ -7,33 +7,9 @@
     <meta name="description" content="High-performance price-time priority matching engine. C++17 core, Python bindings, sub-microsecond operations.">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <!-- Radial mesh gradient background -->
-    <div class="bg-mesh" aria-hidden="true">
-        <div class="mesh-blob indigo"></div>
-        <div class="mesh-blob cyan"></div>
-    </div>
-
+<body data-page="home">
     <!-- Premium glass header — consistent across all docs -->
-    <header class="navbar" role="banner">
-        <div class="container">
-            <a href="index.html" class="brand" aria-label="Orderly Chaos home">
-                <span class="brand-mark">OC</span>
-                OrderlyChaos
-                <small>v0.4.5</small>
-            </a>
-            <nav class="nav-links" aria-label="Main navigation">
-                <a href="getting-started.html">Getting Started</a>
-                <a href="architecture.html">Architecture</a>
-                <a href="benchmarks.html">Benchmarks</a>
-                <a href="api/python.html">Python API</a>
-                <a href="api/cpp.html">C++ API</a>
-                <a href="api/c.html">C API</a>
-                <a href="examples/index.html">Examples</a>
-                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="nav-github" target="_blank" rel="noopener">GitHub ↗</a>
-            </nav>
-        </div>
-    </header>
+    <header id="header-slot" class="navbar" role="banner"></header>
 
     <!-- Hero -->
     <main>
@@ -177,7 +153,7 @@
                                         <div class="card-flex">
                                             <div class="card-icon yellow">📊</div>
                                             <div class="flex-1">
-                                                <h3 class="card-title group-hover:text-white">Market-data ready</h3>
+                                                <h3 class="card-title">Market-data ready</h3>
                                                 <p class="card-description">
                                                     Limit, market, cancel and reduce operations with strict price-time
                                                     priority. Integer prices avoid floating-point drift; matching walks
@@ -201,7 +177,7 @@
                                 <div class="card-outer h-full">
                                     <div class="card-inner">
                                         <div class="card-icon purple">🚀</div>
-                                        <h3 class="card-title group-hover:text-white">Benchmarks</h3>
+                                        <h3 class="card-title">Benchmarks</h3>
                                         <p class="card-description">Reproducible latency tables and complexity analysis — run them yourself with one command.</p>
                                     </div>
                                 </div>
@@ -247,34 +223,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-brand-col">
-                    <div class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></div>
-                    <p>&copy; 2026 Orderly Chaos. MIT License.</p>
-                </div>
-                <nav class="footer-cols" aria-label="Footer">
-                    <div class="footer-col">
-                        <h4>Learn</h4>
-                        <a href="getting-started.html">Getting Started</a>
-                        <a href="architecture.html">Architecture</a>
-                        <a href="benchmarks.html">Benchmarks</a>
-                    </div>
-                    <div class="footer-col">
-                        <h4>API</h4>
-                        <a href="api/python.html">Python</a>
-                        <a href="api/cpp.html">C++</a>
-                        <a href="api/c.html">C</a>
-                    </div>
-                    <div class="footer-col">
-                        <h4>More</h4>
-                        <a href="examples/index.html">Examples</a>
-                        <a href="https://github.com/Meetmendapara09/Orderly-Chaos" target="_blank" rel="noopener">GitHub ↗</a>
-                    </div>
-                </nav>
-            </div>
-        </div>
-    </footer>
+    <footer id="footer-slot" class="footer"></footer>
+    <script src="components.js" defer></script>
 </body>
 </html>

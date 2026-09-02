@@ -6,31 +6,8 @@
     <title>Python API • Orderly Chaos</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
-<body>
-    <div class="fixed inset-0 -z-10 bg-[#050505] overflow-hidden">
-        <div class="absolute -top-1/2 -left-1/2 w-[800px] h-[800px] opacity-50" style="background: radial-gradient(circle at 50% 50%, rgba(99,102,245,0.15), transparent 70%)"></div>
-        <div class="absolute -bottom-1/2 -right-1/2 w-[800px] h-[800px] opacity-40" style="background: radial-gradient(circle at 50% 50%, rgba(6,182,212,0.1), transparent 70%)"></div>
-    </div>
-
-    <header class="navbar" role="banner">
-        <div class="container">
-            <a href="../index.html" class="brand" aria-label="Orderly Chaos home">
-                <span class="brand-mark">OC</span>
-                OrderlyChaos
-                <small>v0.4.5</small>
-            </a>
-            <nav class="nav-links" aria-label="Main navigation">
-                <a href="../getting-started.html">Getting Started</a>
-                <a href="../architecture.html">Architecture</a>
-                <a href="../benchmarks.html">Benchmarks</a>
-                <a href="python.html" class="active" aria-current="page">Python API</a>
-                <a href="cpp.html">C++ API</a>
-                <a href="c.html">C API</a>
-                <a href="../examples/index.html">Examples</a>
-                <a href="https://github.com/Meetmendapara09/Orderly-Chaos" class="nav-github" target="_blank" rel="noopener">GitHub ↗</a>
-            </nav>
-        </div>
-    </header>
+<body data-page="python-api">
+    <header id="header-slot" class="navbar" role="banner"></header>
 
     <main class="pt-24 pb-32">
         <div class="container mx-auto px-6">
@@ -355,20 +332,8 @@ book.clear()
         </div>
     </main>
 
-    <footer class="footer">
-        <div class="container mx-auto px-6">
-            <div class="footer-content">
-                <div>
-                    <div class="footer-logo">Orderly<span class="logo-chaos">Chaos</span></div>
-                    <p>&copy; 2026 Orderly Chaos. MIT License.</p>
-                    <div class="footer-links mt-4">
-                        <a href="../index.html">Home</a>
-                        <a href="../getting-started.html">Getting Started</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <footer id="footer-slot" class="footer"></footer>
+    <script src="../components.js" defer></script>
     <script src="../copy-code.js" defer></script>
 </body>
 </html>
