@@ -34,15 +34,29 @@ jobs:
 
       - name: Build sdist and wheel
         run: |
-          pip install build twine
+          pip install build twine auditwheel patchelf
           python -m build
           twine check dist/*
+          # PyPI only accepts manylinux/musllinux platform tags for Linux
+          # wheels, so repair the plain linux_x86_64 wheel. The raw wheel
+          # stays in dist/ and is never uploaded.
+          auditwheel repair dist/*-linux_x86_64.whl -w wheelhouse/
+          twine check wheelhouse/*
+          # Only the sdist and the repaired manylinux wheel may be
+          # uploaded; the raw linux_x86_64 wheel stays behind.
+          mv dist/*.tar.gz wheelhouse/
 
       - name: Smoke-test the sdist in a fresh environment
         run: |
           python -m venv /tmp/sdist-check
           /tmp/sdist-check/bin/pip install dist/*.tar.gz
           /tmp/sdist-check/bin/python -c "from orderly_chaos import LimitOrderBook, Side; b = LimitOrderBook(); b.limit_sell(1, 100, 10050); assert b.limit_buy(2, 40, 10050) == 40; print('sdist OK')"
+
+      - name: Smoke-test the manylinux wheel in a fresh environment
+        run: |
+          python -m venv /tmp/wheel-check
+          /tmp/wheel-check/bin/pip install wheelhouse/*.whl
+          /tmp/wheel-check/bin/python -c "from orderly_chaos import LimitOrderBook; b = LimitOrderBook(); b.limit_sell(1, 100, 10050); assert b.limit_buy(2, 40, 10050) == 40; print('wheel OK')"
 
       - name: Publish to PyPI
         # Uses trusted publishing (OpenID Connect) when no token is
@@ -51,3 +65,4 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
+          packages-dir: wheelhouse/
