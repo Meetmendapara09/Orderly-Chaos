@@ -26,9 +26,9 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -38,13 +38,9 @@ jobs:
           python -m build
           twine check dist/*
           # PyPI only accepts manylinux/musllinux platform tags for Linux
-          # wheels, so repair the plain linux_x86_64 wheel. The raw wheel
-          # stays in dist/ and is never uploaded.
+          # wheels, so repair the plain linux_x86_64 wheel into wheelhouse/.
           auditwheel repair dist/*-linux_x86_64.whl -w wheelhouse/
           twine check wheelhouse/*
-          # Only the sdist and the repaired manylinux wheel may be
-          # uploaded; the raw linux_x86_64 wheel stays behind.
-          mv dist/*.tar.gz wheelhouse/
 
       - name: Smoke-test the sdist in a fresh environment
         run: |
@@ -58,6 +54,14 @@ jobs:
           /tmp/wheel-check/bin/pip install wheelhouse/*.whl
           /tmp/wheel-check/bin/python -c "from orderly_chaos import LimitOrderBook; b = LimitOrderBook(); b.limit_sell(1, 100, 10050); assert b.limit_buy(2, 40, 10050) == 40; print('wheel OK')"
 
+      - name: Stage the upload directory
+        # Only the sdist and the repaired manylinux wheel may be uploaded;
+        # the raw linux_x86_64 wheel stays behind in dist/.
+        run: |
+          mkdir -p upload
+          cp dist/*.tar.gz wheelhouse/*.whl upload/
+          ls upload/
+
       - name: Publish to PyPI
         # Uses trusted publishing (OpenID Connect) when no token is
         # configured. If you added a PYPI_API_TOKEN secret instead, it is
@@ -65,4 +69,4 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
-          packages-dir: wheelhouse/
+          packages-dir: upload/
