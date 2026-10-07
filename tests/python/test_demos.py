@@ -13,12 +13,22 @@ DEMOS = os.path.join(ROOT, "examples")
 class DemosTest(unittest.TestCase):
     def run_demo(self, directory, script, *args):
         path = os.path.join(DEMOS, directory)
+        env = dict(os.environ)
+        # The CI job sets a relative PYTHONPATH=python, which would resolve
+        # against cwd below instead of the repo root. Always pass the
+        # absolute package directory so demos import the library under test.
+        package_dir = os.path.join(ROOT, "python")
+        if env.get("PYTHONPATH"):
+            env["PYTHONPATH"] = package_dir + os.pathsep + env["PYTHONPATH"]
+        else:
+            env["PYTHONPATH"] = package_dir
         result = subprocess.run(
             [sys.executable, os.path.join(path, script), *args],
             capture_output=True,
             text=True,
             timeout=180,
             cwd=path,
+            env=env,
         )
         self.assertEqual(0, result.returncode, result.stderr)
         return result.stdout
