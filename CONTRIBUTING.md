@@ -84,13 +84,30 @@ in a git-ignored `user.bazelrc`, never in the shared `.bazelrc`.
 ## Versioning and releases
 
 The project follows [Semantic Versioning](https://semver.org/). The version
-appears in `include/orderly_chaos/version.hpp`, `python/orderly_chaos/_version.py`,
-`pyproject.toml`, `MODULE.bazel`, and the docs header; a test fails if they
-disagree. To release:
+appears in `python/orderly_chaos/_version.py` (canonical),
+`include/orderly_chaos/version.hpp`, `pyproject.toml`, `MODULE.bazel`, and
+the docs header; `python tools/check_versions.py` (and the CI docs job) fail
+if they disagree. To release:
 
-1. Update the version in all the files above.
+1. Update the version in all the files above (or run the check to find them).
 2. Move the "Unreleased" notes in `CHANGELOG.md` under the new version.
-3. Run `make test` and `make dist`, then tag the commit `vX.Y.Z`.
+3. Run `make test`, `make docker-test`, and `make dist`, then tag the commit `vX.Y.Z` and push the tag.
+4. Pushing the tag builds and pushes the Docker image to GHCR as
+   `ghcr.io/<owner>/orderly-chaos:vX.Y.Z` (plus `latest` for the default branch).
+5. Publish a GitHub Release for the tag. The publish workflow builds the
+   sdist and wheel, smoke-tests the sdist, and uploads both to PyPI, making
+   `pip install orderly-chaos==X.Y.Z` available.
+
+### One-time publishing setup (package owner only)
+
+- **PyPI:** this repository uses trusted publishing, so no API token is
+  stored anywhere. Before the first release, add a pending publisher at
+  <https://pypi.org/manage/account/publishing> for this repository with
+  workflow file name `publish.yml`. No other configuration is needed.
+- **GHCR:** pushing images uses the built-in `GITHUB_TOKEN`; no setup needed.
+  If the package page does not appear under your profile, check the
+  repository Settings, Actions, General, Workflow permissions
+  ("Read and write permissions" for packages).
 
 ## License
 

@@ -42,6 +42,7 @@
                         <li><a href="#python">Python</a></li>
                         <li><a href="#cpp">C++</a></li>
                         <li><a href="#c">C and other languages</a></li>
+                        <li><a href="#docker">Docker</a></li>
                         <li><a href="#verify">Verify the build</a></li>
                         <li><a href="#first-book">Your first order book</a></li>
                         <li><a href="#layout">Project layout</a></li>
@@ -65,7 +66,9 @@
                     </div>
 
                     <h2 id="python">Python</h2>
-                    <p>Install from a clone of the repository. pip compiles the native library for your platform automatically:</p>
+                    <p>Install the latest release from PyPI (no compiler needed):</p>
+<pre><code class="language-bash">python -m pip install orderly-chaos</code></pre>
+                    <p>Or install from a clone of the repository, in which case pip compiles the native library for your platform automatically:</p>
 <pre><code class="language-bash">git clone https://github.com/Meetmendapara09/Orderly-Chaos.git
 cd Orderly-Chaos
 python -m pip install .</code></pre>
@@ -106,6 +109,14 @@ python -m pytest</code></pre>
 <pre><code class="language-ini">build --shell_executable="C:/Program Files/Git/bin/bash.exe"</code></pre>
                     <p>The pip installation uses your regular MSVC compiler and does not need Bazel.</p>
 
+                    <h2 id="docker">Docker</h2>
+                    <p>A ready-made image runs the quickstart demo with no local toolchain:</p>
+<pre><code class="language-bash">docker run --rm ghcr.io/meetmendapara09/orderly-chaos:latest
+docker run --rm ghcr.io/meetmendapara09/orderly-chaos:latest python examples/python/replay_events.py</code></pre>
+                    <p>Build it yourself, or run the test suite inside the image:</p>
+<pre><code class="language-bash">make docker-build   # runtime image
+make docker-test    # full Python suite in the image</code></pre>
+
                     <h2 id="verify">Verify the build</h2>
 <pre><code class="language-bash">make test             # C++ tests, examples, and the Python suite
 bazel test //...      # everything Bazel knows about
@@ -145,8 +156,7 @@ print(trades[0])               # Trade(taker_id=4, maker_id=1, taker_side=&lt;Si
                     </ol>
                     <p>Continue with the <a href="examples/index.html">examples</a> or the API reference for <a href="api/python.html">Python</a>, <a href="api/cpp.html">C++</a>, or <a href="api/c.html">C</a>.</p>
 
-                    <h2 id="layout">Project layout</h2>
-<pre><code class="language-plaintext">include/orderly_chaos/   Public headers: C++ API (*.hpp) and C API (orderly_chaos.h)
+                    <h2 id="layout">Project layout</h2><pre><code class="language-plaintext">include/orderly_chaos/   Public headers: C++ API (*.hpp) and C API (orderly_chaos.h)
 src/                     C API implementation (the shared library)
 python/orderly_chaos/    Python package (ctypes bindings)
 tests/cpp/               C++ tests (GoogleTest)

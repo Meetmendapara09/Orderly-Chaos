@@ -91,33 +91,7 @@ jobs:
           python-version: '3.12'
 
       - name: Check internal docs links resolve
-        run: python - <<'EOF'
-          import os, pathlib, re
-          root = pathlib.Path('docs')
-          pages = {p.relative_to(root).as_posix() for p in root.rglob('*.html')}
-          assets = {p.relative_to(root).as_posix() for p in (root / 'assets').rglob('*') if p.is_file()}
-          known = pages | assets | {'architecture.md'}
-          bad = []
-          for page in sorted(root.rglob('*.html')):
-              text = page.read_text(encoding='utf-8')
-              for link in re.findall(r'(?:href|src)="([^"#{}]+?)(?:[#?][^"]*)?"', text):
-                  if link.startswith('@/') or re.match(r'[a-zA-Z][a-zA-Z0-9+.-]*:|^//', link):
-                      continue  # runtime placeholder or external URL
-                  target = os.path.normpath(os.path.join(page.parent.relative_to(root).as_posix(), link))
-                  if target not in known:
-                      bad.append(f'{page.relative_to(root)} -> {link}')
-          if bad:
-              raise SystemExit('broken docs links:\n' + '\n'.join(bad))
-          print(f'checked {len(pages)} pages, all internal links resolve')
-          EOF
+        run: python tools/check_docs.py
 
       - name: Check version consistency
-        run: python - <<'EOF'
-          import re
-          version = re.search(r'__version__ = "([^"]+)"', open('python/orderly_chaos/_version.py').read()).group(1)
-          header = open('include/orderly_chaos/version.hpp').read()
-          assert f'#define ORDERLY_CHAOS_VERSION_STRING "{version}"' in header, 'version.hpp mismatch'
-          assert f'version = "{version}"' in open('pyproject.toml').read(), 'pyproject.toml mismatch'
-          assert f'version = "{version}"' in open('MODULE.bazel').read(), 'MODULE.bazel mismatch'
-          print(f'version {version} consistent across _version.py, version.hpp, pyproject.toml, MODULE.bazel')
-          EOF
+        run: python tools/check_versions.py

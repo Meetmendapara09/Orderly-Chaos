@@ -83,13 +83,21 @@ flowchart LR
 
 ## Installation
 
-**Python** (3.9+, needs a C++17 compiler; pip builds the native library):
+**Python** (3.9+) from PyPI, no compiler needed:
+
+```bash
+python -m pip install orderly-chaos
+```
+
+From source (pip compiles the native library; needs a C++17 compiler):
 
 ```bash
 git clone https://github.com/Meetmendapara09/Orderly-Chaos.git
 cd Orderly-Chaos
 python -m pip install .
 ```
+
+**Docker:** `docker run --rm ghcr.io/meetmendapara09/orderly-chaos:latest`
 
 **C++** (header-only): add `include/` and `third_party/robin_map/include/` to
 your include path and `#include <orderly_chaos/orderly_chaos.hpp>`. With

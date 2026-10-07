@@ -14,6 +14,8 @@ help:
 	@echo "docs          generate the Doxygen C/C++ reference into build/docs"
 	@echo "serve-docs    serve the documentation site at http://localhost:8000"
 	@echo "dist          build the source distribution and wheel"
+	@echo "docker-build  build the runtime Docker image"
+	@echo "docker-test   run the Python suite inside the Docker image"
 	@echo "clean         remove build outputs"
 
 test-cpp:
@@ -50,6 +52,12 @@ clean:
 
 dist: clean
 	$(PYTHON) -m build
+
+docker-build:
+	docker build -t orderly-chaos .
+
+docker-test:
+	docker build --target test -t orderly-chaos-test .
 
 ship: test dist
 	twine upload dist/*
