@@ -82,8 +82,8 @@ jobs:
       - name: Install test dependencies
         run: pip install pytest
 
-      - name: Run Python test suite
-        run: python -m pytest tests/python -v
+      - name: Run Python test suite (Bazel-built library)
+        run: PYTHONPATH=python python -m pytest tests/python -v
 
       - name: Install package from source and re-test
         run: |

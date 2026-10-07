@@ -26,7 +26,7 @@ python-lib:
 	cp -f bazel-bin/python/orderly_chaos/lib_orderly_chaos.* python/orderly_chaos/
 
 test-python: python-lib
-	$(PYTHON) -m pytest tests/python -q
+	PYTHONPATH=python $(PYTHON) -m pytest tests/python -q
 
 pytest:
 	$(PYTHON) -m pytest tests/python -q
