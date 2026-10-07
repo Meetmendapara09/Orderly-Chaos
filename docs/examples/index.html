@@ -63,6 +63,17 @@
                             </tbody>
                         </table>
                     </div>
+                    <p>Larger demo projects, built only on the published <code>orderly-chaos</code> package:</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Demo</th><th>Use case</th><th>Run</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>examples/sma-backtest/</code></td><td>SMA crossover strategy with realistic queue fills and P&amp;L vs buy-and-hold</td><td><code>python examples/sma-backtest/backtest.py --steps 2000</code></td></tr>
+                                <tr><td><code>examples/twap-executor/</code></td><td>Work a parent order in time slices; VWAP and slippage vs arrival</td><td><code>python examples/twap-executor/twap.py --quantity 5000 --slices 10</code></td></tr>
+                                <tr><td><code>examples/book-ladder/</code></td><td>Text depth ladder: spread, imbalance, and price formation</td><td><code>python examples/book-ladder/ladder.py --snapshots 4</code></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
 
                     <h2 id="quickstart">Quick start (Python)</h2>
 <pre><code class="language-python">from orderly_chaos import LimitOrderBook, Side, UnknownOrderIdError

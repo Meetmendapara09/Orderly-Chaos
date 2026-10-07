@@ -6,7 +6,7 @@ HTML, no build step) and Markdown design notes.
 ## Pages
 
 | Page | Audience | Contents |
-|------|----------|----------|
+| ------ | ---------- | ---------- |
 | [index.html](index.html) | Everyone | Landing page |
 | [overview.html](overview.html) | New users | What it is, use cases, when to use it, matching rules, lifecycle, errors |
 | [getting-started.html](getting-started.html) | New users | Installation for Python, C++, and C; verification; first program; troubleshooting |
@@ -52,7 +52,7 @@ docs/
 ## Libraries
 
 | Library | Purpose | How it is loaded |
-|---------|---------|------------------|
+| --------- | --------- | ------------------ |
 | [Mermaid 12.1.0](https://mermaid.js.org/) | Flowcharts, sequence, class, and state diagrams | ES module from jsDelivr, imported only on pages with diagrams |
 | [highlight.js 11.12.0](https://highlightjs.org/) | Syntax highlighting | jsDelivr with a Subresource Integrity hash |
 | IBM Plex Sans, Source Code Pro | Typography | Google Fonts |
