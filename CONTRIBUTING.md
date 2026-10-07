@@ -104,6 +104,12 @@ if they disagree. To release:
   stored anywhere. Before the first release, add a pending publisher at
   <https://pypi.org/manage/account/publishing> for this repository with
   workflow file name `publish.yml`. No other configuration is needed.
+  If publishing fails with `invalid-publisher ... no corresponding
+  publisher`, the pending publisher is missing or names the wrong
+  repository, workflow file, or PyPI project (`orderly-chaos`); fix it on
+  PyPI and re-run the workflow. As a fallback you may instead create a
+  PyPI API token, store it as a `PYPI_API_TOKEN` repository secret, and
+  re-run: the publish workflow uses it automatically when present.
 - **GHCR:** pushing images uses the built-in `GITHUB_TOKEN`; no setup needed.
   If the package page does not appear under your profile, check the
   repository Settings, Actions, General, Workflow permissions

@@ -45,4 +45,9 @@ jobs:
           /tmp/sdist-check/bin/python -c "from orderly_chaos import LimitOrderBook, Side; b = LimitOrderBook(); b.limit_sell(1, 100, 10050); assert b.limit_buy(2, 40, 10050) == 40; print('sdist OK')"
 
       - name: Publish to PyPI
+        # Uses trusted publishing (OpenID Connect) when no token is
+        # configured. If you added a PYPI_API_TOKEN secret instead, it is
+        # used as a fallback automatically.
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
