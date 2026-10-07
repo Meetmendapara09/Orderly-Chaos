@@ -1,22 +1,57 @@
 # MARK: Project Files
+
+# Build output (setup.py, ad-hoc build dirs)
 build*/
 
+# Orderly Chaos build artifacts. The shared library staged next to the
+# Python package (python/orderly_chaos/lib_orderly_chaos.*) is built by
+# `make python-lib` or `pip install` and is never committed.
+_orderly_chaos.so
+_orderly_chaos.dll
+lib_orderly_chaos.a
+python/orderly_chaos/lib_orderly_chaos*.so
+python/orderly_chaos/lib_orderly_chaos*.dylib
+python/orderly_chaos/lib_orderly_chaos*.dll
+python/orderly_chaos/lib_orderly_chaos*.pyd
+python/orderly_chaos/*.so
+python/orderly_chaos/*.pyd
+
+# Test frameworks are fetched via Bzlmod, not vendored
+gtest.tar.gz
+
+# Local tooling (not part of the project)
+node_modules/
+/package.json
+/package-lock.json
+.kilo/
+.agents/
+skills-lock.json
+
+
+
+# MARK: Bazel Files
+# .bazelrc and .bazelignore are shared and committed; put machine-specific
+# options (BAZEL_SH, MinGW paths, caches) in user.bazelrc instead.
+
+/bazel-*
+user.bazelrc
+.bazelproject
+.ijwb/
+.clwb/
+
+
+
 # MARK: Python gitignore
-# https://github.com/github/gitignore/blob/master/Python.gitignore
+# https://github.com/github/gitignore/blob/main/Python.gitignore
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# C extensions
-# TODO: this might not need ignored for this package
-*.so
-
 # Distribution / packaging
 MANIFEST
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -33,8 +68,6 @@ wheels/
 *.egg
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
 
@@ -45,6 +78,7 @@ pip-delete-this-directory.txt
 # Unit test / coverage reports
 htmlcov/
 .tox/
+.nox/
 .coverage
 .coverage.*
 .cache
@@ -52,39 +86,19 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+.pytest_cache/
 
-# Translations
-*.mo
-*.pot
-
-# Django stuff:
+# Logs
 *.log
-local_settings.py
-
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
 
 # Sphinx documentation
 docs/_build/
-
-# PyBuilder
-target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
 
 # pyenv
 .python-version
-
-# celery beat schedule file
-celerybeat-schedule
-
-# SageMath parsed files
-*.sage.py
 
 # Environments
 .env
@@ -93,24 +107,13 @@ env/
 venv/
 ENV/
 
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
 # mypy
 .mypy_cache/
 
 
 
-
-# MARK: CPP Project Files
-# https://github.com/github/gitignore/blob/master/C%2B%2B.gitignore
+# MARK: C++ gitignore
+# https://github.com/github/gitignore/blob/main/C%2B%2B.gitignore
 
 ## Prerequisites
 *.d
@@ -125,13 +128,12 @@ ENV/
 *.gch
 *.pch
 
-## Compiled Dynamic libraries
+## Compiled Dynamic libraries (includes MinGW runtime DLLs such as
+## toolchain/runtime/*.dll)
 *.so
 *.dylib
 *.dll
-
-# But not the library in the orderly_chaos package
-!orderly_chaos/lib_orderly_chaos.dll
+*.pyd
 
 ## Fortran module files
 *.mod
@@ -150,54 +152,23 @@ ENV/
 
 
 
-# MARK: Bazel Files
-# https://github.com/bazelbuild/intellij/blob/master/docs/README.md
-# Getting started with Bazel
+# MARK: Editors
 
-# Bazel specific
-bazel-*
-*/bazel-*
-BAZEL_BLAKE2_SRC
-.bazelrc
-.bazelignore
-.bazelproject
-
-# Orderly Chaos build artifacts
-_orderly_chaos.so
-_orderly_chaos.dll
-lib_orderly_chaos.a
-_limit_order_book.so
-_limit_order_book.dll
-lib_limit_order_book.a
-
-# MinGW runtime DLLs (platform-specific)
-orderly_chaos/libgcc_s_seh-1.dll
-orderly_chaos/libstdc++-6.dll
-orderly_chaos/libwinpthread-1.dll
-
-# Vendor test frameworks — fetched via Bzlmod, do not vendor
-vendor/Catch2/
-vendor/googletest/
-gtest.tar.gz
-vendor/googletest_deps.bzl
+.vscode/
+.idea/
+*.swp
+*~
 
 
 
-# MacOS gitignore
-# https://raw.githubusercontent.com/github/gitignore/master/Global/macOS.gitignore
+# MARK: macOS
+# https://github.com/github/gitignore/blob/main/Global/macOS.gitignore
 
-## General
 .DS_Store
 .AppleDouble
 .LSOverride
-
-## Icon must end with two \r
 Icon
-
-## Thumbnails
 ._*
-
-## Files that might appear in the root of a volume
 .DocumentRevisions-V100
 .fseventsd
 .Spotlight-V100
@@ -205,15 +176,8 @@ Icon
 .Trashes
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
-
-## Directories potentially created on remote AFP share
 .AppleDB
 .AppleDesktop
 Network Trash Folder
 Temporary Items
 .apdisk
-
-# Kilo Models
-.kilo/
-.kilo
-.agents/

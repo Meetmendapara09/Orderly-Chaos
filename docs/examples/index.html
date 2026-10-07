@@ -2,211 +2,199 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examples • Orderly Chaos</title>
-    <link rel="stylesheet" href="../styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Examples | Orderly Chaos</title>
+    <meta name="description" content="Runnable Orderly Chaos examples in Python, C++, and C: quick starts, event replay, market making, and order-flow simulation.">
+    <meta name="author" content="Meet Mendapara">
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../assets/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="../assets/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+    <link rel="manifest" href="../assets/site.webmanifest">
+    <meta name="theme-color" content="#23251d">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js" integrity="sha384-wjfDDhOPPdjtva8vWBhWeVprSpmxisEu5aYT3q1JyACqXpdKpo3PWZTMVq24MBix" crossorigin="anonymous" defer></script>
+    <script src="../assets/js/components.js" defer></script>
+    <script src="../assets/js/copy-code.js" defer></script>
+    <script type="module" src="../assets/js/site.js"></script>
 </head>
 <body data-page="examples">
-    <header id="header-slot" class="navbar" role="banner"></header>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header id="header-slot" class="navbar"></header>
 
-    <main class="pt-24 pb-32">
-        <div class="container mx-auto px-6">
-            <div class="content-page">
-                <div class="page-header">
-                    <nav class="breadcrumb" aria-label="Breadcrumb">
-                        <a href="../index.html">Home</a>
-                        <span class="sep">/</span>
-                        <span class="current">Examples</span>
-                    </nav>
-                    <span class="page-badge">Examples</span>
-                    <h1 class="page-title">Practical Examples</h1>
-                    <p class="page-description">
-                        Real-world examples demonstrating common use cases for Orderly Chaos.
+    <main id="main" class="content-page">
+        <div class="container">
+            <div class="page-header">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="../index.html">Home</a><span class="sep">/</span><span class="current">Examples</span>
+                </nav>
+                <span class="page-badge">Examples</span>
+                <h1 class="page-title">Examples</h1>
+                <p class="page-description">Complete, runnable programs in the <code>examples/</code> directory. Every one of them is executed by the test suite, so they always match the current API.</p>
+            </div>
+
+            <div class="docs-layout">
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul>
+                        <li><a href="#catalog">Catalog</a></li>
+                        <li><a href="#quickstart">Quick start (Python)</a></li>
+                        <li><a href="#replay">Replaying order events</a></li>
+                        <li><a href="#market-maker">Market maker simulation</a></li>
+                        <li><a href="#cpp">C++ quick start</a></li>
+                        <li><a href="#simulation">C++ order-flow simulation</a></li>
+                        <li><a href="#c">C quick start</a></li>
+                        <li><a href="#patterns">Common patterns</a></li>
+                    </ul>
+                </nav>
+
+                <article class="doc-content">
+                    <h2 id="catalog">Catalog</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>File</th><th>Use case</th><th>Run</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>examples/python/quickstart.py</code></td><td>Every core operation in one short script</td><td><code>python examples/python/quickstart.py</code></td></tr>
+                                <tr><td><code>examples/python/replay_events.py</code></td><td>Rebuild a book from a CSV event log (market data replay, backtesting)</td><td><code>python examples/python/replay_events.py [events.csv]</code></td></tr>
+                                <tr><td><code>examples/python/market_maker.py</code></td><td>A quoting strategy against random order flow (exchange simulation)</td><td><code>python examples/python/market_maker.py [steps]</code></td></tr>
+                                <tr><td><code>examples/cpp/quickstart.cpp</code></td><td>The C++ API end to end</td><td><code>bazel run //examples/cpp:quickstart</code></td></tr>
+                                <tr><td><code>examples/cpp/market_simulation.cpp</code></td><td>High-volume random order flow with throughput statistics</td><td><code>bazel run -c opt //examples/cpp:market_simulation -- 1000000</code></td></tr>
+                                <tr><td><code>examples/c/quickstart.c</code></td><td>The C API with status codes and a trade callback</td><td><code>bazel run //examples/c:quickstart</code></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 id="quickstart">Quick start (Python)</h2>
+<pre><code class="language-python">from orderly_chaos import LimitOrderBook, Side, UnknownOrderIdError
+
+book = LimitOrderBook(on_trade=lambda t: print(f"TRADE taker={t.taker_id} maker={t.maker_id} qty={t.quantity} @ {t.price}"))
+
+book.limit(Side.SELL, order_id=1, quantity=100, price=10_050)  # ask 100 @ 100.50
+book.limit(Side.SELL, order_id=2, quantity=200, price=10_075)  # ask 200 @ 100.75
+book.limit(Side.BUY, order_id=3, quantity=150, price=10_000)   # bid 150 @ 100.00
+
+filled = book.limit(Side.BUY, order_id=4, quantity=250, price=10_050)
+print(f"order 4 filled {filled}, resting {book.get(4).quantity}")
+print(f"market buy filled {book.market(Side.BUY, order_id=5, quantity=500)} of 500")
+
+try:
+    book.cancel(999)
+except UnknownOrderIdError as error:
+    print(f"rejected: {error}")</code></pre>
+                    <p>Output:</p>
+<pre><code class="language-plaintext">TRADE taker=4 maker=1 qty=100 @ 10050
+order 4 filled 100, resting 150
+TRADE taker=5 maker=2 qty=200 @ 10075
+market buy filled 200 of 500
+rejected: cancel order 999: unknown order id [OC_ERR_UNKNOWN_ORDER_ID]</code></pre>
+
+                    <h2 id="replay">Replaying order events</h2>
+                    <p>
+                        <strong>When to use:</strong> you have a sequence of order events (from an exchange's order-by-order feed, or produced by
+                        a strategy) and want to reconstruct the book, observe trades, and measure prices. The example reads
+                        <code>action,order_id,side,quantity,price</code> rows, applies them in order, logs rejected events without stopping, and
+                        reports the volume-weighted average trade price.
                     </p>
-                    <div class="page-meta">
-                        <span>📋 5 recipes</span><span class="dot"></span><span>🐍 Python + C++</span><span class="dot"></span><span>Copy-paste ready</span>
-                    </div>
-                </div>
+<pre><code class="language-python">def replay(rows):
+    trades = []
+    book = LimitOrderBook(on_trade=trades.append)
+    for row in rows:
+        try:
+            if row["action"] == "limit":
+                book.limit(row["side"], int(row["order_id"]), int(row["quantity"]), int(row["price"]))
+            elif row["action"] == "market":
+                book.market(row["side"], int(row["order_id"]), int(row["quantity"]))
+            elif row["action"] == "cancel":
+                book.cancel(int(row["order_id"]))
+            elif row["action"] == "reduce":
+                book.reduce(int(row["order_id"]), int(row["quantity"]))
+        except OrderBookError as error:
+            print("rejected:", error)   # the book is unchanged; keep going
+    return trades</code></pre>
 
-                <div class="docs-layout">
-                    <nav class="toc">
-                        <div class="toc-nav">
-                            <ul>
-                                <li><a href="#basic-trading">Basic Trading Session</a></li>
-                                <li><a href="#book-inspection">Order Book Inspection</a></li>
-                                <li><a href="#market-making">Market Making Strategy</a></li>
-                                <li><a href="#matching-simulation">Matching Engine Simulation</a></li>
-                                <li><a href="#cpp-example">C++ Usage Example</a></li>
-                            </ul>
-                        </div>
-                    </nav>
+                    <h2 id="market-maker">Market maker simulation</h2>
+                    <p>
+                        <strong>When to use:</strong> research and teaching. A market maker keeps one bid and one ask around the mid price,
+                        re-quotes whenever a quote is filled, leans its quotes against its inventory, and tracks cash and profit and loss from the
+                        trade events, while random traders send market and limit orders. It shows how to tell your own fills apart from other
+                        participants' trades with the <code>maker_id</code> field.
+                    </p>
+<pre><code class="language-python">def on_trade(trade):
+    side = maker_orders.get(trade.maker_id)   # was one of our quotes hit?
+    if side is Side.BUY:
+        position["inventory"] += trade.quantity
+        position["cash"] -= trade.quantity * trade.price
+    elif side is Side.SELL:
+        position["inventory"] -= trade.quantity
+        position["cash"] += trade.quantity * trade.price</code></pre>
 
-                    <div class="doc-content">
-                        <h2 id="basic-trading">1. Basic Trading Session</h2>
-                        <p>A complete example showing how to set up a book, place orders, and query state.</p>
-                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
+                    <h2 id="cpp">C++ quick start</h2>
+<pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;orderly_chaos/orderly_chaos.hpp&gt;
 
-<span class="comment"># Create order book</span>
-book = LimitOrderBook()
+using namespace orderly_chaos;
 
-<span class="comment"># Place limit orders</span>
-book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)
-book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)
-
-<span class="comment"># Market orders</span>
-book.market_buy(order_id=<span class="number">3</span>, quantity=<span class="number">75</span>)
-
-<span class="comment"># Query state</span>
-print(f<span class="string">"Best Ask: ${book.best_sell() / 100:.2f}"</span>)
-print(f<span class="string">"Total Volume: {book.volume()}"</span>)
-print(f<span class="string">"Order Count: {book.count()}"</span>)
-
-<span class="comment"># Cancel an order</span>
-book.cancel(<span class="number">1</span>)</code></pre>
-
-                        <h2 id="book-inspection">2. Order Book Inspection</h2>
-                        <p>Inspect the state of the order book in detail.</p>
-                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-
-book = LimitOrderBook()
-
-<span class="comment"># Add orders across multiple price levels</span>
-for i, (qty, price) <span class="keyword">in</span> <span class="keyword">enumerate</span>([
-    (<span class="number">100</span>, <span class="number">100</span>), (<span class="number">200</span>, <span class="number">101</span>), (<span class="number">150</span>, <span class="number">102</span>),  <span class="comment"># Sell side</span>
-    (<span class="number">100</span>, <span class="number">99</span>),  (<span class="number">200</span>, <span class="number">98</span>),  (<span class="number">300</span>, <span class="number">97</span>),  <span class="comment"># Buy side</span>
-]):
-    <span class="keyword">if</span> i &lt; <span class="number">3</span>:
-        book.limit_sell(i + <span class="number">1</span>, qty, price)
-    <span class="keyword">else</span>:
-        book.limit_buy(i + <span class="number">1</span>, qty, price)
-
-<span class="comment"># Inspect book levels</span>
-print(<span class="string">"=== Order Book Summary ==="</span>)
-print(f<span class="string">"Best Ask: {book.best_sell()}"</span>)
-print(f<span class="string">"Best Bid: {book.best_buy()}"</span>)
-print(f<span class="string">"Total Sell Volume: {book.volume_sell()}"</span>)
-print(f<span class="string">"Total Buy Volume: {book.volume_buy()}"</span>)
-print(f<span class="string">"Orders at price 101: {book.count_at(101)}"</span>)</code></pre>
-
-                        <h2 id="market-making">3. Market Making Strategy</h2>
-                        <p>Simulate a basic market making strategy posting on both sides.</p>
-                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-<span class="keyword">import</span> random
-
-book = LimitOrderBook()
-next_order_id = <span class="number">1</span>
-
-<span class="keyword">def</span> post_market_making_orders(mid_price, spread=<span class="number">5</span>, size=<span class="number">100</span>):
-    <span class="string">"""Post buy and sell orders around a mid-price."""</span>
-    <span class="keyword">global</span> next_order_id
-    buy_price = mid_price - spread
-    sell_price = mid_price + spread
-    book.limit_buy(next_order_id, size, buy_price)
-    next_order_id += <span class="number">1</span>
-    book.limit_sell(next_order_id, size, sell_price)
-    next_order_id += <span class="number">1</span>
-
-<span class="keyword">def</span> simulate_price_movement(book, steps=<span class="number">10</span>):
-    <span class="string">"""Simulate incoming market orders causing price movements."""</span>
-    <span class="keyword">global</span> next_order_id
-    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="keyword">range</span>(steps):
-        side = random.choice([<span class="keyword">True</span>, <span class="keyword">False</span>])
-        qty = random.randint(<span class="number">10</span>, <span class="number">50</span>)
-        <span class="keyword">if</span> side:
-            book.market_buy(next_order_id, qty)
-        <span class="keyword">else</span>:
-            book.market_sell(next_order_id, qty)
-        next_order_id += <span class="number">1</span>
-
-<span class="comment"># Initialize with market making orders</span>
-post_market_making_orders(mid_price=<span class="number">10250</span>, spread=<span class="number">10</span>, size=<span class="number">100</span>)
-print(f<span class="string">"Initial mid-price: {book.price()}"</span>)
-
-<span class="comment"># Simulate price movement</span>
-simulate_price_movement(book, steps=<span class="number">5</span>)
-print(f<span class="string">"After simulation: {book.price()}"</span>)</code></pre>
-
-                        <h2 id="matching-simulation">4. Matching Engine Simulation</h2>
-                        <p>Demonstrate how large orders cascade through the book.</p>
-                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-
-book = LimitOrderBook()
-
-<span class="comment"># Set up initial liquidity</span>
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>)
-
-print(<span class="string">"=== Matching Engine Simulation ==="</span>)
-
-<span class="comment"># Place a large buy that sweeps the ask</span>
-book.limit_buy(<span class="number">3</span>, <span class="number">200</span>, <span class="number">10260</span>)
-<span class="comment"># This matches 100 @ 10250, leaving 100 resting at 10260</span>
-
-print(f<span class="string">"After large buy: {book.count()} orders"</span>)
-print(f<span class="string">"  Best Ask: {book.best_sell()}"</span>)
-print(f<span class="string">"  Buy vol at 10260: {book.volume_buy(10260)}"</span>)
-
-<span class="comment"># Partial fill</span>
-book.market_sell(<span class="number">4</span>, <span class="number">30</span>)
-<span class="comment"># Matches 30 @ 10260</span>
-
-print(f<span class="string">"After market sell: {book.count()} orders"</span>)
-print(f<span class="string">"  Remaining buy vol: {book.volume_buy(10260)}"</span>)</code></pre>
-
-                        <h2 id="cpp-example">5. C++ Usage Example</h2>
-                        <p>Same workflow in native C++ &mdash; zero overhead, direct header inclusion.</p>
-                        <pre><code><span class="keyword">#include</span> <span class="string">"limit_order_book.hpp"</span>
-<span class="keyword">#include</span> <span class="string">&lt;cassert&gt;</span>
-
-<span class="keyword">int</span> main() {
-    LOB::LimitOrderBook book;
-
-    <span class="comment">// Place limit orders &mdash; 10240 bid / 10250 ask</span>
-    book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-    book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
-    <span class="keyword">assert</span>(book.best_sell() == <span class="number">10250</span>);
-    <span class="keyword">assert</span>(book.best_buy() == <span class="number">10240</span>);
-    <span class="keyword">assert</span>(book.price() == <span class="number">10245</span>); <span class="comment">// midpoint</span>
-
-    <span class="comment">// Market order &mdash; buy 40 from ask</span>
-    book.market_buy(<span class="number">3</span>, <span class="number">40</span>);
-    <span class="keyword">assert</span>(book.volume_sell() == <span class="number">60</span>);
-
-    <span class="comment">// Cancel and clear</span>
-    book.cancel(<span class="number">2</span>);
-    <span class="keyword">assert</span>(book.count_buy() == <span class="number">0</span>);
-    book.clear();
-    <span class="keyword">assert</span>(book.count() == <span class="number">0</span>);
-    <span class="keyword">return</span> <span class="number">0</span>;
+int main() {
+    LimitOrderBook book;
+    book.set_trade_handler([](const Trade&amp; t) {
+        std::cout &lt;&lt; "TRADE " &lt;&lt; t.quantity &lt;&lt; " @ " &lt;&lt; t.price &lt;&lt; '\n';
+    });
+    book.limit(Side::Sell, 1, 100, 10'050);
+    book.limit(Side::Buy, 2, 150, 10'000);
+    const auto filled = book.limit(Side::Buy, 3, 250, 10'050);   // 100
+    for (const auto&amp; level : book.depth(Side::Buy, 5))
+        std::cout &lt;&lt; level.price &lt;&lt; " x " &lt;&lt; level.volume &lt;&lt; '\n';
+    try {
+        book.cancel(999);
+    } catch (const OrderBookError&amp; error) {
+        std::cout &lt;&lt; "rejected: " &lt;&lt; error.what() &lt;&lt; '\n';
+    }
+    return filled == 100 ? 0 : 1;
 }</code></pre>
 
-                        <h2 id="c-example">6. C API (FFI) Example</h2>
-                        <p>C-compatible extern "C" layer for FFI &mdash; same engine, C calling convention.</p>
-                        <pre><code><span class="keyword">#include</span> <span class="string">"lib_lob.hpp"</span>
-<span class="keyword">#include</span> <span class="string">&lt;cassert&gt;</span>
+                    <h2 id="simulation">C++ order-flow simulation</h2>
+                    <p>Generates limit, market, and cancel orders around a random-walk fair price, validates the book with <code>check_invariants()</code> at the end, and prints statistics:</p>
+<pre><code class="language-plaintext">$ bazel run -c opt //examples/cpp:market_simulation -- 1000000
+events          1000000
+trades          ...
+resting orders  ...
+best bid / ask  ...
+throughput      ... events/s</code></pre>
 
-<span class="keyword">int</span> main() {
-    <span class="keyword">auto</span>* book = new_();
-    limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-    limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
-    <span class="keyword">assert</span>(best_sell(book) == <span class="number">10250</span>);
-    <span class="keyword">assert</span>(volume(book) == <span class="number">150</span>);
-    market_buy(book, <span class="number">3</span>, <span class="number">40</span>);
-    <span class="keyword">assert</span>(volume_sell(book) == <span class="number">60</span>);
-    cancel(book, <span class="number">2</span>);
-    clear(book);
-    <span class="keyword">assert</span>(count(book) == <span class="number">0</span>);
-    delete_(book);
-    <span class="keyword">return</span> <span class="number">0</span>;
+                    <h2 id="c">C quick start</h2>
+<pre><code class="language-c">oc_book* book = oc_book_new();
+uint32_t filled = 0;
+oc_book_limit(book, OC_SIDE_SELL, 1, 100, 10050, NULL);
+oc_book_limit(book, OC_SIDE_BUY, 4, 250, 10050, &amp;filled);        /* filled == 100 */
+oc_status status = oc_book_cancel(book, 999);                     /* OC_ERR_UNKNOWN_ORDER_ID */
+printf("%s\n", oc_status_string(status));                         /* "unknown order id" */
+oc_book_free(book);</code></pre>
+
+                    <h2 id="patterns">Common patterns</h2>
+                    <h3 id="cancel-if-resting">Cancel an order that may already be filled</h3>
+<pre><code class="language-python">try:
+    book.cancel(order_id)
+except UnknownOrderIdError:
+    pass   # it was filled (or cancelled) already</code></pre>
+                    <h3 id="replace">Cancel and replace (amend price)</h3>
+<pre><code class="language-python">if order_id in book:
+    book.cancel(order_id)
+book.limit(side, new_order_id, quantity, new_price)   # a new price always loses queue priority</code></pre>
+                    <h3 id="snapshot">Top-of-book snapshot</h3>
+<pre><code class="language-python">snapshot = {
+    "bid": book.best_buy(), "bid_size": book.best_volume(Side.BUY),
+    "ask": book.best_sell(), "ask_size": book.best_volume(Side.SELL),
+    "mid": book.mid_price(), "spread": book.spread(),
 }</code></pre>
-                    </div>
-                </div>
+                    <h3 id="ids">Generating order IDs</h3>
+<pre><code class="language-python">from itertools import count
+next_id = count(1).__next__
+book.limit(Side.BUY, next_id(), 10, 100)</code></pre>
+                </article>
             </div>
         </div>
     </main>
 
     <footer id="footer-slot" class="footer"></footer>
-    <script src="../components.js" defer></script>
-    <script src="../copy-code.js" defer></script>
 </body>
 </html>

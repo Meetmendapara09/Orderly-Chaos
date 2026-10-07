@@ -1,0 +1,20 @@
+# Shared Bazel configuration for Orderly Chaos.
+#
+# Platform-specific sections (build:linux, build:macos, build:windows) are
+# applied automatically based on the host platform.
+#
+# Machine-specific settings (e.g. BAZEL_SH, a custom MinGW location, cache
+# directories) belong in user.bazelrc, which is git-ignored.
+
+common --enable_platform_specific_config
+
+build:linux --cxxopt=-std=c++17 --copt=-O2
+build:macos --cxxopt=-std=c++17 --copt=-O2
+
+# Windows builds use the Strawberry Perl MinGW-w64 toolchain registered in
+# toolchain/BUILD.bazel; link the GCC runtime statically so the produced
+# binaries do not depend on MinGW DLLs being on PATH.
+build:windows --cxxopt=-std=c++17 --copt=-O2
+build:windows --linkopt=-static --linkopt=-static-libgcc --linkopt=-static-libstdc++
+
+try-import %workspace%/user.bazelrc

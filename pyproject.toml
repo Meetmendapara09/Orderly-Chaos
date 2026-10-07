@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "orderly-chaos"
+version = "0.2.0"
+description = "A fast price-time priority limit order book (matching engine) with C++, C, and Python APIs."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md", "third_party/robin_map/LICENSE"]
+authors = [{ name = "Meet Mendapara", email = "meetmendapara09@gmail.com" }]
+maintainers = [{ name = "Meet Mendapara", email = "meetmendapara09@gmail.com" }]
+keywords = [
+    "limit order book",
+    "matching engine",
+    "order book",
+    "trading",
+    "market microstructure",
+    "backtesting",
+    "exchange simulator",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Science/Research",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: C",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/Meetmendapara09/Orderly-Chaos"
+Documentation = "https://github.com/Meetmendapara09/Orderly-Chaos/tree/main/docs/guide"
+Source = "https://github.com/Meetmendapara09/Orderly-Chaos"
+Issues = "https://github.com/Meetmendapara09/Orderly-Chaos/issues"
+Changelog = "https://github.com/Meetmendapara09/Orderly-Chaos/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[tool.setuptools]
+package-dir = { "" = "python" }
+packages = ["orderly_chaos"]
+include-package-data = false
+
+[tool.setuptools.package-data]
+orderly_chaos = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python"]
+addopts = "-ra"

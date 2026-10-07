@@ -2,338 +2,288 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python API • Orderly Chaos</title>
-    <link rel="stylesheet" href="../styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Python API | Orderly Chaos</title>
+    <meta name="description" content="Complete reference for the orderly_chaos Python package: LimitOrderBook, Side, Trade, Order, PriceLevel, and exceptions.">
+    <meta name="author" content="Meet Mendapara">
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../assets/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="../assets/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+    <link rel="manifest" href="../assets/site.webmanifest">
+    <meta name="theme-color" content="#23251d">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js" integrity="sha384-wjfDDhOPPdjtva8vWBhWeVprSpmxisEu5aYT3q1JyACqXpdKpo3PWZTMVq24MBix" crossorigin="anonymous" defer></script>
+    <script src="../assets/js/components.js" defer></script>
+    <script src="../assets/js/copy-code.js" defer></script>
+    <script type="module" src="../assets/js/site.js"></script>
 </head>
 <body data-page="python-api">
-    <header id="header-slot" class="navbar" role="banner"></header>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header id="header-slot" class="navbar"></header>
 
-    <main class="pt-24 pb-32">
-        <div class="container mx-auto px-6">
-            <div class="content-page">
-                <div class="page-header">
-                    <nav class="breadcrumb" aria-label="Breadcrumb">
-                        <a href="../index.html">Home</a>
-                        <span class="sep">/</span>
-                        <a href="#limit-order-book">API Reference</a>
-                        <span class="sep">/</span>
-                        <span class="current">Python</span>
-                    </nav>
-                    <span class="page-badge">API Reference</span>
-                    <h1 class="page-title">Python API</h1>
-                    <p class="page-description">
-                        The Python interface for Orderly Chaos, providing high-level access to the C++ matching engine via ctypes.
-                    </p>
-                    <div class="page-meta">
-                        <span>🐍 ctypes bindings</span><span class="dot"></span><span>📦 pip install orderly-chaos</span><span class="dot"></span><span>Python 3.8+</span>
-                    </div>
-                </div>
+    <main id="main" class="content-page">
+        <div class="container">
+            <div class="page-header">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="../index.html">Home</a><span class="sep">/</span><span>API reference</span><span class="sep">/</span><span class="current">Python</span>
+                </nav>
+                <span class="page-badge">API reference</span>
+                <h1 class="page-title">Python API</h1>
+                <p class="page-description">The <code>orderly_chaos</code> package: a typed, Pythonic interface to the native engine.</p>
+                <div class="page-meta"><span>Python 3.9+</span><span>Type hints included</span><span>Version 0.2.0</span></div>
+            </div>
 
-                <div class="docs-layout">
-                    <nav class="toc">
-                        <div class="toc-nav">
+            <div class="docs-layout">
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul>
+                        <li><a href="#summary">Summary</a></li>
+                        <li><a href="#book">LimitOrderBook</a>
                             <ul>
-                                <li><a href="#limit-order-book">LimitOrderBook</a>
-                                    <ul>
-                                        <li><a href="#order-placement">Order Placement</a></li>
-                                        <li><a href="#market-orders">Market Orders</a></li>
-                                        <li><a href="#query-methods">Query Methods</a></li>
-                                        <li><a href="#order-management">Order Management</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="#types">Data Types</a></li>
+                                <li><a href="#constructor">Constructor and lifecycle</a></li>
+                                <li><a href="#order-entry">Order entry</a></li>
+                                <li><a href="#order-queries">Order queries</a></li>
+                                <li><a href="#prices">Prices</a></li>
+                                <li><a href="#volumes">Volumes and counts</a></li>
+                                <li><a href="#depth">Depth</a></li>
+                                <li><a href="#trade-events">Trade events</a></li>
                             </ul>
-                        </div>
-                    </nav>
+                        </li>
+                        <li><a href="#types">Types</a></li>
+                        <li><a href="#exceptions">Exceptions</a></li>
+                        <li><a href="#module">Module attributes</a></li>
+                        <li><a href="#loading">Library loading</a></li>
+                        <li><a href="#migration">Migrating from 0.1</a></li>
+                    </ul>
+                </nav>
 
-                    <div class="doc-content">
-                        <h2 id="limit-order-book">LimitOrderBook</h2>
-                        <p>The main class for interacting with the order book. All methods are thread-unsafe;
-                        use external synchronization if accessing from multiple threads.</p>
+                <article class="doc-content">
+                    <h2 id="summary">Summary</h2>
+<pre><code class="language-python">from orderly_chaos import LimitOrderBook, Side, Trade, UnknownOrderIdError
 
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">class LimitOrderBook</div>
-                                <div class="method-description">
-                                    Initialize a new empty limit order book instance.
-                                </div>
-                            </div>
-                        </div>
-
-                        <h3 id="order-placement">Order Placement</h3>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">limit_sell(order_id: int, quantity: int, price: int) → None</div>
-                                <div class="method-description">Place a sell limit order at the given price.</div>
-                                <table class="param-table">
-                                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-                                    <tr><td>order_id</td><td>int</td><td>Unique identifier for the order</td></tr>
-                                    <tr><td>quantity</td><td>int</td><td>Number of shares to sell</td></tr>
-                                    <tr><td>price</td><td>int</td><td>Limit price for the order</td></tr>
-                                </table>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)
-<span class="keyword">assert</span> book.best_sell() == <span class="number">10250</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">limit_buy(order_id: int, quantity: int, price: int) → None</div>
-                                <div class="method-description">Place a buy limit order at the given price.</div>
-                                <table class="param-table">
-                                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-                                    <tr><td>order_id</td><td>int</td><td>Unique identifier for the order</td></tr>
-                                    <tr><td>quantity</td><td>int</td><td>Number of shares to buy</td></tr>
-                                    <tr><td>price</td><td>int</td><td>Limit price for the order</td></tr>
-                                </table>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)
-<span class="keyword">assert</span> book.best_buy() == <span class="number">10240</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">limit(side: bool, order_id: int, quantity: int, price: int) → None</div>
-                                <div class="method-description">Place a limit order on the specified side. <code>True</code> for buy, <code>False</code> for sell.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit(<span class="keyword">True</span>, order_id=<span class="number">3</span>, quantity=<span class="number">75</span>, price=<span class="number">10240</span>)   <span class="comment"># buy</span>
-book.limit(<span class="keyword">False</span>, order_id=<span class="number">4</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)  <span class="comment"># sell</span>
-<span class="keyword">assert</span> book.count() == <span class="number">2</span></code></pre>
-                            </div>
-                        </div>
-
-                        <h3 id="market-orders">Market Orders</h3>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">market_sell(order_id: int, quantity: int) → None</div>
-                                <div class="method-description">Execute a market sell order, matching against buy-side liquidity.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_buy(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>)
-book.market_sell(order_id=<span class="number">2</span>, quantity=<span class="number">40</span>)  <span class="comment"># sells 40 into bid</span>
-<span class="keyword">assert</span> book.volume_buy() == <span class="number">60</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">market_buy(order_id: int, quantity: int) → None</div>
-                                <div class="method-description">Execute a market buy order, matching against sell-side liquidity.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-book.market_buy(order_id=<span class="number">2</span>, quantity=<span class="number">40</span>)  <span class="comment"># buys 40 from ask</span>
-<span class="keyword">assert</span> book.volume_sell() == <span class="number">60</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">market(side: bool, order_id: int, quantity: int) → None</div>
-                                <div class="method-description">Execute a market order on the specified side. <code>True</code> for buy, <code>False</code> for sell.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-book.limit_buy(<span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>)
-book.market(<span class="keyword">True</span>, <span class="number">3</span>, <span class="number">25</span>)   <span class="comment"># market buy 25</span>
-book.market(<span class="keyword">False</span>, <span class="number">4</span>, <span class="number">25</span>)  <span class="comment"># market sell 25</span>
-<span class="keyword">assert</span> book.volume() == <span class="number">150</span></code></pre>
-                            </div>
-                        </div>
-
-                        <h3 id="query-methods">Query Methods</h3>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">has(order_id: int) → bool</div>
-                                <div class="method-description">Return <code>True</code> if an order with the given ID exists in the book.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-<span class="keyword">assert</span> book.has(<span class="number">1</span>) <span class="keyword">is True</span>
-<span class="keyword">assert</span> book.has(<span class="number">99</span>) <span class="keyword">is False</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">best_sell() → int</div>
-                                <div class="method-description">Return the best (lowest) sell/ask price. Returns 0 if no sell orders exist.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-book.limit_sell(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>)
-<span class="keyword">assert</span> book.best_sell() == <span class="number">10250</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">best_buy() → int</div>
-                                <div class="method-description">Return the best (highest) buy/bid price. Returns 0 if no buy orders exist.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_buy(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>)
-book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10230</span>)
-<span class="keyword">assert</span> book.best_buy() == <span class="number">10240</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">best(side: bool) → int</div>
-                                <div class="method-description">Return the best price for the given side. <code>True</code> for buy, <code>False</code> for sell.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-book.limit_buy(<span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>)
-<span class="keyword">assert</span> book.best(<span class="keyword">False</span>) == <span class="number">10250</span>  <span class="comment"># best ask</span>
-<span class="keyword">assert</span> book.best(<span class="keyword">True</span>) == <span class="number">10240</span>   <span class="comment"># best bid</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">volume(price: int | None = None) → int</div>
-                                <div class="method-description">Return the volume at a specific price, or total volume if no price is given.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-book.limit_buy(<span class="number">2</span>, <span class="number">75</span>, <span class="number">10240</span>)
-<span class="keyword">assert</span> book.volume(<span class="number">10250</span>) == <span class="number">100</span>
-<span class="keyword">assert</span> book.volume() == <span class="number">175</span>  <span class="comment"># total across both sides</span>
-print(book.price())  <span class="comment"># midpoint: (10250+10240)//2 = 10245</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">volume_sell(price: int | None = None) → int</div>
-                                <div class="method-description">Return the sell-side volume at a specific price, or total sell-side volume.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-book.limit_sell(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>)
-<span class="keyword">assert</span> book.volume_sell(<span class="number">10250</span>) == <span class="number">100</span>
-<span class="keyword">assert</span> book.volume_sell() == <span class="number">150</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">volume_buy(price: int | None = None) → int</div>
-                                <div class="method-description">Return the buy-side volume at a specific price, or total buy-side volume.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_buy(<span class="number">1</span>, <span class="number">80</span>, <span class="number">10240</span>)
-book.limit_buy(<span class="number">2</span>, <span class="number">60</span>, <span class="number">10230</span>)
-<span class="keyword">assert</span> book.volume_buy(<span class="number">10240</span>) == <span class="number">80</span>
-<span class="keyword">assert</span> book.volume_buy() == <span class="number">140</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">count() → int</div>
-                                <div class="method-description">Return the total number of orders in the book.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)
-book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)
-<span class="keyword">assert</span> book.count() == <span class="number">2</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">count_sell() → int</div>
-                                <div class="method-description">Return the number of orders on the sell side.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-book.limit_sell(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>)
-<span class="keyword">assert</span> book.count_sell() == <span class="number">2</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">count_buy() → int</div>
-                                <div class="method-description">Return the number of orders on the buy side.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_buy(<span class="number">1</span>, <span class="number">50</span>, <span class="number">10240</span>)
-<span class="keyword">assert</span> book.count_buy() == <span class="number">1</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">count_at(price: int) → int</div>
-                                <div class="method-description">Return the number of orders at a specific price level.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-book.limit_sell(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10250</span>)
-<span class="keyword">assert</span> book.count_at(<span class="number">10250</span>) == <span class="number">2</span></code></pre>
-                            </div>
-                        </div>
-
-                        <h3 id="order-management">Order Management</h3>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">cancel(order_id: int) → None</div>
-                                <div class="method-description">Cancel an existing order by its ID.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-book.cancel(<span class="number">1</span>)
-<span class="keyword">assert</span> book.count() == <span class="number">0</span>
-<span class="keyword">assert</span> book.has(<span class="number">1</span>) <span class="keyword">is False</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">clear() → None</div>
-                                <div class="method-description">Remove all orders from the book, resetting it to an empty state.</div>
-                                <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>)
-book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>)
-book.clear()
-<span class="keyword">assert</span> book.count() == <span class="number">0</span>
-<span class="keyword">assert</span> book.volume() == <span class="number">0</span></code></pre>
-                            </div>
-                        </div>
-
-                        <h2 id="types">Data Types</h2>
-                        <table class="param-table">
-                            <tr><th>Type</th><th>ctypes Type</th><th>Description</th></tr>
-                            <tr><td>UID</td><td>c_uint64</td><td>Unique order identifier</td></tr>
-                            <tr><td>Side</td><td>c_bool</td><td>Order side (true=buy, false=sell)</td></tr>
-                            <tr><td>Quantity</td><td>c_uint32</td><td>Number of shares</td></tr>
-                            <tr><td>Price</td><td>c_uint64</td><td>Price value (integer)</td></tr>
-                            <tr><td>Volume</td><td>c_uint32</td><td>Total share volume</td></tr>
-                            <tr><td>Count</td><td>c_uint32</td><td>Order count</td></tr>
+book = LimitOrderBook(on_trade=lambda t: print(t.quantity, "@", t.price))
+book.limit(Side.SELL, order_id=1, quantity=100, price=10_050)   # returns 0 (rested)
+book.limit(Side.BUY, order_id=2, quantity=40, price=10_050)     # returns 40 (traded)
+book.market(Side.BUY, order_id=3, quantity=100)                 # returns 60, rest discarded
+try:
+    book.cancel(1)                                              # already filled
+except UnknownOrderIdError as error:
+    print(error)</code></pre>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Category</th><th>Members</th></tr></thead>
+                            <tbody>
+                                <tr><td>Order entry</td><td><code>limit</code>, <code>limit_buy</code>, <code>limit_sell</code>, <code>market</code>, <code>market_buy</code>, <code>market_sell</code>, <code>cancel</code>, <code>reduce</code>, <code>clear</code></td></tr>
+                                <tr><td>Order queries</td><td><code>has</code>, <code>get</code>, <code>in</code>, <code>len()</code></td></tr>
+                                <tr><td>Prices</td><td><code>best</code>, <code>best_buy</code>, <code>best_sell</code>, <code>mid_price</code>, <code>spread</code></td></tr>
+                                <tr><td>Volumes and counts</td><td><code>volume</code>, <code>volume_buy</code>, <code>volume_sell</code>, <code>best_volume</code>, <code>count</code>, <code>count_buy</code>, <code>count_sell</code>, <code>count_at</code></td></tr>
+                                <tr><td>Market depth</td><td><code>depth</code></td></tr>
+                                <tr><td>Events and lifecycle</td><td><code>on_trade</code>, <code>close</code>, <code>closed</code>, context manager</td></tr>
+                            </tbody>
                         </table>
                     </div>
-                </div>
+
+                    <h2 id="book">LimitOrderBook</h2>
+                    <p>
+                        A price-time priority limit order book. Prices are integer ticks (at least 1), quantities are integers from 1 to
+                        2<sup>32</sup>&nbsp;-&nbsp;1, and order IDs are integers from 0 to 2<sup>64</sup>&nbsp;-&nbsp;1 that must be unique among resting
+                        orders. Arguments outside these ranges raise an exception instead of being silently truncated.
+                    </p>
+                    <p>Wherever a <code>side</code> is expected you may pass <code>Side.BUY</code> / <code>Side.SELL</code>, the strings <code>"buy"</code> / <code>"sell"</code> (also <code>"bid"</code> / <code>"ask"</code>), or the legacy booleans <code>True</code> (buy) / <code>False</code> (sell).</p>
+
+                    <h3 id="constructor">Constructor and lifecycle</h3>
+                    <div class="api-method">
+                        <pre class="method-signature">LimitOrderBook(on_trade: Callable[[Trade], None] | None = None)</pre>
+                        <p>Create an empty book. <code>on_trade</code>, if given, receives every <a href="#trade-events">trade</a>.</p>
+                        <p><span class="tag raises">raises</span> <code>LibraryError</code> if the native library cannot be found or is incompatible.</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">close() -&gt; None
+closed: bool                                   # property</pre>
+                        <p>Free the native book immediately. Afterwards every method raises <code>OrderlyChaosError</code>. Closing twice is harmless. Books are also freed automatically when garbage collected, and can be used as context managers:</p>
+<pre><code class="language-python">with LimitOrderBook() as book:
+    book.limit_buy(1, 10, 100)
+assert book.closed</code></pre>
+                    </div>
+
+                    <h3 id="order-entry">Order entry</h3>
+                    <div class="api-method">
+                        <pre class="method-signature">limit(side, order_id: int, quantity: int, price: int) -&gt; int
+limit_buy(order_id: int, quantity: int, price: int) -&gt; int
+limit_sell(order_id: int, quantity: int, price: int) -&gt; int</pre>
+                        <p>Submit a limit order. The part that crosses the spread trades immediately at the resting orders' prices; the remainder rests at <code>price</code>.</p>
+                        <p><span class="tag returns">returns</span> the quantity filled immediately (0 if it simply rested).</p>
+                        <p><span class="tag raises">raises</span> <code>DuplicateOrderIdError</code> if <code>order_id</code> is resting, <code>InvalidQuantityError</code> for a quantity of 0 or out of range, <code>InvalidPriceError</code> for a price of 0 or out of range, <code>InvalidSideError</code>, <code>TypeError</code> for non-integers.</p>
+<pre><code class="language-python">book.limit_sell(1, 30, 100)
+book.limit(Side.BUY, 2, 50, 101)   # returns 30; 20 rest as a bid at 101</code></pre>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">market(side, order_id: int, quantity: int) -&gt; int
+market_buy(order_id: int, quantity: int) -&gt; int
+market_sell(order_id: int, quantity: int) -&gt; int</pre>
+                        <p>Submit an immediate-or-cancel market order. It trades against the opposite side best price first; any unfilled remainder is discarded. <code>order_id</code> only labels the trades and does not need to be unique.</p>
+                        <p><span class="tag returns">returns</span> the quantity filled (0 if the opposite side is empty).</p>
+                        <p><span class="tag raises">raises</span> <code>InvalidQuantityError</code>, <code>InvalidSideError</code>, <code>TypeError</code>.</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">cancel(order_id: int) -&gt; None</pre>
+                        <p>Remove a resting order.</p>
+                        <p><span class="tag raises">raises</span> <code>UnknownOrderIdError</code> (a <code>KeyError</code>) if no resting order has this ID, for example because it was already filled.</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">reduce(order_id: int, quantity: int) -&gt; None</pre>
+                        <p>Lower a resting order's quantity by <code>quantity</code> while keeping its place in the queue. Reducing by the full open quantity cancels it.</p>
+                        <p><span class="tag raises">raises</span> <code>UnknownOrderIdError</code>; <code>InvalidQuantityError</code> if <code>quantity</code> is 0 or larger than the open quantity.</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">clear() -&gt; None</pre>
+                        <p>Remove every order. All IDs become available again.</p>
+                    </div>
+
+                    <h3 id="order-queries">Order queries</h3>
+                    <div class="api-method">
+                        <pre class="method-signature">has(order_id: int) -&gt; bool
+order_id in book                               # same, never raises
+len(book)                                      # number of resting orders</pre>
+                        <p>Check whether an order is resting.</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">get(order_id: int) -&gt; Order</pre>
+                        <p>Return an immutable snapshot of a resting order (its current open quantity, side, and price).</p>
+                        <p><span class="tag raises">raises</span> <code>UnknownOrderIdError</code>.</p>
+<pre><code class="language-python">book.limit_buy(7, 25, 99)
+book.get(7)   # Order(order_id=7, side=&lt;Side.BUY: 1&gt;, quantity=25, price=99)</code></pre>
+                    </div>
+
+                    <h3 id="prices">Prices</h3>
+                    <p>Price queries return <code>None</code> when there is no price (for example, the best ask of a book with no sell orders).</p>
+                    <div class="api-method">
+                        <pre class="method-signature">best(side) -&gt; int | None
+best_buy() -&gt; int | None                       # highest bid
+best_sell() -&gt; int | None                      # lowest ask</pre>
+                        <p>Best price of a side. O(1).</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">mid_price() -&gt; int | None
+spread() -&gt; int | None</pre>
+                        <p><code>mid_price</code> is the midpoint of the best bid and ask rounded down, the only best price if one side is empty, or <code>None</code> for an empty book. <code>spread</code> is best ask minus best bid, or <code>None</code> unless both sides have orders.</p>
+                    </div>
+
+                    <h3 id="volumes">Volumes and counts</h3>
+                    <div class="api-method">
+                        <pre class="method-signature">volume(price: int | None = None) -&gt; int
+volume_buy(price: int | None = None) -&gt; int
+volume_sell(price: int | None = None) -&gt; int
+best_volume(side) -&gt; int</pre>
+                        <p>Open (unfilled) quantity: in the whole book, on one side, or at one price when <code>price</code> is given. <code>best_volume</code> is the quantity at the best price of a side. All are O(1).</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">count() -&gt; int
+count_buy() -&gt; int
+count_sell() -&gt; int
+count_at(price: int) -&gt; int</pre>
+                        <p>Number of resting orders in total, per side, or at a price.</p>
+                    </div>
+
+                    <h3 id="depth">Depth</h3>
+                    <div class="api-method">
+                        <pre class="method-signature">depth(side, levels: int = 10) -&gt; list[PriceLevel]</pre>
+                        <p>Up to <code>levels</code> aggregated price levels of a side, best price first: a "level 2" market-depth snapshot.</p>
+<pre><code class="language-python">for level in book.depth(Side.BUY, levels=5):
+    print(f"{level.price:&gt;8} {level.volume:&gt;8} ({level.count} orders)")</code></pre>
+                    </div>
+
+                    <h3 id="trade-events">Trade events</h3>
+                    <div class="api-method">
+                        <pre class="method-signature">on_trade: Callable[[Trade], None] | None      # read/write property</pre>
+                        <p>
+                            The function called once per execution, in order, <strong>after</strong> the operation has fully updated the book.
+                            The handler may query the book but must not modify it. If the handler raises, the remaining trades are still
+                            delivered and the first exception is re-raised from the call that produced the trades. Set to <code>None</code> to stop events.
+                        </p>
+<pre><code class="language-python">fills = []
+book.on_trade = fills.append
+book.limit_sell(1, 10, 100)
+book.market_buy(2, 4)
+fills[0]   # Trade(taker_id=2, maker_id=1, taker_side=&lt;Side.BUY: 1&gt;, price=100, quantity=4, maker_remaining=6)</code></pre>
+                    </div>
+
+                    <h2 id="types">Types</h2>
+                    <div class="api-method">
+                        <pre class="method-signature">class Side(enum.IntEnum): SELL = 0; BUY = 1</pre>
+                        <p><code>Side.BUY.opposite</code> returns <code>Side.SELL</code>. <code>Side.parse(value)</code> converts any accepted side value or raises <code>InvalidSideError</code>.</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">@dataclass(frozen=True)
+class Order: order_id: int; side: Side; quantity: int; price: int</pre>
+                        <p>Snapshot returned by <code>get()</code>. <code>quantity</code> is the open quantity.</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">@dataclass(frozen=True)
+class Trade: taker_id: int; maker_id: int; taker_side: Side; price: int; quantity: int; maker_remaining: int</pre>
+                        <p>One execution. <code>price</code> is the maker's price; <code>maker_remaining</code> is 0 when the maker was fully filled.</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">@dataclass(frozen=True)
+class PriceLevel: price: int; volume: int; count: int</pre>
+                        <p>One aggregated price level from <code>depth()</code>.</p>
+                    </div>
+
+                    <h2 id="exceptions">Exceptions</h2>
+<pre><code class="language-plaintext">OrderlyChaosError
+    LibraryError                      (also OSError)
+    OrderBookError                    .status holds the C status code
+        DuplicateOrderIdError         (also ValueError)
+        UnknownOrderIdError           (also KeyError)
+        InvalidQuantityError          (also ValueError)
+        InvalidPriceError             (also ValueError)
+        InvalidSideError              (also ValueError)</code></pre>
+                    <p>A rejected operation never changes the book. Non-integer arguments raise <code>TypeError</code>; an out-of-range <code>order_id</code> raises <code>ValueError</code>. Every <code>OrderBookError</code> carries <code>.status</code> (the numeric C status) and <code>.code_name</code> (for example <code>"OC_ERR_UNKNOWN_ORDER_ID"</code>), and its message combines the failed operation with the reason, so errors can be traced across the Python, C, and C++ references. See the <a href="../overview.html#errors">overview</a> for what causes each error and how to fix it.</p>
+
+                    <h2 id="module">Module attributes</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Name</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>__version__</code></td><td>Package version, for example <code>"0.2.0"</code></td></tr>
+                                <tr><td><code>native_version()</code></td><td>Version reported by the loaded native library</td></tr>
+                                <tr><td><code>__author__</code></td><td><code>"Meet Mendapara"</code></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 id="loading">Library loading</h2>
+                    <p>
+                        Importing the package never loads native code; the library is loaded when the first <code>LimitOrderBook</code> is
+                        created. The package looks for <code>lib_orderly_chaos*.so</code> (Linux), <code>.dylib</code>/<code>.so</code> (macOS), or
+                        <code>.dll</code>/<code>.pyd</code> (Windows) next to its own files. Set the <code>ORDERLY_CHAOS_LIBRARY</code> environment
+                        variable to load a specific file instead. The library's version must match the package's major and minor version.
+                    </p>
+                    <p>
+                        Calls are made with the GIL held, so a book may be shared between threads without memory corruption. Each call is
+                        atomic; sequences of calls are not, so use your own lock when you need, for example, "check then cancel" to be atomic.
+                    </p>
+
+                    <h2 id="migration">Migrating from 0.1</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>0.1</th><th>0.2</th></tr></thead>
+                            <tbody>
+                                <tr><td>Methods returned <code>None</code></td><td><code>limit*</code> and <code>market*</code> return the filled quantity</td></tr>
+                                <tr><td>Empty-side prices returned <code>0</code></td><td>They return <code>None</code></td></tr>
+                                <tr><td>Duplicate IDs, price 0, unknown IDs corrupted the book or crashed</td><td>They raise typed exceptions and leave the book unchanged</td></tr>
+                                <tr><td>Volumes were truncated to 32 bits</td><td>Volumes are exact 64-bit values</td></tr>
+                                <tr><td><code>get()</code> was not available</td><td><code>get()</code>, <code>reduce()</code>, <code>depth()</code>, <code>mid_price()</code>, <code>spread()</code>, <code>on_trade</code> added</td></tr>
+                                <tr><td>Side was a <code>bool</code></td><td>Use <code>Side</code>; booleans still work</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
             </div>
         </div>
     </main>
 
     <footer id="footer-slot" class="footer"></footer>
-    <script src="../components.js" defer></script>
-    <script src="../copy-code.js" defer></script>
 </body>
 </html>

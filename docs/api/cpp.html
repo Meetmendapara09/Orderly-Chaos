@@ -2,353 +2,185 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C++ API • Orderly Chaos</title>
-    <link rel="stylesheet" href="../styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>C++ API | Orderly Chaos</title>
+    <meta name="description" content="Reference for the header-only Orderly Chaos C++17 API: LimitOrderBook, types, errors, and trade handlers.">
+    <meta name="author" content="Meet Mendapara">
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../assets/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="../assets/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+    <link rel="manifest" href="../assets/site.webmanifest">
+    <meta name="theme-color" content="#23251d">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js" integrity="sha384-wjfDDhOPPdjtva8vWBhWeVprSpmxisEu5aYT3q1JyACqXpdKpo3PWZTMVq24MBix" crossorigin="anonymous" defer></script>
+    <script src="../assets/js/components.js" defer></script>
+    <script src="../assets/js/copy-code.js" defer></script>
+    <script type="module" src="../assets/js/site.js"></script>
 </head>
 <body data-page="cpp-api">
-    <header id="header-slot" class="navbar" role="banner"></header>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header id="header-slot" class="navbar"></header>
 
-    <main class="pt-24 pb-32">
-        <div class="container mx-auto px-6">
-            <div class="content-page">
-                <div class="page-header">
-                    <nav class="breadcrumb" aria-label="Breadcrumb">
-                        <a href="../index.html">Home</a>
-                        <span class="sep">/</span>
-                        <a href="#headers">API Reference</a>
-                        <span class="sep">/</span>
-                        <span class="current">C++</span>
-                    </nav>
-                    <span class="page-badge">API Reference</span>
-                    <h1 class="page-title">C++ API Reference</h1>
-                    <p class="page-description">
-                        Native C++ interface for the Orderly Chaos matching engine. Provides direct access with zero abstraction overhead.
-                    </p>
-                    <div class="page-meta">
-                        <span>⚙️ Header-only</span><span class="dot"></span><span>🚀 Zero overhead</span><span class="dot"></span><span>C++17</span>
-                    </div>
-                </div>
+    <main id="main" class="content-page">
+        <div class="container">
+            <div class="page-header">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="../index.html">Home</a><span class="sep">/</span><span>API reference</span><span class="sep">/</span><span class="current">C++</span>
+                </nav>
+                <span class="page-badge">API reference</span>
+                <h1 class="page-title">C++ API</h1>
+                <p class="page-description">The header-only C++17 core. Include one header and use <code>orderly_chaos::LimitOrderBook</code> directly, with no runtime library.</p>
+                <div class="page-meta"><span>C++17</span><span>Header-only</span><span>Namespace <code>orderly_chaos</code></span></div>
+            </div>
 
-                <div class="docs-layout">
-                    <nav class="toc">
-                        <div class="toc-nav">
+            <div class="docs-layout">
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul>
+                        <li><a href="#setup">Setup</a></li>
+                        <li><a href="#types">Types</a></li>
+                        <li><a href="#book">LimitOrderBook</a>
                             <ul>
-                                <li><a href="#headers">Header Files</a></li>
-                                <li><a href="#limit-order-book">LOB::LimitOrderBook</a>
-                                    <ul>
-                                        <li><a href="#limit-methods">Limit Order Methods</a></li>
-                                        <li><a href="#market-methods">Market Order Methods</a></li>
-                                        <li><a href="#query-methods">Query Methods</a></li>
-                                        <li><a href="#management">Management Methods</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="#structures">Structures</a></li>
-                                <li><a href="#types">Type Definitions</a></li>
+                                <li><a href="#entry">Order entry</a></li>
+                                <li><a href="#queries">Queries</a></li>
+                                <li><a href="#trades">Trade handler</a></li>
+                                <li><a href="#diagnostics">Diagnostics</a></li>
                             </ul>
-                        </div>
-                    </nav>
+                        </li>
+                        <li><a href="#errors">Errors</a></li>
+                        <li><a href="#guarantees">Guarantees</a></li>
+                        <li><a href="#headers">Headers</a></li>
+                    </ul>
+                </nav>
 
-                    <div class="doc-content">
-                        <h2 id="headers">Header Files</h2>
-                        <pre><code>#include "limit_order_book.hpp"  // Main LOB class
-#include "lib_lob.hpp"           // C-compatible API
-#include "limit_tree.hpp"        // Underlying tree structure
-#include "structures.hpp"        // Order, Limit, Side types</code></pre>
+                <article class="doc-content">
+                    <h2 id="setup">Setup</h2>
+<pre><code class="language-cpp">#include &lt;orderly_chaos/orderly_chaos.hpp&gt;
 
-                        <h2 id="limit-order-book">LOB::LimitOrderBook</h2>
-                        <p>An order book for managing Limit/Order objects in a continuous double auction with price-time priority.</p>
+int main() {
+    orderly_chaos::LimitOrderBook book;
+    book.limit(orderly_chaos::Side::Sell, 1, 100, 10'050);
+    auto filled = book.limit(orderly_chaos::Side::Buy, 2, 40, 10'050);  // 40
+    return filled == 40 ? 0 : 1;
+}</code></pre>
+                    <p>Compile with <code>-std=c++17</code> and the include directories <code>include</code> and <code>third_party/robin_map/include</code>, or depend on the Bazel target <code>//:orderly_chaos</code>. Code written for 0.1 can keep using the namespace alias <code>LOB</code>.</p>
 
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">LimitOrderBook()</div>
-                                <div class="method-description">Initialize a new empty limit order book.</div>
-                            </div>
-                        </div>
-
-                        <h3 id="limit-methods">Limit Order Methods</h3>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void limit_sell(UID order_id, Quantity quantity, Price price)</div>
-                                <div class="method-description">Add a new sell limit order. Matches against buy orders if price crosses the spread.</div>
-                                <pre><code><span class="keyword">#include</span> <span class="string">"limit_order_book.hpp"</span>
-LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-<span class="keyword">assert</span>(book.best_sell() == <span class="number">10250</span>);</code></pre>
-                                <table class="param-table">
-                                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-                                    <tr><td>order_id</td><td>UID</td><td>Unique order identifier</td></tr>
-                                    <tr><td>quantity</td><td>Quantity</td><td>Number of shares to sell</td></tr>
-                                    <tr><td>price</td><td>Price</td><td>Limit price</td></tr>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void limit_buy(UID order_id, Quantity quantity, Price price)</div>
-                                <div class="method-description">Add a new buy limit order. Matches against sell orders if price crosses the spread.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
-<span class="keyword">assert</span>(book.best_buy() == <span class="number">10240</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void limit(Side side, UID order_id, Quantity quantity, Price price)</div>
-                                <div class="method-description">Add a limit order to the specified side.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit(LOB::Side::Buy, <span class="number">3</span>, <span class="number">75</span>, <span class="number">10240</span>); <span class="comment">// buy</span>
-book.limit(LOB::Side::Sell, <span class="number">4</span>, <span class="number">100</span>, <span class="number">10250</span>); <span class="comment">// sell</span>
-<span class="keyword">assert</span>(book.count() == <span class="number">2</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <h3 id="market-methods">Market Order Methods</h3>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void market_sell(UID order_id, Quantity quantity)</div>
-                                <div class="method-description">Execute a market sell order against buy-side liquidity.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_buy(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>);
-book.market_sell(<span class="number">2</span>, <span class="number">40</span>); <span class="comment">// sells 40 into bid</span>
-<span class="keyword">assert</span>(book.volume_buy() == <span class="number">60</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void market_buy(UID order_id, Quantity quantity)</div>
-                                <div class="method-description">Execute a market buy order against sell-side liquidity.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-book.market_buy(<span class="number">2</span>, <span class="number">40</span>); <span class="comment">// buys 40 from ask</span>
-<span class="keyword">assert</span>(book.volume_sell() == <span class="number">60</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void market(Side side, UID order_id, Quantity quantity)</div>
-                                <div class="method-description">Execute a market order on the specified side.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-book.limit_buy(<span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>);
-book.market(LOB::Side::Buy, <span class="number">3</span>, <span class="number">25</span>);
-book.market(LOB::Side::Sell, <span class="number">4</span>, <span class="number">25</span>);
-<span class="keyword">assert</span>(book.volume() == <span class="number">150</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <h3 id="query-methods">Query Methods</h3>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">bool has(UID order_id) const</div>
-                                <div class="method-description">Check if an order with the given ID exists. O(1) average time.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-<span class="keyword">assert</span>(book.has(<span class="number">1</span>) == <span class="keyword">true</span>);
-<span class="keyword">assert</span>(book.has(<span class="number">99</span>) == <span class="keyword">false</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">const Order& get(UID order_id)</div>
-                                <div class="method-description">Get a reference to the order with the given ID.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-<span class="keyword">const</span> LOB::Order& o = book.get(<span class="number">1</span>);
-<span class="keyword">assert</span>(o.price == <span class="number">10250</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Price best_sell() const</div>
-                                <div class="method-description">Return the best (lowest) sell/ask price. Returns 0 if empty. O(1).</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-book.limit_sell(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>);
-<span class="keyword">assert</span>(book.best_sell() == <span class="number">10250</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Price best_buy() const</div>
-                                <div class="method-description">Return the best (highest) buy/bid price. Returns 0 if empty. O(1).</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_buy(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>);
-book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10230</span>);
-<span class="keyword">assert</span>(book.best_buy() == <span class="number">10240</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Price best(Side side) const</div>
-                                <div class="method-description">Return the best price for the given side.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-book.limit_buy(<span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>);
-<span class="keyword">assert</span>(book.best(LOB::Side::Sell) == <span class="number">10250</span>);
-<span class="keyword">assert</span>(book.best(LOB::Side::Buy) == <span class="number">10240</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Price price() const</div>
-                                <div class="method-description">Return the current midpoint price. O(1).</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-book.limit_buy(<span class="number">2</span>, <span class="number">75</span>, <span class="number">10240</span>);
-<span class="keyword">assert</span>(book.price() == <span class="number">10245</span>); <span class="comment">// (10250+10240)/2</span></code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Price last_best_sell() const</div>
-                                <div class="method-description">Return the last best sell price before the most recent change.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-<span class="keyword">auto</span> prev = book.last_best_sell();</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Price last_best_buy() const</div>
-                                <div class="method-description">Return the last best buy price before the most recent change.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_buy(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>);
-<span class="keyword">auto</span> prev = book.last_best_buy();</code></pre>
-                            </div>
-                        </div>
-
-
-                        <h3 id="volume-count">Volume & Count</h3>
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Volume volume() const</div>
-                                <div class="method-description">Total volume across both sides.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-book.limit_buy(<span class="number">2</span>, <span class="number">75</span>, <span class="number">10240</span>);
-<span class="keyword">assert</span>(book.volume() == <span class="number">175</span>);
-<span class="keyword">assert</span>(book.volume(<span class="number">10250</span>) == <span class="number">100</span>);</code></pre>
-                            </div>
-                        </div>
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Volume volume_sell() const / volume_sell(Price price) const</div>
-                                <div class="method-description">Sell-side volume, total or at price.</div>
-                                <pre><code><span class="keyword">assert</span>(book.volume_sell() == <span class="number">100</span>);
-<span class="keyword">assert</span>(book.volume_sell(<span class="number">10250</span>) == <span class="number">100</span>);</code></pre>
-                            </div>
-                        </div>
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Volume volume_buy() const / volume_buy(Price price) const</div>
-                                <div class="method-description">Buy-side volume, total or at price.</div>
-                                <pre><code><span class="keyword">assert</span>(book.volume_buy() == <span class="number">75</span>);
-<span class="keyword">assert</span>(book.volume_buy(<span class="number">10240</span>) == <span class="number">75</span>);</code></pre>
-                            </div>
-                        </div>
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Count count() const</div>
-                                <div class="method-description">Total number of orders.</div>
-                                <pre><code><span class="keyword">assert</span>(book.count() == <span class="number">2</span>);
-<span class="keyword">assert</span>(book.count_sell() == <span class="number">1</span>);
-<span class="keyword">assert</span>(book.count_buy() == <span class="number">1</span>);
-<span class="keyword">assert</span>(book.count_at(<span class="number">10250</span>) == <span class="number">1</span>);</code></pre>
-                            </div>
-                        </div>
-                        <h3 id="management">Management Methods</h3>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void cancel(UID order_id)</div>
-                                <div class="method-description">Cancel an existing order. O(log n) due to tree removal.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-book.cancel(<span class="number">1</span>);
-<span class="keyword">assert</span>(book.count() == <span class="number">0</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void reduce(UID order_id, Quantity quantity)</div>
-                                <div class="method-description">Reduce the quantity of an existing order by the specified amount.</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-book.reduce(<span class="number">1</span>, <span class="number">40</span>);
-<span class="keyword">assert</span>(book.volume_sell() == <span class="number">60</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void clear()</div>
-                                <div class="method-description">Remove all orders from both sides of the book. O(n).</div>
-                                <pre><code>LOB::LimitOrderBook book;
-book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
-book.clear();
-<span class="keyword">assert</span>(book.count() == <span class="number">0</span>);</code></pre>
-                            </div>
-                        </div>
-
-                        <h2 id="structures">Structures</h2>
-
-                        <h3>LOB::Order</h3>
-                        <pre><code>struct Order {
-    UID uid;           // unique order ID
-    Side side;         // buy or sell
-    Quantity quantity; // shares in this order
-    Price price;       // price of the order
-    Limit* limit;      // pointer to containing price level
-    Order* prev;       // previous order at this price level
-    Order* next;       // next order at this price level
-};</code></pre>
-
-                        <h3>LOB::Limit</h3>
-                        <pre><code>struct Limit {
-    Price key;             // price level
-    Volume volume;         // total volume at this price
-    Count count;           // orders at this price
-    Order* head;           // first order (time-priority queue)
-    Order* tail;           // last order
-    Limit* next;           // next price level
-    Limit* prev;           // previous price level
-};</code></pre>
-
-                        <h2 id="types">Type Definitions</h2>
-                        <table class="param-table">
-                            <tr><th>Type</th><th>Underlying C++ Type</th><th>Description</th></tr>
-                            <tr><td><code>UID</code></td><td><code>std::uint64_t</code></td><td>Order identifier</td></tr>
-                            <tr><td><code>Side</code></td><td><code>enum</code></td><td>Buy/Sell side</td></tr>
-                            <tr><td><code>Quantity</code></td><td><code>std::uint32_t</code></td><td>Number of shares</td></tr>
-                            <tr><td><code>Price</code></td><td><code>std::uint64_t</code></td><td>Price value</td></tr>
-                            <tr><td><code>Volume</code></td><td><code>std::uint32_t</code></td><td>Total share volume</td></tr>
-                            <tr><td><code>Count</code></td><td><code>std::uint32_t</code></td><td>Order count</td></tr>
+                    <h2 id="types">Types</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Type</th><th>Definition</th><th>Meaning</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>Side</code></td><td><code>enum class Side : bool { Sell, Buy }</code></td><td>Order side; <code>!side</code> gives the opposite side</td></tr>
+                                <tr><td><code>UID</code></td><td><code>uint64_t</code></td><td>Caller-assigned order ID</td></tr>
+                                <tr><td><code>Quantity</code></td><td><code>uint32_t</code></td><td>Units in one order</td></tr>
+                                <tr><td><code>Price</code></td><td><code>uint64_t</code></td><td>Price in ticks; 0 means "no price"</td></tr>
+                                <tr><td><code>Volume</code></td><td><code>uint64_t</code></td><td>Sum of quantities</td></tr>
+                                <tr><td><code>Count</code></td><td><code>uint64_t</code></td><td>Number of orders</td></tr>
+                                <tr><td><code>Order</code></td><td>struct</td><td><code>uid</code>, <code>side</code>, <code>quantity</code> (open), <code>price</code>, plus internal queue links</td></tr>
+                                <tr><td><code>Trade</code></td><td>struct</td><td><code>taker_id</code>, <code>maker_id</code>, <code>taker_side</code>, <code>price</code>, <code>quantity</code>, <code>maker_remaining</code></td></tr>
+                                <tr><td><code>PriceLevel</code></td><td>struct</td><td><code>price</code>, <code>volume</code>, <code>count</code> for one level</td></tr>
+                            </tbody>
                         </table>
                     </div>
-                </div>
+
+                    <h2 id="book">LimitOrderBook</h2>
+                    <p>Default constructible, movable, not copyable. Not thread-safe: use one book per thread or synchronise access.</p>
+
+                    <h3 id="entry">Order entry</h3>
+                    <div class="api-method">
+                        <pre class="method-signature">Quantity limit(Side side, UID order_id, Quantity quantity, Price price);
+Quantity limit_buy(UID order_id, Quantity quantity, Price price);
+Quantity limit_sell(UID order_id, Quantity quantity, Price price);</pre>
+                        <p>Submit a limit order. Crossing quantity trades at the resting prices; the remainder rests. <span class="tag returns">returns</span> the quantity filled immediately.</p>
+                        <p><span class="tag raises">throws</span> <code>OrderBookError</code> with <code>DuplicateOrderId</code>, <code>InvalidQuantity</code> (0), or <code>InvalidPrice</code> (0).</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">Quantity market(Side side, UID order_id, Quantity quantity);
+Quantity market_buy(UID order_id, Quantity quantity);
+Quantity market_sell(UID order_id, Quantity quantity);</pre>
+                        <p>Submit an immediate-or-cancel market order. <span class="tag returns">returns</span> the quantity filled; the remainder is discarded. <span class="tag raises">throws</span> <code>InvalidQuantity</code> for 0.</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">void cancel(UID order_id);
+void reduce(UID order_id, Quantity quantity);
+void clear();</pre>
+                        <p><code>cancel</code> removes a resting order. <code>reduce</code> lowers its quantity keeping queue priority (the full amount cancels it). <code>clear</code> removes everything.</p>
+                        <p><span class="tag raises">throws</span> <code>UnknownOrderId</code>; <code>reduce</code> also throws <code>InvalidQuantity</code> for 0 or more than the open quantity.</p>
+                    </div>
+
+                    <h3 id="queries">Queries</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>bool has(UID) const</code></td><td>Whether the order is resting</td></tr>
+                                <tr><td><code>const Order&amp; get(UID) const</code></td><td>The resting order; throws <code>UnknownOrderId</code>. Invalidated by the next modifying call</td></tr>
+                                <tr><td><code>Price best(Side)</code>, <code>best_buy()</code>, <code>best_sell()</code></td><td>Best price, or 0 if the side is empty</td></tr>
+                                <tr><td><code>Price price() const</code></td><td>Mid price (rounded down), the only best price if one side is empty, or 0</td></tr>
+                                <tr><td><code>Price last_best(Side)</code>, <code>last_best_buy()</code>, <code>last_best_sell()</code>, <code>last_price()</code></td><td>Best prices as of the most recent change on each side (kept when a side empties)</td></tr>
+                                <tr><td><code>Volume volume()</code>, <code>volume(Price)</code></td><td>Open quantity in the book, or at a price</td></tr>
+                                <tr><td><code>volume_buy()</code>, <code>volume_buy(Price)</code>, <code>volume_sell()</code>, <code>volume_sell(Price)</code></td><td>Open quantity per side, optionally at a price</td></tr>
+                                <tr><td><code>volume_best(Side)</code>, <code>volume_buy_best()</code>, <code>volume_sell_best()</code></td><td>Open quantity at the best price</td></tr>
+                                <tr><td><code>Count count()</code>, <code>count_buy()</code>, <code>count_sell()</code>, <code>count_at(Price)</code></td><td>Number of resting orders</td></tr>
+                                <tr><td><code>bool empty() const</code></td><td>Whether no orders rest</td></tr>
+                                <tr><td><code>std::vector&lt;PriceLevel&gt; depth(Side, size_t max_levels)</code></td><td>Aggregated levels, best first</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3 id="trades">Trade handler</h3>
+                    <div class="api-method">
+                        <pre class="method-signature">using TradeHandler = std::function&lt;void(const Trade&amp;)&gt;;
+void set_trade_handler(TradeHandler handler);   // nullptr disables events</pre>
+                        <p>Called once per execution after the operation has updated the book. The handler may query the book but must not modify it. If it throws, the remaining trades are still delivered and the first exception is rethrown.</p>
+<pre><code class="language-cpp">std::vector&lt;orderly_chaos::Trade&gt; trades;
+book.set_trade_handler([&amp;](const orderly_chaos::Trade&amp; trade) { trades.push_back(trade); });</code></pre>
+                    </div>
+
+                    <h3 id="diagnostics">Diagnostics</h3>
+                    <div class="api-method">
+                        <pre class="method-signature">void check_invariants() const;</pre>
+                        <p>Verifies every internal invariant in O(N) and throws <code>std::logic_error</code> on the first violation. Intended for tests, fuzzing, and debugging, not for hot paths.</p>
+                    </div>
+
+                    <h2 id="errors">Errors</h2>
+<pre><code class="language-cpp">try {
+    book.cancel(42);
+} catch (const orderly_chaos::OrderBookError&amp; error) {
+    if (error.code() == orderly_chaos::ErrorCode::UnknownOrderId) { /* ... */ }
+    std::cerr &lt;&lt; error.what() &lt;&lt; '\n';   // "unknown order id [OC_ERR_UNKNOWN_ORDER_ID]: no resting order with id 42"
+}</code></pre>
+                    <p><code>OrderBookError</code> derives from <code>std::runtime_error</code>. <code>ErrorCode</code> values are <code>DuplicateOrderId</code>, <code>UnknownOrderId</code>, <code>InvalidQuantity</code>, and <code>InvalidPrice</code>; <code>to_string(code)</code> returns a short description.</p>
+
+                    <h2 id="guarantees">Guarantees</h2>
+                    <ul>
+                        <li>A call that throws <code>OrderBookError</code> has not modified the book.</li>
+                        <li>If memory allocation fails during matching, the book stays consistent: trades already made are kept and the incoming order is dropped.</li>
+                        <li>Trades always execute at the maker's price and never through the taker's limit.</li>
+                        <li>All cached aggregates match the underlying orders at all times (verified by <code>check_invariants()</code> in the test suite).</li>
+                    </ul>
+
+                    <h2 id="headers">Headers</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Header</th><th>Contents</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>orderly_chaos/orderly_chaos.hpp</code></td><td>Umbrella header; include this</td></tr>
+                                <tr><td><code>orderly_chaos/limit_order_book.hpp</code></td><td><code>LimitOrderBook</code>, <code>PriceLevel</code></td></tr>
+                                <tr><td><code>orderly_chaos/limit_tree.hpp</code></td><td><code>LimitTree</code>, one side of the book (internal building block)</td></tr>
+                                <tr><td><code>orderly_chaos/types.hpp</code></td><td><code>Side</code>, <code>Order</code>, <code>Limit</code>, <code>Trade</code>, integer types</td></tr>
+                                <tr><td><code>orderly_chaos/errors.hpp</code></td><td><code>ErrorCode</code>, <code>OrderBookError</code></td></tr>
+                                <tr><td><code>orderly_chaos/version.hpp</code></td><td><code>ORDERLY_CHAOS_VERSION_*</code> macros, <code>version()</code></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>A full Doxygen reference generated from the headers is available with <code>make docs</code>.</p>
+                </article>
             </div>
         </div>
     </main>
 
     <footer id="footer-slot" class="footer"></footer>
-    <script src="../components.js" defer></script>
-    <script src="../copy-code.js" defer></script>
 </body>
 </html>

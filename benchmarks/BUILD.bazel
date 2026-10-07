@@ -1,0 +1,21 @@
+# Micro-benchmarks. Always run optimized:
+#
+#   bazel run -c opt //benchmarks:benchmark_lob
+#   bazel run -c opt //benchmarks:benchmark_lob -- --quick
+
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+
+cc_binary(
+    name = "benchmark_lob",
+    srcs = ["benchmark_lob.cpp"],
+    deps = ["//:orderly_chaos"],
+)
+
+# Runs every scenario once with a small n so the benchmark cannot rot.
+cc_test(
+    name = "benchmark_smoke_test",
+    srcs = ["benchmark_lob.cpp"],
+    args = ["--quick"],
+    data = ["//toolchain:mingw_runtime"],
+    deps = ["//:orderly_chaos"],
+)

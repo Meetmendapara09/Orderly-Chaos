@@ -2,332 +2,151 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orderly Chaos — Non-Consensual Matching Engine</title>
-    <meta name="description" content="High-performance price-time priority matching engine. C++17 core, Python bindings, sub-microsecond operations.">
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Orderly Chaos | Fast price-time priority limit order book</title>
+    <meta name="description" content="Orderly Chaos is a fast, tested price-time priority limit order book (matching engine) with a header-only C++17 core, a stable C API, and Python bindings.">
+    <meta name="author" content="Meet Mendapara">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Orderly Chaos">
+    <meta property="og:description" content="A fast price-time priority limit order book with C++, C, and Python APIs.">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="assets/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="assets/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="manifest" href="assets/site.webmanifest">
+    <meta name="theme-color" content="#23251d">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js" integrity="sha384-wjfDDhOPPdjtva8vWBhWeVprSpmxisEu5aYT3q1JyACqXpdKpo3PWZTMVq24MBix" crossorigin="anonymous" defer></script>
+    <script src="assets/js/components.js" defer></script>
+    <script src="assets/js/copy-code.js" defer></script>
+    <script src="assets/js/hero.js" defer></script>
+    <script type="module" src="assets/js/site.js"></script>
 </head>
 <body data-page="home">
-    <!-- Animated mesh gradient background -->
-    <div class="bg-mesh" aria-hidden="true">
-        <div class="mesh-blob amber"></div>
-        <div class="mesh-blob teal"></div>
-    </div>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header id="header-slot" class="navbar"></header>
 
-    <!-- Premium glass header — consistent across all docs -->
-    <header id="header-slot" class="navbar" role="banner"></header>
-
-    <!-- Hero -->
-    <main>
+    <main id="main">
         <section class="hero">
             <div class="container">
                 <div class="hero-grid">
                     <div class="hero-copy">
-                        <span class="hero-pill">
-                            High-Performance Matching Engine
-                        </span>
                         <h1 class="hero-title">
-                            <span class="hero-word light">Orderly</span>
+                            <span class="hero-word">Orderly</span>
                             <span class="hero-word accent">Chaos</span>
                         </h1>
                         <p class="hero-lead">
-                            A non-consensual matching engine for unruly capital. Price-time priority
-                            order matching for market data streams — a header-only C++17 core,
-                            callable from Python, C++, or any C FFI.
+                            A limit order book with price-time priority matching: a header-only C++17 core,
+                            a stable C API, and Python bindings. Rebuild markets from order feeds, backtest
+                            strategies against a realistic book, or embed an exchange matching core.
                         </p>
                         <div class="hero-ctas">
                             <a href="getting-started.html" class="btn-primary">
-                                Get Started
+                                Get started
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                             </a>
-                            <a href="examples/index.html" class="btn-ghost">See Examples</a>
+                            <a href="overview.html" class="btn-ghost">What it does</a>
                         </div>
                     </div>
 
                     <div class="hero-visual">
-                        <div class="order-book-card">
+                        <div class="order-book-card" role="img" aria-label="Illustration of an order book with three ask levels and three bid levels">
                             <div class="order-book-head">
-                                <span class="ob-title">BTC-USD · Order Book</span>
-                                <span class="ob-spread">spread $0.05</span>
+                                <span class="ob-title">Example order book</span>
+                                <span class="ob-spread">spread 0.02</span>
                             </div>
                             <div class="ob-side asks">
-                                <div class="ob-row"><i style="--depth:78%"></i><span class="ob-price">102.50</span><span class="ob-size">200</span></div>
-                                <div class="ob-row"><i style="--depth:52%"></i><span class="ob-price">102.45</span><span class="ob-size">134</span></div>
-                                <div class="ob-row"><i style="--depth:31%"></i><span class="ob-price">102.42</span><span class="ob-size">80</span></div>
+                                <div class="ob-row"><i class="ob-depth"></i><span class="ob-price">102.46</span><span class="ob-size">80</span></div>
+                                <div class="ob-row"><i class="ob-depth"></i><span class="ob-price">102.44</span><span class="ob-size">134</span></div>
+                                <div class="ob-row"><i class="ob-depth"></i><span class="ob-price">102.42</span><span class="ob-size">200</span></div>
                             </div>
-                            <div class="ob-mid"><span></span>mid 102.41<span></span></div>
+                            <div class="ob-mid">mid 102.41</div>
                             <div class="ob-side bids">
-                                <div class="ob-row"><i style="--depth:64%"></i><span class="ob-price">102.40</span><span class="ob-size">163</span></div>
-                                <div class="ob-row"><i style="--depth:88%"></i><span class="ob-price">102.38</span><span class="ob-size">225</span></div>
-                                <div class="ob-row"><i style="--depth:40%"></i><span class="ob-price">102.35</span><span class="ob-size">102</span></div>
+                                <div class="ob-row"><i class="ob-depth"></i><span class="ob-price">102.40</span><span class="ob-size">163</span></div>
+                                <div class="ob-row"><i class="ob-depth"></i><span class="ob-price">102.38</span><span class="ob-size">225</span></div>
+                                <div class="ob-row"><i class="ob-depth"></i><span class="ob-price">102.36</span><span class="ob-size">102</span></div>
                             </div>
-                            <div class="ob-foot">
-                                <span>volume</span><strong>904</strong>
-                                <span>·</span>
-                                <span>match</span><strong class="ok">price-time</strong>
-                            </div>
+                            <div class="ob-foot">resting volume <strong class="ob-volume">904</strong></div>
                         </div>
-                        <div class="hero-glow" aria-hidden="true"></div>
                     </div>
                 </div>
 
-                <!-- Stats strip -->
                 <dl class="stats-strip">
                     <div class="stat">
-                        <dt>Latency per op</dt>
-                        <dd>~0.3<em>µs</em></dd>
+                        <dt>Mixed order flow</dt>
+                        <dd>6.3<em>M ops/s</em></dd>
                     </div>
                     <div class="stat">
-                        <dt>Throughput</dt>
-                        <dd>3.3<em>M ops/s</em></dd>
+                        <dt>Join a price level</dt>
+                        <dd>~50<em>ns</em></dd>
                     </div>
                     <div class="stat">
                         <dt>Best bid / ask</dt>
                         <dd>O(1)</dd>
                     </div>
                     <div class="stat">
-                        <dt>Test assertions</dt>
-                        <dd>691<em>+15 py</em></dd>
+                        <dt>Automated tests</dt>
+                        <dd>220+<em>C++ &amp; Python</em></dd>
                     </div>
                 </dl>
             </div>
         </section>
 
-        <!-- Features — asymmetric bento -->
-        <section class="features-section">
+        <section class="section">
             <div class="container">
                 <div class="section-header">
-                    <span class="badge">Features</span>
-                    <h2>Built for speed and precision</h2>
-                    <p class="section-sub">One engine, three interfaces — pick the layer that fits your stack.</p>
+                    <span class="badge">Design</span>
+                    <h2>Specified, tested, and measured</h2>
+                    <p class="section-sub">Every behaviour is specified in the overview, validated at the API boundary, and checked against an independent reference model on every build.</p>
                 </div>
-                <div class="bento-grid">
-                    <div class="bento-card large">
-                        <a href="architecture.html" class="group block">
-                            <div class="card-outer h-full">
-                                <div class="card-inner">
-                                    <div class="card-flex">
-                                        <div class="card-icon cyan">⚡</div>
-                                        <div class="flex-1">
-                                            <h3 class="card-title group-hover:text-white">High-performance core</h3>
-                                            <p class="card-description">
-                                                Header-only C++17. Red-black trees for price levels, robin_map for
-                                                O(1) order lookup, incremental aggregates so best price, volume and
-                                                count never walk the tree. Compiled with <code>-O2 -march=native</code>.
-                                            </p>
-                                            <div class="card-stats">
-                                                <span class="stat-chip"><span class="dot emerald">●</span> O(1) best &amp; volume</span>
-                                                <span class="stat-chip"><span class="dot emerald">●</span> O(log n) inserts</span>
-                                                <span class="stat-chip"><span class="dot emerald">●</span> zero alloc hot path</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="bento-card small space-y-4">
-                        <div class="group">
-                            <a href="api/python.html" class="block">
-                                <div class="card-outer h-full">
-                                    <div class="card-inner">
-                                        <div class="card-icon cyan">🐍</div>
-                                        <h3 class="card-title group-hover:text-white">Python bindings</h3>
-                                        <p class="card-description">ctypes over a plain C ABI — pip-installable, no compiler needed on the Python side.</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="group">
-                            <a href="api/cpp.html" class="block">
-                                <div class="card-outer h-full">
-                                    <div class="card-inner">
-                                        <div class="card-icon emerald">⚙️</div>
-                                        <h3 class="card-title group-hover:text-white">C++ native</h3>
-                                        <p class="card-description">Include one header, get the whole engine. Zero abstraction overhead.</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="bento-card large">
-                        <div class="group">
-                            <a href="examples/index.html" class="block">
-                                <div class="card-outer h-full">
-                                    <div class="card-inner">
-                                        <div class="card-flex">
-                                            <div class="card-icon yellow">📊</div>
-                                            <div class="flex-1">
-                                                <h3 class="card-title">Market-data ready</h3>
-                                                <p class="card-description">
-                                                    Limit, market, cancel and reduce operations with strict price-time
-                                                    priority. Integer prices avoid floating-point drift; matching walks
-                                                    FIFO queues level by level.
-                                                </p>
-                                                <div class="card-stats">
-                                                    <span class="stat-chip"><span class="dot amber">✓</span> Price-time priority</span>
-                                                    <span class="stat-chip"><span class="dot amber">✓</span> Two-sided book</span>
-                                                    <span class="stat-chip"><span class="dot amber">✓</span> Volume aggregation</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="bento-card small">
-                        <div class="group">
-                            <a href="benchmarks.html" class="block">
-                                <div class="card-outer h-full">
-                                    <div class="card-inner">
-                                        <div class="card-icon purple">🚀</div>
-                                        <h3 class="card-title">Benchmarks</h3>
-                                        <p class="card-description">Reproducible latency tables and complexity analysis — run them yourself with one command.</p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
+                <div class="card-grid">
+                    <a class="card" href="architecture.html">
+                        <span class="card-icon yellow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
+                        <h3 class="card-title">Predictable performance</h3>
+                        <p class="card-text">A balanced tree of price levels guarantees O(log n) level changes, cached top of book answers best price and volume in O(1), and FIFO queues make joining a level O(1).</p>
+                        <span class="card-meta">Architecture</span>
+                    </a>
+                    <a class="card" href="overview.html#semantics">
+                        <span class="card-icon green" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>
+                        <h3 class="card-title">Exchange-grade semantics</h3>
+                        <p class="card-text">Strict price-time priority, trades at the resting price, immediate-or-cancel market orders, priority-preserving reduces, and trade events for every execution.</p>
+                        <span class="card-meta">Matching rules</span>
+                    </a>
+                    <a class="card" href="overview.html#errors">
+                        <span class="card-icon red" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg></span>
+                        <h3 class="card-title">Safe by default</h3>
+                        <p class="card-text">Duplicate IDs, zero quantities, zero prices, and unknown orders are rejected without touching the book. No exception ever crosses the C boundary.</p>
+                        <span class="card-meta">Error handling</span>
+                    </a>
+                    <a class="card" href="api/python.html">
+                        <span class="card-icon blue" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span>
+                        <h3 class="card-title">Three APIs, one engine</h3>
+                        <p class="card-text">Include a C++ header, link the C API from any language with an FFI, or <code>pip install</code> the typed Python package. All three share the same tested core.</p>
+                        <span class="card-meta">API reference</span>
+                    </a>
                 </div>
             </div>
         </section>
 
-        <!-- Tech stack -->
-        <section class="tech-section-block">
+        <section class="section">
             <div class="container">
-                <div class="tech-wrapper">
-                    <div class="tech-outer">
-                        <div class="tech-inner">
-                            <div class="tech-header">
-                                <span>Built with</span>
-                            </div>
-                            <div class="tech-grid">
-                                <div class="tech-item cyan text-center">
-                                    <div class="tech-name">C++17</div>
-                                    <div class="tech-desc">Core engine</div>
-                                </div>
-                                <div class="tech-item purple text-center">
-                                    <div class="tech-name">Python</div>
-                                    <div class="tech-desc">Bindings</div>
-                                </div>
-                                <div class="tech-item emerald text-center">
-                                    <div class="tech-name">Bazel 7</div>
-                                    <div class="tech-desc">Build system</div>
-                                </div>
-                                <div class="tech-item yellow text-center">
-                                    <div class="tech-name">Google Test</div>
-                                    <div class="tech-desc">Testing</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="section-header">
+                    <span class="badge">In five lines</span>
+                    <h2>Submit orders, get trades</h2>
+                </div>
+                <div class="doc-content" style="margin: 0 auto;">
+<pre><code class="language-python">from orderly_chaos import LimitOrderBook, Side
+
+book = LimitOrderBook(on_trade=print)
+book.limit(Side.SELL, order_id=1, quantity=100, price=10_050)   # rests: 0 filled
+book.limit(Side.BUY, order_id=2, quantity=40, price=10_050)     # trades: 40 filled
+print(book.best_sell(), book.volume_sell())                     # 10050 60</code></pre>
+                    <p style="text-align: center;"><a href="getting-started.html" class="btn-primary" style="color: var(--on-primary);">Install and build</a></p>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
     <footer id="footer-slot" class="footer"></footer>
-    <script src="components.js" defer></script>
-    <script>
-    /*!
-     * Orderly Chaos — live order book simulation.
-     * Animates the hero order book card with realistic price movements.
-     */
-    (function () {
-        "use strict";
-
-        var asksWrapper = document.querySelector('.ob-side.asks');
-        var bidsWrapper = document.querySelector('.ob-side.bids');
-        var midEl = document.querySelector('.ob-mid');
-        var spreadEl = document.querySelector('.ob-spread');
-        var volumeEl = document.querySelector('.ob-foot strong');
-        if (!asksWrapper || !bidsWrapper || !midEl) return;
-
-        var askPrices = [102.50, 102.45, 102.42];
-        var askSizes = [200, 134, 80];
-        var bidPrices = [102.40, 102.38, 102.35];
-        var bidSizes = [163, 225, 102];
-        var midPrice = 102.41;
-        var totalVolume = 904;
-
-        function fmtPrice(p) { return p.toFixed(2); }
-        function fmtSize(s) { return String(s); }
-        function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-
-        function flashRow(row) {
-            row.classList.remove('flash');
-            void row.offsetWidth; // reflow to restart animation
-            row.classList.add('flash');
-        }
-
-        function renderSide(wrapper, prices, sizes, isAsk) {
-            var rows = wrapper.querySelectorAll('.ob-row');
-            for (var i = 0; i < rows.length; i++) {
-                var priceEl = rows[i].querySelector('.ob-price');
-                var sizeEl = rows[i].querySelector('.ob-size');
-                if (priceEl) priceEl.textContent = fmtPrice(prices[i]);
-                if (sizeEl) sizeEl.textContent = fmtSize(sizes[i]);
-            }
-        }
-
-        function renderMid() {
-            midEl.innerHTML = '<span></span>mid ' + fmtPrice(midPrice) + '<span></span>';
-        }
-
-        function renderSpread() {
-            var spread = (askPrices[0] - bidPrices[0]).toFixed(2);
-            if (spreadEl) spreadEl.textContent = spread;
-        }
-
-        function tick() {
-            // Randomly walk prices
-            for (var i = 0; i < askPrices.length; i++) {
-                var delta = (Math.random() - 0.48) * 0.03; // slight upward bias
-                askPrices[i] = Math.max(102.00, askPrices[i] + delta);
-                askSizes[i] = Math.max(10, askSizes[i] + randInt(-20, 25));
-            }
-            for (var j = 0; j < bidPrices.length; j++) {
-                var bdelta = (Math.random() - 0.52) * 0.03;
-                bidPrices[j] = Math.max(101.50, bidPrices[j] + bdelta);
-                bidSizes[j] = Math.max(10, bidSizes[j] + randInt(-20, 25));
-            }
-
-            // Keep asks above bids
-            askPrices.sort(function (a, b) { return a - b; });
-            bidPrices.sort(function (a, b) { return b - a; });
-            if (askPrices[0] <= bidPrices[0]) {
-                var gap = 0.05;
-                var center = (askPrices[0] + bidPrices[0]) / 2;
-                askPrices[0] = center + gap / 2;
-                bidPrices[0] = center - gap / 2;
-            }
-
-            midPrice = (askPrices[0] + bidPrices[0]) / 2;
-            totalVolume = Math.max(500, totalVolume + randInt(-30, 40));
-
-            renderSide(asksWrapper, askPrices, askSizes, true);
-            renderSide(bidsWrapper, bidPrices, bidSizes, false);
-            renderMid();
-            renderSpread();
-            if (volumeEl) volumeEl.textContent = totalVolume;
-
-            // Flash random rows
-            var allRows = document.querySelectorAll('.ob-row');
-            var flashIdx = randInt(0, allRows.length - 1);
-            if (allRows[flashIdx]) flashRow(allRows[flashIdx]);
-        }
-
-        // Initial render
-        renderSide(asksWrapper, askPrices, askSizes, true);
-        renderSide(bidsWrapper, bidPrices, bidSizes, false);
-        renderMid();
-        renderSpread();
-
-        // Start simulation
-        setInterval(tick, 1200);
-    })();
-    </script>
 </body>
 </html>

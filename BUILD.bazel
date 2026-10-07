@@ -1,18 +1,67 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+# Orderly Chaos: top-level Bazel targets.
+#
+#   //:orderly_chaos     header-only C++ library  (#include <orderly_chaos/orderly_chaos.hpp>)
+#   //:orderly_chaos_c   C API                    (#include <orderly_chaos/orderly_chaos.h>)
+#   //:shared_lib        platform shared library  (.so / .dylib / .dll) exposing the C API
+
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
-alias(
-    name = "tests",
-    actual = "//test:limit_order_book_test",
+exports_files(["LICENSE"])
+
+cc_library(
+    name = "orderly_chaos",
+    hdrs = glob(["include/orderly_chaos/*.hpp"]),
+    includes = ["include"],
+    deps = ["//third_party/robin_map"],
+)
+
+cc_library(
+    name = "orderly_chaos_c",
+    srcs = ["src/c_api.cpp"],
+    hdrs = ["include/orderly_chaos/orderly_chaos.h"],
+    includes = ["include"],
+    local_defines = ["ORDERLY_CHAOS_BUILDING_LIBRARY"],
+    # keep every exported symbol when linked into a shared library
+    alwayslink = True,
+    deps = [":orderly_chaos"],
+)
+
+# One shared-library target per platform file extension. Only the target
+# matching the build platform is compatible, so `bazel build //...` skips
+# the others. Use //:shared_lib to select the right one automatically.
+
+cc_binary(
+    name = "lib_orderly_chaos.so",
+    linkshared = True,
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "@platforms//os:macos": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    deps = [":orderly_chaos_c"],
+)
+
+cc_binary(
+    name = "lib_orderly_chaos.dylib",
+    linkshared = True,
+    target_compatible_with = ["@platforms//os:macos"],
+    deps = [":orderly_chaos_c"],
+)
+
+cc_binary(
+    name = "lib_orderly_chaos.dll",
+    linkshared = True,
+    target_compatible_with = ["@platforms//os:windows"],
+    deps = [":orderly_chaos_c"],
 )
 
 alias(
-    name = "benchmarks",
-    actual = "//benchmark:benchmark_lob_test",
-)
-
-alias(
-    name = "python_dll",
-    actual = "//orderly_chaos:copy_dll",
+    name = "shared_lib",
+    actual = select({
+        "@platforms//os:windows": ":lib_orderly_chaos.dll",
+        "@platforms//os:macos": ":lib_orderly_chaos.dylib",
+        "//conditions:default": ":lib_orderly_chaos.so",
+    }),
 )

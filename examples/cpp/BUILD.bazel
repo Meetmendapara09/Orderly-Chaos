@@ -1,0 +1,33 @@
+# C++ examples. Each example is also run as a test so it cannot rot.
+#
+#   bazel run //examples/cpp:quickstart
+#   bazel run -c opt //examples/cpp:market_simulation -- 1000000
+
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+
+cc_binary(
+    name = "quickstart",
+    srcs = ["quickstart.cpp"],
+    deps = ["//:orderly_chaos"],
+)
+
+cc_binary(
+    name = "market_simulation",
+    srcs = ["market_simulation.cpp"],
+    deps = ["//:orderly_chaos"],
+)
+
+cc_test(
+    name = "quickstart_test",
+    srcs = ["quickstart.cpp"],
+    data = ["//toolchain:mingw_runtime"],
+    deps = ["//:orderly_chaos"],
+)
+
+cc_test(
+    name = "market_simulation_test",
+    srcs = ["market_simulation.cpp"],
+    args = ["20000"],
+    data = ["//toolchain:mingw_runtime"],
+    deps = ["//:orderly_chaos"],
+)

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Overview | Orderly Chaos</title>
+    <meta name="description" content="What Orderly Chaos is, what it is for, when to use it, and the exact matching rules it implements.">
+    <meta name="author" content="Meet Mendapara">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="assets/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="assets/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="manifest" href="assets/site.webmanifest">
+    <meta name="theme-color" content="#23251d">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js" integrity="sha384-wjfDDhOPPdjtva8vWBhWeVprSpmxisEu5aYT3q1JyACqXpdKpo3PWZTMVq24MBix" crossorigin="anonymous" defer></script>
+    <script src="assets/js/components.js" defer></script>
+    <script src="assets/js/copy-code.js" defer></script>
+    <script type="module" src="assets/js/site.js"></script>
+</head>
+<body data-page="overview">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header id="header-slot" class="navbar"></header>
+
+    <main id="main" class="content-page">
+        <div class="container">
+            <div class="page-header">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="index.html">Home</a><span class="sep">/</span><span class="current">Overview</span>
+                </nav>
+                <span class="page-badge">Start here</span>
+                <h1 class="page-title">Overview</h1>
+                <p class="page-description">What Orderly Chaos is, what you can build with it, when it is the right tool, and the exact rules it follows when orders meet.</p>
+            </div>
+
+            <div class="docs-layout">
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul>
+                        <li><a href="#what">What it is</a></li>
+                        <li><a href="#use-cases">Use cases</a></li>
+                        <li><a href="#when">When to use it</a></li>
+                        <li><a href="#concepts">Core concepts</a></li>
+                        <li><a href="#semantics">Matching rules</a>
+                            <ul>
+                                <li><a href="#limit-orders">Limit orders</a></li>
+                                <li><a href="#market-orders">Market orders</a></li>
+                                <li><a href="#cancel-reduce">Cancel and reduce</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#lifecycle">Order lifecycle</a></li>
+                        <li><a href="#trades">Trade events</a></li>
+                        <li><a href="#errors">Errors</a></li>
+                        <li><a href="#threads">Threads</a></li>
+                        <li><a href="#glossary">Glossary</a></li>
+                    </ul>
+                </nav>
+
+                <article class="doc-content">
+                    <h2 id="what">What it is</h2>
+                    <p>
+                        A <strong>limit order book</strong> is the data structure at the heart of every exchange. It holds all
+                        open buy orders (<em>bids</em>) and sell orders (<em>asks</em>), sorted by price. When a new order arrives
+                        that is willing to pay at least what a seller asks (or sell for at most what a buyer bids), the book
+                        <strong>matches</strong> them and produces trades.
+                    </p>
+                    <p>
+                        Orderly Chaos is a fast, embeddable implementation of that data structure with
+                        <strong>price-time priority</strong> matching: the best price trades first, and among orders at the same
+                        price, the oldest trades first. It is a library, not a server: you call it from C++, C, or Python and
+                        decide yourself where orders come from and what to do with the trades.
+                    </p>
+                    <figure class="diagram">
+                        <pre class="mermaid">
+flowchart LR
+    feed["Order source&lt;br/&gt;feed, strategy, users"] -->|limit / market / cancel / reduce| book["LimitOrderBook"]
+    book -->|filled quantity| feed
+    book -->|Trade events| sink["Your code&lt;br/&gt;fills, P&amp;L, logs"]
+    book -->|queries| state["Top of book, depth,&lt;br/&gt;volumes, order lookup"]
+                        </pre>
+                        <figcaption>You drive the book with orders; it answers with fills, trade events, and market state.</figcaption>
+                    </figure>
+
+                    <h2 id="use-cases">Use cases</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Use case</th><th>How Orderly Chaos is used</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>Market data replay</strong></td><td>Rebuild the book of an instrument from an exchange's order-by-order feed (add, cancel, execute messages) and read best bid/ask, depth, and volumes at any point in time.</td></tr>
+                                <tr><td><strong>Backtesting</strong></td><td>Simulate where a strategy's orders would rest in the queue and when they would fill, instead of assuming fills at the last price.</td></tr>
+                                <tr><td><strong>Exchange and venue simulators</strong></td><td>Use the book as the matching core of a paper-trading venue, a game, a classroom exchange, or an internal crossing engine.</td></tr>
+                                <tr><td><strong>Market microstructure research</strong></td><td>Study queue dynamics, spread formation, and price impact in agent-based simulations with millions of events per second.</td></tr>
+                                <tr><td><strong>Teaching</strong></td><td>Show exactly how price-time priority, partial fills, and immediate-or-cancel orders behave, with runnable examples in three languages.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 id="when">When to use it</h2>
+                    <div class="compare">
+                        <div class="yes">
+                            <h3>A good fit when you need</h3>
+                            <ul>
+                                <li>One continuous, price-time priority book per instrument</li>
+                                <li>Limit, market (immediate-or-cancel), cancel, and reduce operations</li>
+                                <li>Integer prices in ticks, with no floating-point drift</li>
+                                <li>Millions of operations per second in a single thread</li>
+                                <li>The same engine from C++, C, Python, or any C FFI</li>
+                                <li>Exact, tested semantics you can reason about</li>
+                            </ul>
+                        </div>
+                        <div class="no">
+                            <h3>Look elsewhere if you need</h3>
+                            <ul>
+                                <li>A complete exchange (networking, risk checks, persistence, accounts)</li>
+                                <li>Pro-rata, auction, or other non price-time allocation</li>
+                                <li>Order types such as stop, iceberg, fill-or-kill, or post-only (build them on top)</li>
+                                <li>Many threads writing to the same book without your own synchronisation</li>
+                                <li>Fractional prices that cannot be expressed as integer ticks</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h2 id="concepts">Core concepts</h2>
+                    <dl class="definitions">
+                        <dt>Side</dt>
+                        <dd><code>BUY</code> orders form the bids; <code>SELL</code> orders form the asks.</dd>
+                        <dt>Price</dt>
+                        <dd>An unsigned 64-bit integer number of <em>ticks</em>. Choose the tick to suit the instrument, for example cents (10050 means 100.50). Zero is reserved and is never a valid limit price.</dd>
+                        <dt>Quantity</dt>
+                        <dd>An unsigned 32-bit integer number of units (shares, contracts, lots). Must be at least 1.</dd>
+                        <dt>Order ID</dt>
+                        <dd>An unsigned 64-bit integer chosen by you. It must be unique among <em>resting</em> orders; once an order is filled or cancelled its ID may be reused.</dd>
+                        <dt>Price level</dt>
+                        <dd>All resting orders at one price on one side, kept in arrival order (a FIFO queue).</dd>
+                        <dt>Taker and maker</dt>
+                        <dd>The incoming order that trades immediately is the <em>taker</em>; the resting order it trades against is the <em>maker</em>.</dd>
+                    </dl>
+
+                    <h2 id="semantics">Matching rules</h2>
+                    <ol>
+                        <li><strong>Price priority.</strong> An incoming buy trades with the lowest ask first; an incoming sell trades with the highest bid first.</li>
+                        <li><strong>Time priority.</strong> Among resting orders at the same price, the oldest trades first.</li>
+                        <li><strong>Maker price.</strong> Every trade executes at the resting (maker) order's price. An aggressive buy at 105 against an ask at 100 trades at 100.</li>
+                        <li><strong>No trade-through.</strong> A limit order never trades at a price worse than its limit.</li>
+                        <li><strong>Atomic validation.</strong> A rejected request leaves the book exactly as it was.</li>
+                    </ol>
+
+                    <h3 id="limit-orders">Limit orders</h3>
+                    <figure class="diagram">
+                        <pre class="mermaid">
+flowchart TD
+    A(["Limit order arrives"]) --> V{"Valid?&lt;br/&gt;quantity &gt; 0, price &gt; 0,&lt;br/&gt;ID not resting"}
+    V -- No --> R["Rejected with an error&lt;br/&gt;book unchanged"]
+    V -- Yes --> C{"Crosses the spread?"}
+    C -- No --> Rest["Rest at the back of the&lt;br/&gt;queue at its price"]
+    C -- Yes --> M["Trade against the best opposite level,&lt;br/&gt;oldest order first, at the maker's price"]
+    M --> Q{"Quantity left and&lt;br/&gt;still crossing?"}
+    Q -- Yes --> M
+    Q -- "No, quantity left" --> Rest
+    Q -- "No, fully filled" --> Done(["Done: nothing rests"])
+    Rest --> Done2(["Return quantity filled"])
+    Done --> Done2
+                        </pre>
+                        <figcaption>A limit order trades as far as its price allows, then rests.</figcaption>
+                    </figure>
+                    <p>The call returns the quantity filled immediately. Whatever is left rests in the book until it is filled by later orders, reduced, or cancelled.</p>
+
+                    <h3 id="market-orders">Market orders</h3>
+                    <p>
+                        A market order trades against the opposite side, best price first, until it is filled or that side is empty.
+                        It never rests: any unfilled remainder is discarded (immediate-or-cancel). Its ID only labels the trades it
+                        produces, so it does not need to be unique. The call returns the quantity filled.
+                    </p>
+
+                    <h3 id="cancel-reduce">Cancel and reduce</h3>
+                    <ul>
+                        <li><strong>Cancel</strong> removes a resting order completely.</li>
+                        <li><strong>Reduce</strong> lowers a resting order's quantity <em>without</em> losing its place in the queue. Reducing by the full open quantity cancels the order.</li>
+                    </ul>
+
+                    <h2 id="lifecycle">Order lifecycle</h2>
+                    <figure class="diagram">
+                        <pre class="mermaid">
+stateDiagram-v2
+    [*] --> Rejected: invalid request
+    [*] --> Resting: limit order, no cross
+    [*] --> PartiallyFilled: limit order crosses, quantity left
+    [*] --> Filled: crosses and fully fills
+    Resting --> PartiallyFilled: some quantity traded
+    PartiallyFilled --> PartiallyFilled: more quantity traded
+    Resting --> Filled: all quantity traded
+    PartiallyFilled --> Filled: rest traded
+    Resting --> Resting: reduce
+    Resting --> Cancelled: cancel or reduce to zero
+    PartiallyFilled --> Cancelled: cancel or reduce to zero
+    Rejected --> [*]
+    Filled --> [*]
+    Cancelled --> [*]
+                        </pre>
+                        <figcaption>States of a limit order. Partially filled orders keep resting at their price.</figcaption>
+                    </figure>
+
+                    <h2 id="trades">Trade events</h2>
+                    <p>Register a handler to receive one <code>Trade</code> per execution:</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>taker_id</code></td><td>ID of the incoming order</td></tr>
+                                <tr><td><code>maker_id</code></td><td>ID of the resting order it traded with</td></tr>
+                                <tr><td><code>taker_side</code></td><td>Side of the incoming order</td></tr>
+                                <tr><td><code>price</code></td><td>Execution price (the maker's price)</td></tr>
+                                <tr><td><code>quantity</code></td><td>Executed quantity</td></tr>
+                                <tr><td><code>maker_remaining</code></td><td>Maker's open quantity after the trade; 0 means it was fully filled and left the book</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>
+                        Handlers run <strong>after</strong> the operation has fully updated the book, in execution order. They may
+                        query the book but must not modify it. If a handler raises, the remaining trades of that operation are still
+                        delivered and the first error is raised from the call that caused them.
+                    </p>
+
+                    <h2 id="errors">Errors</h2>
+                    <p>
+                        Every rejection names the failed operation, states the reason, and carries the symbolic status
+                        code in brackets, so the same failure reads the same way in every language. For example,
+                        cancelling order 99 when it is not resting reports
+                        <code>cancel order 99: unknown order id [OC_ERR_UNKNOWN_ORDER_ID]</code> in Python and
+                        <code>unknown order id [OC_ERR_UNKNOWN_ORDER_ID]: no resting order with id 99</code> in C++.
+                        Query the book first (<code>has()</code> / <code>oc_book_has</code>) when an ID may already be gone.
+                    </p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Error</th><th>Cause</th><th>Fix</th><th>Python</th><th>C status</th></tr></thead>
+                            <tbody>
+                                <tr><td>Duplicate order ID</td><td>A limit order uses an ID that is already resting</td><td>Cancel the old order first, or generate a fresh ID</td><td><code>DuplicateOrderIdError</code></td><td><code>OC_ERR_DUPLICATE_ORDER_ID</code></td></tr>
+                                <tr><td>Unknown order ID</td><td>Cancel, reduce, or get for an ID that is not resting (it may have been filled)</td><td>Treat a filled order as done; check <code>has()</code> before cancelling a possibly filled order</td><td><code>UnknownOrderIdError</code></td><td><code>OC_ERR_UNKNOWN_ORDER_ID</code></td></tr>
+                                <tr><td>Invalid quantity</td><td>Quantity is 0, out of range, or a reduce exceeds the open quantity</td><td>Pass 1 to 2<sup>32</sup>&nbsp;-&nbsp;1; for reduce, pass at most the value from <code>get()</code></td><td><code>InvalidQuantityError</code></td><td><code>OC_ERR_INVALID_QUANTITY</code></td></tr>
+                                <tr><td>Invalid price</td><td>Limit price is 0 (reserved for market orders) or out of range</td><td>Pass at least 1 tick; use a market order for price-insensitive execution</td><td><code>InvalidPriceError</code></td><td><code>OC_ERR_INVALID_PRICE</code></td></tr>
+                                <tr><td>Invalid side</td><td>Side is not buy or sell</td><td>Pass <code>Side.BUY</code> / <code>Side.SELL</code> (or <code>OC_SIDE_BUY</code> / <code>OC_SIDE_SELL</code>)</td><td><code>InvalidSideError</code></td><td><code>OC_ERR_INVALID_SIDE</code></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>In C++ every rejection throws <code>orderly_chaos::OrderBookError</code>: <code>code()</code> returns the <code>ErrorCode</code>, <code>code_name()</code> returns the matching <code>OC_ERR_*</code> name, and <code>what()</code> combines the reason with the order details. A rejected call never modifies the book.</p>
+
+                    <h2 id="threads">Threads</h2>
+                    <p>
+                        A book is a single-threaded data structure, which is what makes it fast. Use one book per instrument and
+                        drive each book from one thread, or protect it with your own lock. The Python binding calls the library
+                        while holding the GIL, so sharing a Python book between threads is memory-safe; each individual call is
+                        atomic, but sequences of calls (such as <code>has()</code> followed by <code>cancel()</code>) are not.
+                    </p>
+
+                    <h2 id="glossary">Glossary</h2>
+                    <dl class="definitions">
+                        <dt>Best bid / best ask</dt><dd>The highest buy price and the lowest sell price in the book (the top of book).</dd>
+                        <dt>Spread</dt><dd>Best ask minus best bid.</dd>
+                        <dt>Mid price</dt><dd>The midpoint of the best bid and ask, rounded down to a whole tick.</dd>
+                        <dt>Depth</dt><dd>The aggregated volume and order count at each price level, best first ("level 2" data).</dd>
+                        <dt>Crossing</dt><dd>An order whose price reaches the best opposite price, and therefore trades immediately.</dd>
+                    </dl>
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <footer id="footer-slot" class="footer"></footer>
+</body>
+</html>

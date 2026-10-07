@@ -1,0 +1,62 @@
+# C++ unit tests (GoogleTest).
+#
+#   bazel test //tests/cpp:all
+
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
+MINGW_RUNTIME = ["//toolchain:mingw_runtime"]
+
+GTEST = [
+    "@com_google_googletest//:gtest",
+    "@com_google_googletest//:gtest_main",
+]
+
+cc_test(
+    name = "types_test",
+    srcs = ["test_types.cpp"],
+    data = MINGW_RUNTIME,
+    deps = ["//:orderly_chaos"] + GTEST,
+)
+
+cc_test(
+    name = "limit_tree_test",
+    srcs = ["test_limit_tree.cpp"],
+    data = MINGW_RUNTIME,
+    deps = ["//:orderly_chaos"] + GTEST,
+)
+
+cc_test(
+    name = "limit_order_book_test",
+    srcs = ["test_limit_order_book.cpp"],
+    data = MINGW_RUNTIME,
+    deps = ["//:orderly_chaos"] + GTEST,
+)
+
+cc_test(
+    name = "validation_test",
+    srcs = ["test_validation.cpp"],
+    data = MINGW_RUNTIME,
+    deps = ["//:orderly_chaos"] + GTEST,
+)
+
+cc_test(
+    name = "trades_test",
+    srcs = ["test_trades.cpp"],
+    data = MINGW_RUNTIME,
+    deps = ["//:orderly_chaos"] + GTEST,
+)
+
+cc_test(
+    name = "randomized_test",
+    size = "medium",
+    srcs = ["test_randomized.cpp"],
+    data = MINGW_RUNTIME,
+    deps = ["//:orderly_chaos"] + GTEST,
+)
+
+cc_test(
+    name = "c_api_test",
+    srcs = ["test_c_api.cpp"],
+    data = MINGW_RUNTIME,
+    deps = ["//:orderly_chaos_c"] + GTEST,
+)

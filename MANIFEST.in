@@ -1,3 +1,8 @@
+# Files included in the source distribution (sdist) in addition to the
+# Python package, so that the native library can be built from it.
+include LICENSE THIRD_PARTY_NOTICES.md README.md CHANGELOG.md
 graft include
 graft src
-graft vendor
+graft third_party/robin_map
+graft tests/python
+global-exclude *.py[cod] __pycache__ *.so *.dylib *.dll *.pyd *.o

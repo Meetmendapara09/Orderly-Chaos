@@ -1,0 +1,46 @@
+# Stages the platform shared library for the Python package at
+# bazel-bin/python/orderly_chaos/lib_orderly_chaos.{so,dylib,dll}.
+#
+#   bazel build //python:shared_lib
+#   cp bazel-bin/python/orderly_chaos/lib_orderly_chaos.* python/orderly_chaos/
+#
+# (`make python-lib` does both steps.)
+
+package(default_visibility = ["//visibility:public"])
+
+alias(
+    name = "shared_lib",
+    actual = select({
+        "@platforms//os:windows": ":stage_dll",
+        "@platforms//os:macos": ":stage_dylib",
+        "//conditions:default": ":stage_so",
+    }),
+)
+
+genrule(
+    name = "stage_so",
+    srcs = ["//:lib_orderly_chaos.so"],
+    outs = ["orderly_chaos/lib_orderly_chaos.so"],
+    cmd = "cp $< $@",
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "@platforms//os:macos": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)
+
+genrule(
+    name = "stage_dylib",
+    srcs = ["//:lib_orderly_chaos.dylib"],
+    outs = ["orderly_chaos/lib_orderly_chaos.dylib"],
+    cmd = "cp $< $@",
+    target_compatible_with = ["@platforms//os:macos"],
+)
+
+genrule(
+    name = "stage_dll",
+    srcs = ["//:lib_orderly_chaos.dll"],
+    outs = ["orderly_chaos/lib_orderly_chaos.dll"],
+    cmd = "cp $< $@",
+    target_compatible_with = ["@platforms//os:windows"],
+)

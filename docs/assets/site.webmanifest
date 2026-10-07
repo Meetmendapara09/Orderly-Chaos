@@ -1,0 +1,13 @@
+{
+  "name": "Orderly Chaos documentation",
+  "short_name": "OrderlyChaos",
+  "description": "A fast price-time priority limit order book with C++, C, and Python APIs.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#eeefe9",
+  "theme_color": "#23251d",
+  "icons": [
+    { "src": "favicon-32x32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}

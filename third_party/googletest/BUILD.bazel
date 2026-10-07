@@ -1,0 +1,4 @@
+# Build file for GoogleTest, fetched by MODULE.bazel via http_archive.
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["googletest.BUILD"])

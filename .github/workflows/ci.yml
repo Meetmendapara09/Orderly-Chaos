@@ -1,19 +1,16 @@
 # Continuous integration for Orderly Chaos.
 #
-# Two jobs on ubuntu-latest:
-#   1. cpp     - GoogleTest suites + performance benchmark via Bazel
-#   2. python  - build the ctypes shared library and run unittest discovery
+# Three jobs on ubuntu-latest:
+#   1. cpp     - every Bazel target (C++ tests, examples, benchmark smoke test)
+#   2. python  - build the shared library with Bazel and run the Python suite
+#   3. docs    - internal link check and version consistency check
 #
 # Notes:
 #   * Bazelisk installs Bazel; USE_BAZEL_VERSION pins the LTS 7 series
 #     (the project targets Bazel 7+ with Bzlmod).
-#   * The repository .bazelrc carries Windows-only MinGW options
-#     (-static* linkopts, windows_unix_root). On Linux every Bazel
-#     invocation passes --bazelrc=/dev/null and restates the needed
-#     compiler flags explicitly.
-#   * //orderly_chaos:copy_dll emits lib_orderly_chaos.dll on every
-#     platform, while orderly_chaos/library.py globs *.so on POSIX,
-#     so the Python job renames the artifact before testing.
+#   * Compiler flags come from the committed .bazelrc (build:linux).
+#   * //python:shared_lib stages the platform-specific library
+#     (lib_orderly_chaos.so on Linux) that python/orderly_chaos loads.
 
 name: CI
 
@@ -28,7 +25,7 @@ env:
 
 jobs:
   cpp:
-    name: C++ tests & benchmark (ubuntu)
+    name: C++ tests, examples & benchmark (ubuntu)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -43,17 +40,8 @@ jobs:
           key: bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel', '**/*.bzl', '**/BUILD.bazel') }}
           restore-keys: bazel-${{ runner.os }}-
 
-      - name: Run unit tests (GoogleTest)
-        run: >
-          bazel --bazelrc=/dev/null test //test:all
-          --cxxopt=-std=c++17 --copt=-O2
-          --test_output=errors
-
-      - name: Run performance benchmark
-        run: >
-          bazel --bazelrc=/dev/null test //benchmark:benchmark_lob_test
-          --cxxopt=-std=c++17 --copt=-O2
-          --test_output=streamed
+      - name: Run all Bazel tests
+        run: bazel test //... --test_output=errors
 
   python:
     name: Python bindings (ubuntu)
@@ -75,21 +63,61 @@ jobs:
           key: bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel', '**/*.bzl', '**/BUILD.bazel') }}
           restore-keys: bazel-${{ runner.os }}-
 
-      - name: Build ctypes shared library
-        run: >
-          bazel --bazelrc=/dev/null build //orderly_chaos:copy_dll
-          --cxxopt=-std=c++17 --copt=-O2
-
-      - name: Place library next to the Python package
+      - name: Build shared library with Bazel
         run: |
-          cp bazel-bin/orderly_chaos/lib_orderly_chaos.* orderly_chaos/
-          cd orderly_chaos
-          for f in lib_orderly_chaos*.dll; do
-            [ -e "$f" ] && mv "$f" "${f%.dll}.so"
-          done
+          bazel build //python:shared_lib
+          cp bazel-bin/python/orderly_chaos/lib_orderly_chaos.* python/orderly_chaos/
 
-      - name: Install package in editable mode
-        run: pip install -e .
+      - name: Install test dependencies
+        run: pip install pytest
 
-      - name: Run Python unit tests
-        run: python -m unittest discover -v .
+      - name: Run Python test suite
+        run: python -m pytest tests/python -v
+
+      - name: Install package from source and re-test
+        run: |
+          rm -f python/orderly_chaos/lib_orderly_chaos.*
+          pip install .
+          python -m pytest tests/python -v
+
+  docs:
+    name: Docs link & version check (ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check internal docs links resolve
+        run: python - <<'EOF'
+          import os, pathlib, re
+          root = pathlib.Path('docs')
+          pages = {p.relative_to(root).as_posix() for p in root.rglob('*.html')}
+          assets = {p.relative_to(root).as_posix() for p in (root / 'assets').rglob('*') if p.is_file()}
+          known = pages | assets | {'architecture.md'}
+          bad = []
+          for page in sorted(root.rglob('*.html')):
+              text = page.read_text(encoding='utf-8')
+              for link in re.findall(r'(?:href|src)="([^"#{}]+?)(?:[#?][^"]*)?"', text):
+                  if link.startswith('@/') or re.match(r'[a-zA-Z][a-zA-Z0-9+.-]*:|^//', link):
+                      continue  # runtime placeholder or external URL
+                  target = os.path.normpath(os.path.join(page.parent.relative_to(root).as_posix(), link))
+                  if target not in known:
+                      bad.append(f'{page.relative_to(root)} -> {link}')
+          if bad:
+              raise SystemExit('broken docs links:\n' + '\n'.join(bad))
+          print(f'checked {len(pages)} pages, all internal links resolve')
+          EOF
+
+      - name: Check version consistency
+        run: python - <<'EOF'
+          import re
+          version = re.search(r'__version__ = "([^"]+)"', open('python/orderly_chaos/_version.py').read()).group(1)
+          header = open('include/orderly_chaos/version.hpp').read()
+          assert f'#define ORDERLY_CHAOS_VERSION_STRING "{version}"' in header, 'version.hpp mismatch'
+          assert f'version = "{version}"' in open('pyproject.toml').read(), 'pyproject.toml mismatch'
+          assert f'version = "{version}"' in open('MODULE.bazel').read(), 'MODULE.bazel mismatch'
+          print(f'version {version} consistent across _version.py, version.hpp, pyproject.toml, MODULE.bazel')
+          EOF

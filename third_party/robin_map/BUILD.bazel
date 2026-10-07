@@ -1,0 +1,16 @@
+# tsl::robin_map 0.6.1 - header-only hash map (MIT, see LICENSE).
+# https://github.com/Tessil/robin-map
+
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
+cc_library(
+    name = "robin_map",
+    hdrs = glob(["include/tsl/*.h"]),
+    includes = ["include"],
+)

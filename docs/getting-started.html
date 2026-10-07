@@ -1,345 +1,196 @@
-﻿?<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Getting Started • Orderly Chaos</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Getting started | Orderly Chaos</title>
+    <meta name="description" content="Install Orderly Chaos for Python, C++, or C, build it from source with pip or Bazel, and run your first order book.">
+    <meta name="author" content="Meet Mendapara">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="assets/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="assets/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="manifest" href="assets/site.webmanifest">
+    <meta name="theme-color" content="#23251d">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js" integrity="sha384-wjfDDhOPPdjtva8vWBhWeVprSpmxisEu5aYT3q1JyACqXpdKpo3PWZTMVq24MBix" crossorigin="anonymous" defer></script>
+    <script src="assets/js/components.js" defer></script>
+    <script src="assets/js/copy-code.js" defer></script>
+    <script type="module" src="assets/js/site.js"></script>
 </head>
 <body data-page="getting-started">
-    <header id="header-slot" class="navbar" role="banner"></header>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header id="header-slot" class="navbar"></header>
 
-    <main class="pt-24 pb-32">
-        <div class="container mx-auto px-6">
-            <div class="content-page">
-                <div class="page-header">
-                    <nav class="breadcrumb" aria-label="Breadcrumb">
-                        <a href="index.html">Home</a>
-                        <span class="sep">/</span>
-                        <span class="current">Getting Started</span>
-                    </nav>
-                    <span class="page-badge">Getting Started</span>
-                    <h1 class="page-title">Getting Started with Orderly Chaos</h1>
-                    <p class="page-description">
-                        Install the engine, build from source, and place your first order — in under five minutes.
-                        No prior trading-systems knowledge required.
-                    </p>
-                    <div class="page-meta">
-                        <span>⏱ 5 min setup</span><span class="dot"></span><span>📦 Bazel + Python</span><span class="dot"></span><span>Updated Aug 2026</span>
-                    </div>
-                </div>
+    <main id="main" class="content-page">
+        <div class="container">
+            <div class="page-header">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="index.html">Home</a><span class="sep">/</span><span class="current">Getting started</span>
+                </nav>
+                <span class="page-badge">Guide</span>
+                <h1 class="page-title">Getting started</h1>
+                <p class="page-description">Install the library for your language, verify the build, and run your first order book in a few minutes.</p>
+                <div class="page-meta"><span>C++17</span><span>Python 3.9+</span><span>Linux, macOS, Windows</span></div>
+            </div>
 
-                <div class="docs-layout">
-                    <nav class="toc">
-                        <div class="toc-nav">
-                            <ul>
-                                <li><a href="#prerequisites">Prerequisites</a></li>
-                                <li><a href="#installation">Installation</a></li>
-                                <li><a href="#quick-start">Quick Start</a></li>
-                                <li><a href="#verify">Verify the Build</a></li>
-                                <li><a href="#python-guide">Python Guide</a></li>
-                                <li><a href="#cpp-guide">C++ Guide</a></li>
-                                <li><a href="#c-guide">C API Guide</a></li>
-                                <li><a href="#troubleshooting">Troubleshooting</a></li>
-                                <li><a href="#references">Official References</a></li>
-                                <li><a href="#next-steps">Next Steps</a></li>
-                            </ul>
-                        </div>
-                    </nav>
+            <div class="docs-layout">
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul>
+                        <li><a href="#requirements">Requirements</a></li>
+                        <li><a href="#python">Python</a></li>
+                        <li><a href="#cpp">C++</a></li>
+                        <li><a href="#c">C and other languages</a></li>
+                        <li><a href="#verify">Verify the build</a></li>
+                        <li><a href="#first-book">Your first order book</a></li>
+                        <li><a href="#layout">Project layout</a></li>
+                        <li><a href="#make">Make targets</a></li>
+                        <li><a href="#troubleshooting">Troubleshooting</a></li>
+                    </ul>
+                </nav>
 
-                    <div class="doc-content">
-                        <!-- Prerequisites -->
-                        <h2 id="prerequisites">Prerequisites</h2>
-                        <p>
-                            Orderly Chaos is a C++17 engine with Python bindings built by Bazel. You need a
-                            compiler, Python, and Bazel — everything else is fetched automatically. Check each
-                            requirement before you start:
-                        </p>
-                        <table class="param-table">
-                            <tr><th>Tool</th><th>Required Version</th><th>Notes</th></tr>
-                            <tr><td><strong>C++ compiler</strong></td><td>GCC 7+ or Clang 6+ with <code>-std=c++17</code></td><td>Any recent GCC/Clang works (<a href="https://gcc.gnu.org/" style="color:#1078a3;text-decoration:underline">gcc.gnu.org</a>). MSVC is not tested — use MinGW-w64 on Windows.</td></tr>
-                            <tr><td><strong>Python</strong></td><td>3.8+</td><td>Needed only for the Python bindings (<a href="https://docs.python.org/3/" style="color:#1078a3;text-decoration:underline">docs.python.org</a>). The C++ core builds without Python.</td></tr>
-                            <tr><td><strong>Bazel</strong></td><td>7+ with Bzlmod enabled</td><td>Install via <a href="https://bazel.build/install" style="color:#1078a3;text-decoration:underline">bazel.build/install</a> (Windows guide: <a href="https://bazel.build/install/windows" style="color:#1078a3;text-decoration:underline">bazel.build/install/windows</a>). Bzlmod is on by default in Bazel 7+.</td></tr>
-                            <tr><td><strong>Windows only</strong></td><td>MinGW-w64 via <a href="https://strawberryperl.com/" style="color:#1078a3;text-decoration:underline">Strawberry Perl</a>, plus <a href="https://gitforwindows.org/" style="color:#1078a3;text-decoration:underline">Git for Windows</a> (or <a href="https://www.msys2.org/" style="color:#1078a3;text-decoration:underline">MSYS2</a>) for <code>bash.exe</code></td><td>Bazel requires a POSIX shell on Windows — see <a href="#troubleshooting" style="color:#1078a3">Troubleshooting</a>. The custom toolchain lives in <code>toolchain/BUILD.bazel</code>.</td></tr>
+                <article class="doc-content">
+                    <h2 id="requirements">Requirements</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>To use</th><th>You need</th></tr></thead>
+                            <tbody>
+                                <tr><td>Python package</td><td>Python 3.9 or newer, pip, and a C++17 compiler (GCC 7+, Clang 5+, Xcode command line tools, or MSVC 2019+)</td></tr>
+                                <tr><td>C++ library</td><td>A C++17 compiler. The core is header-only; no build step is required.</td></tr>
+                                <tr><td>C API / shared library</td><td>A C++17 compiler, plus <a href="https://bazel.build/install">Bazel</a> 7+ (or <a href="https://github.com/bazelbuild/bazelisk">Bazelisk</a>) if you build with Bazel</td></tr>
+                                <tr><td>Running the test suites</td><td>Bazel 7+ for C++ tests; Python 3.9+ for Python tests</td></tr>
+                            </tbody>
                         </table>
-                        <p>Verify your setup in one shot:</p>
-                        <pre><code>g++ --version        <span class="comment"># should show GCC 7+ or Clang 6+</span>
-python --version     <span class="comment"># should show 3.8+</span>
-bazel --version      <span class="comment"># should show 7.x or 8.x</span>
-<span class="comment"># Windows: confirm MinGW is where the toolchain expects it</span>
-ls "D:/Strawberry/c/bin/g++.exe"  <span class="comment"># or wherever your g++ lives</span></code></pre>
+                    </div>
 
-                        <!-- Installation -->
-                        <h2 id="installation">Installation</h2>
-                        <p>Choose the path that fits you. Most users want <strong>Option A</strong>.</p>
-
-                        <h3>Option A — Python from PyPI (fastest)</h3>
-                        <p>If you just want to use the engine from Python, no build needed:</p>
-                        <pre><code>pip install orderly-chaos</code></pre>
-                        <p>Then jump to <a href="#quick-start" style="color:#1078a3">Quick Start</a>.</p>
-
-                        <h3>Option B — Build from source (all platforms)</h3>
-                        <p>Clone, build the shared library, and install the Python package in editable mode. Every command below is copy-paste ready.</p>
-                        <pre><code><span class="comment"># 1. Clone</span>
-git clone https://github.com/Meetmendapara09/Orderly-Chaos.git
+                    <h2 id="python">Python</h2>
+                    <p>Install from a clone of the repository. pip compiles the native library for your platform automatically:</p>
+<pre><code class="language-bash">git clone https://github.com/Meetmendapara09/Orderly-Chaos.git
 cd Orderly-Chaos
-
-<span class="comment"># 2. Tell Bazel where bash lives (Windows + Git Bash users — required once per shell)</span>
-<span class="comment">#    If you use Command Prompt:  set BAZEL_SH=C:\Program Files\Git\bin\bash.exe</span>
-export BAZEL_SH="C:/Program Files/Git/bin/bash.exe"   <span class="comment"># Git Bash / MSYS2</span>
-
-<span class="comment"># 3. Build the shared library</span>
-bazel build //orderly_chaos:copy_dll
-
-<span class="comment"># 4. Copy the DLL next to the Python package (so ctypes can find it)</span>
-cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
-
-<span class="comment"># 5. Install the Python package</span>
-pip install -e .</code></pre>
-                        <p><strong>What just happened?</strong> <code>//orderly_chaos:copy_dll</code> compiles the C++ core and C API into <code>lib_orderly_chaos.dll</code> (or <code>.so</code> on Linux/macOS) and copies it into the build output. The <code>cp</code> step places it where <code>orderly_chaos/library.py</code> expects it at runtime.</p>
-                        <p>
-                            <strong>First build?</strong> The very first command downloads all external dependencies
-                            declared in <code>MODULE.bazel</code> (Bzlmod resolves them automatically; you can pre-fetch with
-                            <a href="https://bazel.build/run/build#fetching-external-dependencies" style="color:#1078a3;text-decoration:underline"><code>bazel fetch //...</code></a>).
-                            Google Test is pinned by SHA-256 via <code>http_archive</code>, so builds are hermetic —
-                            everyone gets the exact same sources. Subsequent builds are incremental and cached.
-                        </p>
-
-                        <h3>Option C — C++ only (no Python)</h3>
-                        <p>Just copy the headers — the engine is header-only for C++ consumers:</p>
-                        <pre><code>cp -r include/ your_project/include/</code></pre>
-                        <p>Then <code>#include "limit_order_book.hpp"</code> and compile with <code>-std=c++17 -O2</code>. No Bazel required for this path.</p>
-
-                        <!-- Quick Start -->
-                        <h2 id="quick-start">Quick Start</h2>
-                        <p>Prices are integers (e.g., cents). Pass <code>10250</code> for $102.50 — this avoids floating-point rounding in matching.</p>
-
-                        <h3>Python — your first book in 6 lines</h3>
-                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-
-book = LimitOrderBook()
-
-<span class="comment"># Place two limit orders that do not cross</span>
-book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)  <span class="comment"># ask $102.50</span>
-book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)   <span class="comment"># bid $102.40</span>
-
-<span class="comment"># A market buy that lifts 75 shares from the ask</span>
-book.market_buy(order_id=<span class="number">3</span>, quantity=<span class="number">75</span>)
-
-<span class="comment"># Inspect the book</span>
-print(f<span class="string">"Best Ask: ${book.best_sell() / 100:.2f}"</span>)   <span class="comment"># 102.50 (25 shares remain)</span>
-print(f<span class="string">"Best Bid: ${book.best_buy() / 100:.2f}"</span>)    <span class="comment"># 102.40</span>
-print(f<span class="string">"Total Volume: {book.volume()}"</span>)             <span class="comment"># 75</span></code></pre>
-
-                        <h3>C++ — same flow, zero overhead</h3>
-                        <pre><code>#include <span class="string">"limit_order_book.hpp"</span>
-#include <span class="string">&lt;iostream&gt;</span>
-
-<span class="keyword">int</span> main() {
-    LOB::LimitOrderBook book;
-
-    book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-    book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
-    book.market_buy(<span class="number">3</span>, <span class="number">75</span>);
-
-    std::cout <span class="keyword">&lt;&lt;</span> <span class="string">"Best ask: "</span> <span class="keyword">&lt;&lt;</span> book.best_sell() <span class="keyword">&lt;&lt;</span> std::endl; <span class="comment">// 10250</span>
-    std::cout <span class="keyword">&lt;&lt;</span> <span class="string">"Volume: "</span> <span class="keyword">&lt;&lt;</span> book.volume() <span class="keyword">&lt;&lt;</span> std::endl;     <span class="comment">// 75</span>
-    <span class="keyword">return</span> <span class="number">0</span>;
-}</code></pre>
-                        <p>Compile with: <code>g++ -std=c++17 -O2 -Iinclude main.cpp -o book</code></p>
-
-                        <!-- Verify -->
-                        <h2 id="verify">Verify the Build</h2>
-                        <p>Run these before you change anything — they confirm the toolchain is correct:</p>
-                        <pre><code><span class="comment"># C++ unit tests (Google Test, 3 suites)</span>
-bazel test //test:all --test_output=errors
-<span class="comment"># expect: 3/3 PASSED — limit_order_book, limit_tree, structures</span>
-
-<span class="comment"># Performance benchmark</span>
-bazel test //benchmark:benchmark_lob_test --test_output=streamed
-<span class="comment"># expect: 1/1 PASSED — prints latency table</span>
-
-<span class="comment"># Python tests (after pip install -e .)</span>
-python -m unittest discover -v
-<span class="comment"># expect: 15 tests OK</span></code></pre>
-
-                        <!-- Python Guide -->
-                        <h2 id="python-guide">Python Guide</h2>
-                        <p>All operations go through <code>LimitOrderBook</code>. Order IDs must be unique — reusing an ID without cancelling first will throw.</p>
-
-                        <h3>Creating a book</h3>
-                        <pre><code><span class="keyword">from</span> orderly_chaos <span class="keyword">import</span> LimitOrderBook
-book = LimitOrderBook()  <span class="comment"># empty book, zero volume</span></code></pre>
-
-                        <h3>Placing limit orders</h3>
-                        <pre><code><span class="comment"># Explicit side methods (recommended for readability)</span>
-book.limit_sell(order_id=<span class="number">1</span>, quantity=<span class="number">100</span>, price=<span class="number">10250</span>)
-book.limit_buy(order_id=<span class="number">2</span>, quantity=<span class="number">50</span>, price=<span class="number">10240</span>)
-
-<span class="comment"># Generic method — side=True means buy, False means sell</span>
-book.limit(side=<span class="keyword">True</span>, order_id=<span class="number">3</span>, quantity=<span class="number">75</span>, price=<span class="number">10230</span>)</code></pre>
-                        <p>If a new limit order <em>crosses the spread</em> (e.g., you buy at or above the best ask), it matches immediately like a market order for the crossing portion. Any leftover quantity rests in the book.</p>
-
-                        <h3>Market orders</h3>
-                        <pre><code>book.market_buy(order_id=<span class="number">4</span>, quantity=<span class="number">25</span>)   <span class="comment"># lifts from the ask side</span>
-book.market_sell(order_id=<span class="number">5</span>, quantity=<span class="number">25</span>)  <span class="comment"># hits the bid side</span></code></pre>
-
-                        <h3>Querying the book</h3>
-                        <pre><code>book.best_sell()        <span class="comment"># lowest ask, 0 if no asks</span>
-book.best_buy()         <span class="comment"># highest bid, 0 if no bids</span>
-book.best(<span class="keyword">True</span>)              <span class="comment"># generic: True=bid, False=ask</span>
-book.volume()           <span class="comment"># total shares in book</span>
-book.volume(<span class="number">10250</span>)           <span class="comment"># shares resting at price 10250</span>
-book.count()            <span class="comment"># total number of orders</span>
-book.has(<span class="number">1</span>)             <span class="comment"># True if order 1 still rests</span>
-book.cancel(<span class="number">1</span>)          <span class="comment"># remove order 1</span>
-book.clear()            <span class="comment"># remove everything</span></code></pre>
-
-                        <!-- C++ Guide -->
-                        <h2 id="cpp-guide">C++ Guide</h2>
-                        <p>Include one header. All types live in namespace <code>LOB</code>.</p>
-                        <pre><code>#include <span class="string">"limit_order_book.hpp"</span>
-#include <span class="string">&lt;iostream&gt;</span>
-
-<span class="keyword">using</span> <span class="keyword">namespace</span> LOB;
-
-<span class="keyword">int</span> main() {
-    LimitOrderBook book;
-
-    <span class="comment">// Place limit orders</span>
-    book.limit_sell(<span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-    book.limit_buy(<span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
-
-    <span class="comment">// Market order — consumes from opposite side</span>
-    book.market_buy(<span class="number">3</span>, <span class="number">25</span>);
-
-    <span class="comment">// Query — all O(1) except count_at (O(log n))</span>
-    std::cout <span class="keyword">&lt;&lt;</span> book.best_sell() <span class="keyword">&lt;&lt;</span> std::endl;
-    std::cout <span class="keyword">&lt;&lt;</span> book.volume() <span class="keyword">&lt;&lt;</span> std::endl;
-    std::cout <span class="keyword">&lt;&lt;</span> book.count() <span class="keyword">&lt;&lt;</span> std::endl;
-
-    <span class="comment">// Manage orders</span>
-    book.cancel(<span class="number">1</span>);
-    book.clear();
-
-    <span class="keyword">return</span> <span class="number">0</span>;
-}</code></pre>
-                        <p>Key C++ notes: price and quantity are integer types (<code>Price</code> = <code>uint64_t</code>, <code>Quantity</code> = <code>uint32_t</code>). The book owns its orders — use <code>has()</code>/<code>get()</code> to inspect before cancelling.</p>
-
-                        <!-- C API Guide -->
-                        <h2 id="c-guide">C API Guide</h2>
-                        <p>The C API (<code>include/lib_lob.hpp</code>) wraps the same engine with <code>extern "C"</code> so any language with a C FFI can call it. Python's <code>ctypes</code> layer is built on top of it.</p>
-                        <pre><code>#include <span class="string">"lib_lob.hpp"</span>
-
-<span class="keyword">int</span> main() {
-    <span class="comment">// Create — returns an opaque pointer</span>
-    LOB::LimitOrderBook* book = new_();
-
-    <span class="comment">// Place orders (same semantics as C++)</span>
-    limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-    limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
-    market_buy(book, <span class="number">3</span>, <span class="number">25</span>);
-
-    <span class="comment">// Query</span>
-    LOB::Price best_ask = best_sell(book);
-    LOB::Volume vol = volume(book);
-
-    <span class="comment">// Cancel and free — you own the book pointer</span>
-    cancel(book, <span class="number">1</span>);
-    delete_(book);
-
-    <span class="keyword">return</span> <span class="number">0</span>;
-}</code></pre>
-                        <p>Every <code>new_()</code> must be paired with <code>delete_()</code>. See <a href="api/c.html" style="color:#1078a3">C API reference</a> for the full function list.</p>
-
-                        <!-- Troubleshooting -->
-                        <h2 id="troubleshooting">Troubleshooting</h2>
-
-                        <h3>Error: <code>BAZEL_SH</code> not set / <code>sh_toolchain</code> failed</h3>
-                        <pre><code>ERROR: Cannot determine sh_toolchain ... BAZEL_SH not set</code></pre>
-                        <p>
-                            Bazel on Windows requires a POSIX-compatible shell and needs to be told where
-                            <code>bash.exe</code> lives — from Git for Windows or MSYS2 (<strong>x86_64</strong> build, not i686/MSYS —
-                            per the official <a href="https://bazel.build/install/windows" style="color:#1078a3;text-decoration:underline">Bazel-on-Windows guide</a>). Fix:
-                        </p>
-                        <pre><code><span class="comment"># Git Bash / MSYS2 — run before every bazel command, or add to ~/.bashrc</span>
-export BAZEL_SH="C:/Program Files/Git/bin/bash.exe"
-
-<span class="comment"># Command Prompt</span>
-set BAZEL_SH=C:\Program Files\Git\bin\bash.exe
-
-<span class="comment"># PowerShell</span>
-$env:BAZEL_SH="C:/Program Files/Git/bin/bash.exe"</code></pre>
-                        <p>Verify: <code>echo $BAZEL_SH</code> should print the path, and <code>ls "$BAZEL_SH"</code> should exist.</p>
-
-                        <h3>Error: <code>g++.exe</code> not found / toolchain misconfigured</h3>
-                        <pre><code>error: could not find g++.exe in STRAWBERRY_BIN</code></pre>
-                        <p>The Bazel toolchain hard-codes the MinGW path in <code>toolchain/BUILD.bazel:14</code>:</p>
-                        <pre><code>STRAWBERRY_BIN = "D:/Strawberry/c/bin"  <span class="comment"># default</span></code></pre>
-                        <p>If your Strawberry (or standalone MinGW) is elsewhere, edit that line to your <code>g++.exe</code> directory, e.g. <code>"C:/msys64/mingw64/bin"</code>. Then <code>bazel clean</code> and rebuild.</p>
-
-                        <h3>Python: <code>DLL load failed</code> or <code>FileNotFoundError</code></h3>
-                        <p>
-                            <code>orderly_chaos/library.py</code> loads <code>lib_orderly_chaos.dll</code> from the package directory
-                            via <a href="https://docs.python.org/3/library/ctypes.html#ctypes.CDLL" style="color:#1078a3;text-decoration:underline"><code>ctypes.CDLL</code></a>.
-                            Windows raises <code>OSError: [WinError 126]</code> when the DLL (or a runtime it depends on) is
-                            missing. If you built from source but skipped the copy step:
-                        </p>
-                        <pre><code>cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
-pip install -e .  <span class="comment"># reinstall so Python sees it</span></code></pre>
-
-                        <h3>Python version too old</h3>
-                        <p>The bindings require Python 3.8+. If <code>python --version</code> shows 3.7 or older, upgrade Python or use a virtual environment with a newer interpreter. The C++ core still builds fine without Python.</p>
-
-                        <h3>Still stuck?</h3>
-                        <p>Run with verbose output and open an issue with the log:</p>
-                        <pre><code>bazel test //test:all --test_output=streamed --verbose_failures</code></pre>
-
-                        <!-- References -->
-                        <h2 id="references">Official References</h2>
-                        <p>Primary documentation for every tool in this guide — worth bookmarking:</p>
-                        <table class="param-table">
-                            <tr><th>Topic</th><th>Link</th></tr>
-                            <tr><td>Bazel install (all OSes)</td><td><a href="https://bazel.build/install" style="color:#1078a3;text-decoration:underline">bazel.build/install</a></td></tr>
-                            <tr><td>Bazel on Windows (BAZEL_SH, MSYS2)</td><td><a href="https://bazel.build/install/windows" style="color:#1078a3;text-decoration:underline">bazel.build/install/windows</a></td></tr>
-                            <tr><td>Bzlmod &amp; MODULE.bazel</td><td><a href="https://bazel.build/external/module" style="color:#1078a3;text-decoration:underline">bazel.build/external/module</a></td></tr>
-                            <tr><td>C++ rules (<code>cc_binary</code>, <code>cc_test</code>)</td><td><a href="https://bazel.build/reference/be/c-cpp" style="color:#1078a3;text-decoration:underline">bazel.build/reference/be/c-cpp</a></td></tr>
-                            <tr><td><code>ctypes</code> — foreign function library</td><td><a href="https://docs.python.org/3/library/ctypes.html" style="color:#1078a3;text-decoration:underline">docs.python.org/3/library/ctypes.html</a></td></tr>
-                            <tr><td>GCC options (<code>-std=c++17</code>, <code>-O2</code>)</td><td><a href="https://gcc.gnu.org/onlinedocs/gcc/Invoking-G_002dC_002b_002b.html" style="color:#1078a3;text-decoration:underline">gcc.gnu.org/onlinedocs</a></td></tr>
-                            <tr><td>MinGW-w64 toolchain</td><td><a href="https://www.mingw-w64.org/" style="color:#1078a3;text-decoration:underline">mingw-w64.org</a></td></tr>
-                        </table>
-
-                        <!-- Next Steps -->
-                        <h2 id="next-steps">Next Steps</h2>
-                        <ul>
-                            <li><strong>Explore the APIs:</strong> <a href="api/python.html" style="color:#1078a3">Python API</a> · <a href="api/cpp.html" style="color:#1078a3">C++ API</a> · <a href="api/c.html" style="color:#1078a3">C API</a></li>
-                            <li><strong>Understand the engine:</strong> <a href="architecture.html" style="color:#1078a3">Architecture</a> — layered design, data structures, matching rules.</li>
-                            <li><strong>Measure it:</strong> <a href="benchmarks.html" style="color:#1078a3">Benchmarks</a> — methodology, complexity table, and how to run your own.</li>
-                            <li><strong>Run examples:</strong> <a href="examples/index.html" style="color:#1078a3">Examples</a> — runnable snippets for common workflows.</li>
-                        </ul>
-
-                        <h2 id="development">Development</h2>
-                        <p>Common commands for contributors:</p>
-                        <pre><code><span class="comment"># Run C++ tests (Bazel + Google Test)</span>
-bazel test //test:all
-
-<span class="comment"># Build the shared library</span>
-bazel build //orderly_chaos:copy_dll
-
-<span class="comment"># Run Python tests</span>
-cp bazel-bin/orderly_chaos/lib_orderly_chaos.dll orderly_chaos/
-python -m unittest discover -v
-
-<span class="comment"># Full suite (C++ + Python + benchmarks)</span>
-bazel test //... --test_output=errors</code></pre>
+python -m pip install .</code></pre>
+                    <p>For development, install in editable mode with the test dependencies:</p>
+<pre><code class="language-bash">python -m pip install -e ".[test]"
+python -m pytest</code></pre>
+                    <div class="callout callout-note">
+                        <div class="callout-title">Using a library built elsewhere</div>
+                        <p>Set <code>ORDERLY_CHAOS_LIBRARY</code> to the path of a shared library built with Bazel (or copied from another machine with the same platform) to make the Python package load it instead of searching its own directory.</p>
                     </div>
-                </div>
+
+                    <h2 id="cpp">C++</h2>
+                    <p>The C++ API is header-only. Add two include directories to your build and include one header:</p>
+<pre><code class="language-bash">g++ -std=c++17 -O2 -I include -I third_party/robin_map/include app.cpp -o app</code></pre>
+<pre><code class="language-cpp">#include &lt;orderly_chaos/orderly_chaos.hpp&gt;</code></pre>
+                    <p>With Bazel, depend on the library target from your own module:</p>
+<pre><code class="language-python">cc_binary(
+    name = "app",
+    srcs = ["app.cpp"],
+    deps = ["@orderly_chaos//:orderly_chaos"],
+)</code></pre>
+
+                    <h2 id="c">C and other languages</h2>
+                    <p>Build the shared library, which exports the C API declared in <code>include/orderly_chaos/orderly_chaos.h</code>:</p>
+<pre><code class="language-bash">bazel build //:shared_lib
+# bazel-bin/lib_orderly_chaos.so     (Linux)
+# bazel-bin/lib_orderly_chaos.dylib  (macOS)
+# bazel-bin/lib_orderly_chaos.dll    (Windows)</code></pre>
+                    <p>Link it from C, or load it from any language with a C foreign-function interface (Rust, Go, C#, Java, Julia, and others). Bazel users can link the static <code>//:orderly_chaos_c</code> target instead.</p>
+
+                    <h3 id="windows">Windows notes</h3>
+                    <p>
+                        The Bazel build uses the MinGW-w64 toolchain bundled with <a href="https://strawberryperl.com/">Strawberry Perl</a>,
+                        registered in <code>toolchain/BUILD.bazel</code>. Edit <code>STRAWBERRY_BIN</code> there if your <code>g++.exe</code>
+                        lives elsewhere. Bazel also needs a bash; put machine-specific settings like this in a git-ignored
+                        <code>user.bazelrc</code> at the repository root:
+                    </p>
+<pre><code class="language-ini">build --shell_executable="C:/Program Files/Git/bin/bash.exe"</code></pre>
+                    <p>The pip installation uses your regular MSVC compiler and does not need Bazel.</p>
+
+                    <h2 id="verify">Verify the build</h2>
+<pre><code class="language-bash">make test             # C++ tests, examples, and the Python suite
+bazel test //...      # everything Bazel knows about
+python -m pytest      # Python tests only (after pip install -e .)</code></pre>
+                    <p>All suites should pass. The C++ suite includes a randomized test that compares the engine with an independent reference model over more than 80,000 operations.</p>
+
+                    <h2 id="first-book">Your first order book</h2>
+                    <ol class="steps">
+                        <li>
+                            <p><strong>Create a book and listen for trades.</strong></p>
+<pre><code class="language-python">from orderly_chaos import LimitOrderBook, Side
+
+trades = []
+book = LimitOrderBook(on_trade=trades.append)</code></pre>
+                        </li>
+                        <li>
+                            <p><strong>Add resting orders.</strong> Prices are integer ticks; here one tick is one cent.</p>
+<pre><code class="language-python">book.limit(Side.SELL, order_id=1, quantity=100, price=10_050)  # ask 100 @ 100.50
+book.limit(Side.SELL, order_id=2, quantity=200, price=10_075)  # ask 200 @ 100.75
+book.limit(Side.BUY,  order_id=3, quantity=150, price=10_000)  # bid 150 @ 100.00
+print(book.best_buy(), book.best_sell(), book.spread())        # 10000 10050 50</code></pre>
+                        </li>
+                        <li>
+                            <p><strong>Send an order that crosses the spread.</strong> It trades what it can and rests the rest.</p>
+<pre><code class="language-python">filled = book.limit(Side.BUY, order_id=4, quantity=250, price=10_050)
+print(filled)                  # 100 (all of order 1)
+print(book.get(4).quantity)    # 150 still resting at 10050
+print(trades[0])               # Trade(taker_id=4, maker_id=1, taker_side=&lt;Side.BUY: 1&gt;, price=10050, quantity=100, maker_remaining=0)</code></pre>
+                        </li>
+                        <li>
+                            <p><strong>Inspect the book.</strong></p>
+<pre><code class="language-python">for level in book.depth(Side.BUY, levels=5):
+    print(level.price, level.volume, level.count)
+# 10050 150 1
+# 10000 150 1</code></pre>
+                        </li>
+                    </ol>
+                    <p>Continue with the <a href="examples/index.html">examples</a> or the API reference for <a href="api/python.html">Python</a>, <a href="api/cpp.html">C++</a>, or <a href="api/c.html">C</a>.</p>
+
+                    <h2 id="layout">Project layout</h2>
+<pre><code class="language-plaintext">include/orderly_chaos/   Public headers: C++ API (*.hpp) and C API (orderly_chaos.h)
+src/                     C API implementation (the shared library)
+python/orderly_chaos/    Python package (ctypes bindings)
+tests/cpp/               C++ tests (GoogleTest)
+tests/python/            Python tests (unittest / pytest)
+examples/                Runnable C++, C, and Python examples
+benchmarks/              Micro-benchmarks
+docs/                    This documentation site and design notes
+third_party/             Vendored dependencies (tsl::robin_map, GoogleTest build file)
+toolchain/               Optional MinGW-w64 toolchain for Windows</code></pre>
+
+                    <h2 id="make">Make targets</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>make test</code></td><td>Run the C++ tests, the examples, and the Python suite</td></tr>
+                                <tr><td><code>make test-cpp</code></td><td>Run all Bazel tests</td></tr>
+                                <tr><td><code>make test-python</code></td><td>Build the shared library with Bazel and run the Python suite against it</td></tr>
+                                <tr><td><code>make python-lib</code></td><td>Build the shared library and copy it into <code>python/orderly_chaos/</code></td></tr>
+                                <tr><td><code>make bench</code></td><td>Run the benchmarks in an optimized build</td></tr>
+                                <tr><td><code>make docs</code></td><td>Generate the Doxygen C/C++ reference into <code>build/docs</code></td></tr>
+                                <tr><td><code>make serve-docs</code></td><td>Serve this site locally at <code>http://localhost:8000</code></td></tr>
+                                <tr><td><code>make dist</code></td><td>Build the source distribution and wheel into <code>dist/</code></td></tr>
+                                <tr><td><code>make clean</code></td><td>Remove build outputs</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 id="troubleshooting">Troubleshooting</h2>
+                    <h3 id="library-not-found"><code>LibraryError: the Orderly Chaos native library was not found</code></h3>
+                    <p>The Python package could not find its compiled library. Reinstall with <code>pip install .</code>, run <code>make python-lib</code> in a source checkout, or point <code>ORDERLY_CHAOS_LIBRARY</code> at a built library.</p>
+                    <h3 id="library-version">"built from an incompatible version" or a version mismatch</h3>
+                    <p>A library from a different release is being loaded (for example, a stale file left in <code>python/orderly_chaos/</code>). Delete it and rebuild with <code>make python-lib</code> or <code>pip install -e .</code>.</p>
+                    <h3 id="no-compiler">pip fails with "command 'g++' failed" or "Microsoft Visual C++ is required"</h3>
+                    <p>Install a C++17 compiler: <code>build-essential</code> on Debian/Ubuntu, <code>xcode-select --install</code> on macOS, or the "Desktop development with C++" workload of Visual Studio Build Tools on Windows.</p>
+                    <h3 id="mingw"><code>could not find g++.exe</code> (Windows, Bazel)</h3>
+                    <p>Update <code>STRAWBERRY_BIN</code> in <code>toolchain/BUILD.bazel</code> to the directory containing your MinGW <code>g++.exe</code>, then run <code>bazel clean</code>.</p>
+                    <h3 id="still-stuck">Still stuck?</h3>
+                    <p>Run the failing command with <code>--verbose_failures</code> (Bazel) or <code>-v</code> (pip) and <a href="https://github.com/Meetmendapara09/Orderly-Chaos/issues">open an issue</a> with the output, your operating system, and compiler version.</p>
+                </article>
             </div>
         </div>
     </main>
 
     <footer id="footer-slot" class="footer"></footer>
-    <script src="components.js" defer></script>
-    <script src="copy-code.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,18 @@
+# C examples using the C API. Each example is also run as a test.
+#
+#   bazel run //examples/c:quickstart
+
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+
+cc_binary(
+    name = "quickstart",
+    srcs = ["quickstart.c"],
+    deps = ["//:orderly_chaos_c"],
+)
+
+cc_test(
+    name = "quickstart_test",
+    srcs = ["quickstart.c"],
+    data = ["//toolchain:mingw_runtime"],
+    deps = ["//:orderly_chaos_c"],
+)

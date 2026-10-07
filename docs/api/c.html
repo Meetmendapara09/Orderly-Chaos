@@ -2,376 +2,197 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C API • Orderly Chaos</title>
-    <link rel="stylesheet" href="../styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>C API | Orderly Chaos</title>
+    <meta name="description" content="Reference for the Orderly Chaos C API: a stable ABI for C and any language with a C foreign-function interface.">
+    <meta name="author" content="Meet Mendapara">
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="../assets/favicon-32x32.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="../assets/favicon-16x16.png" sizes="16x16" type="image/png">
+    <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+    <link rel="manifest" href="../assets/site.webmanifest">
+    <meta name="theme-color" content="#23251d">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.12.0/highlight.min.js" integrity="sha384-wjfDDhOPPdjtva8vWBhWeVprSpmxisEu5aYT3q1JyACqXpdKpo3PWZTMVq24MBix" crossorigin="anonymous" defer></script>
+    <script src="../assets/js/components.js" defer></script>
+    <script src="../assets/js/copy-code.js" defer></script>
+    <script type="module" src="../assets/js/site.js"></script>
 </head>
 <body data-page="c-api">
-    <header id="header-slot" class="navbar" role="banner"></header>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header id="header-slot" class="navbar"></header>
 
-    <main class="pt-24 pb-32">
-        <div class="container mx-auto px-6">
-            <div class="content-page">
-                <div class="page-header">
-                    <nav class="breadcrumb" aria-label="Breadcrumb">
-                        <a href="../index.html">Home</a>
-                        <span class="sep">/</span>
-                        <a href="#types">API Reference</a>
-                        <span class="sep">/</span>
-                        <span class="current">C</span>
-                    </nav>
-                    <span class="page-badge">API Reference</span>
-                    <h1 class="page-title">C API Reference</h1>
-                    <p class="page-description">
-                        A C-compatible interface (extern "C") for integrating with other languages via FFI.
-                    </p>
-                    <div class="page-meta">
-                        <span>🔌 extern "C"</span><span class="dot"></span><span>🌐 Any C FFI</span><span class="dot"></span><span>Rust / Go ready</span>
-                    </div>
-                </div>
+    <main id="main" class="content-page">
+        <div class="container">
+            <div class="page-header">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="../index.html">Home</a><span class="sep">/</span><span>API reference</span><span class="sep">/</span><span class="current">C</span>
+                </nav>
+                <span class="page-badge">API reference</span>
+                <h1 class="page-title">C API</h1>
+                <p class="page-description">A stable, C-compatible interface declared in <code>orderly_chaos/orderly_chaos.h</code>, for C programs and for any language with a C FFI.</p>
+                <div class="page-meta"><span>C99</span><span>Opaque handles</span><span>Status codes, no exceptions</span></div>
+            </div>
 
-                <div class="docs-layout">
-                    <nav class="toc">
-                        <div class="toc-nav">
-                            <ul>
-                                <li><a href="#types">Types</a></li>
-                                <li><a href="#lifecycle">Lifecycle</a></li>
-                                <li><a href="#limit-orders">Limit Orders</a></li>
-                                <li><a href="#market-orders">Market Orders</a></li>
-                                <li><a href="#cancellation">Cancellation</a></li>
-                                <li><a href="#queries">Queries</a></li>
-                            </ul>
-                        </div>
-                    </nav>
+            <div class="docs-layout">
+                <nav class="toc" aria-label="On this page">
+                    <p class="toc-title">On this page</p>
+                    <ul>
+                        <li><a href="#conventions">Conventions</a></li>
+                        <li><a href="#example">Example</a></li>
+                        <li><a href="#types">Types</a></li>
+                        <li><a href="#status">Status codes</a></li>
+                        <li><a href="#lifecycle">Lifecycle</a></li>
+                        <li><a href="#entry">Order entry</a></li>
+                        <li><a href="#queries">Queries</a></li>
+                        <li><a href="#callbacks">Trade callback</a></li>
+                        <li><a href="#linking">Building and linking</a></li>
+                        <li><a href="#ffi">Using from other languages</a></li>
+                    </ul>
+                </nav>
 
-                    <div class="doc-content">
-                        <h2 id="types">Types</h2>
-                        <table class="param-table">
-                            <tr><th>Type</th><th>C Type</th><th>Description</th></tr>
-                            <tr><td><code>UID</code></td><td><code>uint64_t</code></td><td>Order identifier</td></tr>
-                            <tr><td><code>Side</code></td><td><code>bool</code></td><td>Buy (true) or Sell (false)</td></tr>
-                            <tr><td><code>Quantity</code></td><td><code>uint32_t</code></td><td>Number of shares</td></tr>
-                            <tr><td><code>Price</code></td><td><code>uint64_t</code></td><td>Price value</td></tr>
-                            <tr><td><code>Volume</code></td><td><code>uint32_t</code></td><td>Total share volume</td></tr>
-                            <tr><td><code>Count</code></td><td><code>uint32_t</code></td><td>Order count</td></tr>
+                <article class="doc-content">
+                    <h2 id="conventions">Conventions</h2>
+                    <ul>
+                        <li>Every function that changes the book returns an <code>oc_status</code>; <code>OC_OK</code> (0) means success. A failed call never modifies the book.</li>
+                        <li>Query functions return 0 when the book pointer is <code>NULL</code>, the side is invalid, or there is no data (such as the best price of an empty side).</li>
+                        <li>Prices are integer ticks and 0 is reserved. Output pointers documented as optional may be <code>NULL</code>.</li>
+                        <li>All symbols use the <code>oc_</code> prefix. A book is not thread-safe.</li>
+                    </ul>
+
+                    <h2 id="example">Example</h2>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;orderly_chaos/orderly_chaos.h&gt;
+
+static void on_trade(const oc_trade* t, void* user_data) {
+    (void)user_data;
+    printf("%llu traded with %llu: %u @ %llu\n", (unsigned long long)t-&gt;taker_id,
+           (unsigned long long)t-&gt;maker_id, t-&gt;quantity, (unsigned long long)t-&gt;price);
+}
+
+int main(void) {
+    uint32_t filled = 0;
+    oc_book* book = oc_book_new();
+    if (book == NULL) return 1;
+    oc_book_set_trade_callback(book, on_trade, NULL);
+
+    oc_book_limit(book, OC_SIDE_SELL, 1, 100, 10050, NULL);
+    oc_book_limit(book, OC_SIDE_BUY, 2, 40, 10050, &amp;filled);   /* filled == 40 */
+
+    oc_status status = oc_book_cancel(book, 99);
+    if (status != OC_OK) printf("cancel failed: %s\n", oc_status_string(status));
+
+    oc_book_free(book);
+    return 0;
+}</code></pre>
+
+                    <h2 id="types">Types</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Type</th><th>Definition</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>oc_book</code></td><td>Opaque handle; create with <code>oc_book_new</code>, destroy with <code>oc_book_free</code></td></tr>
+                                <tr><td><code>oc_side</code></td><td><code>int32_t</code>: <code>OC_SIDE_SELL</code> (0) or <code>OC_SIDE_BUY</code> (1)</td></tr>
+                                <tr><td><code>oc_status</code></td><td><code>int32_t</code> status code (see below)</td></tr>
+                                <tr><td><code>oc_order</code></td><td><code>{ uint64_t order_id; uint64_t price; uint32_t quantity; oc_side side; }</code> (24 bytes)</td></tr>
+                                <tr><td><code>oc_trade</code></td><td><code>{ uint64_t taker_id, maker_id, price; uint32_t quantity, maker_remaining; oc_side taker_side; }</code> (40 bytes)</td></tr>
+                                <tr><td><code>oc_level</code></td><td><code>{ uint64_t price, volume, count; }</code> (24 bytes)</td></tr>
+                                <tr><td><code>oc_trade_callback</code></td><td><code>void (*)(const oc_trade* trade, void* user_data)</code></td></tr>
+                            </tbody>
                         </table>
-
-                        <h2 id="lifecycle">Lifecycle Functions</h2>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">LOB::LimitOrderBook* new_()</div>
-                                <div class="method-description">Create and return a pointer to a new, empty limit order book.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_(); <span class="comment">// create</span>
-<span class="keyword">assert</span>(count(book) == <span class="number">0</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void delete_(LOB::LimitOrderBook* book)</div>
-                                <div class="method-description">Delete the limit order book, freeing all associated memory.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-delete_(book); <span class="comment">// frees all orders</span></code></pre>
-                                <table class="param-table">
-                                    <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
-                                    <tr><td>book</td><td>LimitOrderBook*</td><td>Pointer to the book to delete</td></tr>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void clear(LOB::LimitOrderBook* book)</div>
-                                <div class="method-description">Clear all orders from the book.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
-clear(book);
-<span class="keyword">assert</span>(count(book) == <span class="number">0</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <h2 id="limit-orders">Limit Order Functions</h2>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void limit_sell(LOB::LimitOrderBook* book, UID uid, Quantity quantity, Price price)</div>
-                                <div class="method-description">Place a sell limit order at the given price.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-<span class="keyword">assert</span>(best_sell(book) == <span class="number">10250</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void limit_buy(LOB::LimitOrderBook* book, UID uid, Quantity quantity, Price price)</div>
-                                <div class="method-description">Place a buy limit order at the given price.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
-<span class="keyword">assert</span>(best_buy(book) == <span class="number">10240</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void limit(LOB::LimitOrderBook* book, Side side, UID uid, Quantity quantity, Price price)</div>
-                                <div class="method-description">Place a limit order on the specified side.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit(book, <span class="keyword">true</span>, <span class="number">3</span>, <span class="number">75</span>, <span class="number">10240</span>); <span class="comment">// buy</span>
-limit(book, <span class="keyword">false</span>, <span class="number">4</span>, <span class="number">100</span>, <span class="number">10250</span>); <span class="comment">// sell</span>
-<span class="keyword">assert</span>(count(book) == <span class="number">2</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <h2 id="market-orders">Market Order Functions</h2>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void market_sell(LOB::LimitOrderBook* book, UID uid, Quantity quantity)</div>
-                                <div class="method-description">Execute a market sell against buy-side liquidity.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_buy(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>);
-market_sell(book, <span class="number">2</span>, <span class="number">40</span>);
-<span class="keyword">assert</span>(volume_buy(book) == <span class="number">60</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void market_buy(LOB::LimitOrderBook* book, UID uid, Quantity quantity)</div>
-                                <div class="method-description">Execute a market buy against sell-side liquidity.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-market_buy(book, <span class="number">2</span>, <span class="number">40</span>);
-<span class="keyword">assert</span>(volume_sell(book) == <span class="number">60</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void market(LOB::LimitOrderBook* book, Side side, UID uid, Quantity quantity)</div>
-                                <div class="method-description">Execute a market order on the specified side.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-limit_buy(book, <span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>);
-market(book, <span class="keyword">true</span>, <span class="number">3</span>, <span class="number">25</span>);
-<span class="keyword">assert</span>(volume(book) == <span class="number">150</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <h2 id="cancellation">Cancellation Functions</h2>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">bool has(LOB::LimitOrderBook* book, UID uid)</div>
-                                <div class="method-description">Return true if the book contains an order with the given ID.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-<span class="keyword">assert</span>(has(book, <span class="number">1</span>) == <span class="keyword">true</span>);
-<span class="keyword">assert</span>(has(book, <span class="number">99</span>) == <span class="keyword">false</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">const LOB::Order* get(LOB::LimitOrderBook* book, UID uid)</div>
-                                <div class="method-description">Get a pointer to the order with the given ID.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-<span class="keyword">const</span> LOB::Order* o = get(book, <span class="number">1</span>);
-<span class="keyword">assert</span>(o-&gt;price == <span class="number">10250</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">void cancel(LOB::LimitOrderBook* book, UID uid)</div>
-                                <div class="method-description">Cancel an existing order by its ID.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-cancel(book, <span class="number">1</span>);
-<span class="keyword">assert</span>(count(book) == <span class="number">0</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <h2 id="queries">Query Functions</h2>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Price best_sell(LOB::LimitOrderBook* book)</div>
-                                <div class="method-description">Return the best (lowest) sell/ask price. O(1).</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-limit_sell(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>);
-<span class="keyword">assert</span>(best_sell(book) == <span class="number">10250</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Price best_buy(LOB::LimitOrderBook* book)</div>
-                                <div class="method-description">Return the best (highest) buy/bid price. O(1).</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_buy(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10240</span>);
-limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10230</span>);
-<span class="keyword">assert</span>(best_buy(book) == <span class="number">10240</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Price best(LOB::LimitOrderBook* book, Side side)</div>
-                                <div class="method-description">Return the best price for the given side.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-limit_buy(book, <span class="number">2</span>, <span class="number">100</span>, <span class="number">10240</span>);
-<span class="keyword">assert</span>(best(book, <span class="keyword">false</span>) == <span class="number">10250</span>);
-<span class="keyword">assert</span>(best(book, <span class="keyword">true</span>) == <span class="number">10240</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Volume volume_sell_price(LOB::LimitOrderBook* book, Price price)</div>
-                                <div class="method-description">Return the volume at a specific sell-side price.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-<span class="keyword">assert</span>(volume_sell_price(book, <span class="number">10250</span>) == <span class="number">100</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Volume volume_sell(LOB::LimitOrderBook* book)</div>
-                                <div class="method-description">Return the total sell-side volume.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-limit_sell(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>);
-<span class="keyword">assert</span>(volume_sell(book) == <span class="number">150</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Volume volume_buy_price(LOB::LimitOrderBook* book, Price price)</div>
-                                <div class="method-description">Return the volume at a specific buy-side price.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_buy(book, <span class="number">1</span>, <span class="number">80</span>, <span class="number">10240</span>);
-<span class="keyword">assert</span>(volume_buy_price(book, <span class="number">10240</span>) == <span class="number">80</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Volume volume_buy(LOB::LimitOrderBook* book)</div>
-                                <div class="method-description">Return the total buy-side volume.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_buy(book, <span class="number">1</span>, <span class="number">80</span>, <span class="number">10240</span>);
-limit_buy(book, <span class="number">2</span>, <span class="number">60</span>, <span class="number">10230</span>);
-<span class="keyword">assert</span>(volume_buy(book) == <span class="number">140</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Volume volume_price(LOB::LimitOrderBook* book, Price price)</div>
-                                <div class="method-description">Return the volume at a specific price across both sides.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-limit_buy(book, <span class="number">2</span>, <span class="number">75</span>, <span class="number">10240</span>);
-<span class="keyword">assert</span>(volume_price(book, <span class="number">10250</span>) == <span class="number">100</span>);
-<span class="keyword">assert</span>(volume(book) == <span class="number">175</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Volume volume(LOB::LimitOrderBook* book)</div>
-                                <div class="method-description">Return the total volume across both sides.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-limit_buy(book, <span class="number">2</span>, <span class="number">75</span>, <span class="number">10240</span>);
-<span class="keyword">assert</span>(volume(book) == <span class="number">175</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Count count_at(LOB::LimitOrderBook* book, Price price)</div>
-                                <div class="method-description">Return the number of orders at a specific price.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-limit_sell(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10250</span>);
-<span class="keyword">assert</span>(count_at(book, <span class="number">10250</span>) == <span class="number">2</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Count count_sell(LOB::LimitOrderBook* book)</div>
-                                <div class="method-description">Return the order count on the sell side.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-limit_sell(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10260</span>);
-<span class="keyword">assert</span>(count_sell(book) == <span class="number">2</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Count count_buy(LOB::LimitOrderBook* book)</div>
-                                <div class="method-description">Return the order count on the buy side.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_buy(book, <span class="number">1</span>, <span class="number">50</span>, <span class="number">10240</span>);
-<span class="keyword">assert</span>(count_buy(book) == <span class="number">1</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
-
-                        <div class="api-method">
-                            <div class="method-inner">
-                                <div class="method-signature">Count count(LOB::LimitOrderBook* book)</div>
-                                <div class="method-description">Return the total number of orders in the book.</div>
-                                <pre><code><span class="keyword">auto</span>* book = new_();
-limit_sell(book, <span class="number">1</span>, <span class="number">100</span>, <span class="number">10250</span>);
-limit_buy(book, <span class="number">2</span>, <span class="number">50</span>, <span class="number">10240</span>);
-<span class="keyword">assert</span>(count(book) == <span class="number">2</span>);
-delete_(book);</code></pre>
-                            </div>
-                        </div>
                     </div>
-                </div>
+                    <p>The struct layouts and sizes are part of the ABI and are checked by the test suite.</p>
+
+                    <h2 id="status">Status codes</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Code</th><th class="num">Value</th><th>Meaning</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>OC_OK</code></td><td class="num">0</td><td>Success</td></tr>
+                                <tr><td><code>OC_ERR_DUPLICATE_ORDER_ID</code></td><td class="num">1</td><td>A limit order used an ID that is already resting</td></tr>
+                                <tr><td><code>OC_ERR_UNKNOWN_ORDER_ID</code></td><td class="num">2</td><td>No resting order has the ID</td></tr>
+                                <tr><td><code>OC_ERR_INVALID_QUANTITY</code></td><td class="num">3</td><td>Quantity is 0 or exceeds the open quantity</td></tr>
+                                <tr><td><code>OC_ERR_INVALID_PRICE</code></td><td class="num">4</td><td>Limit price is 0</td></tr>
+                                <tr><td><code>OC_ERR_INVALID_SIDE</code></td><td class="num">5</td><td>Side is neither buy nor sell</td></tr>
+                                <tr><td><code>OC_ERR_NULL_ARGUMENT</code></td><td class="num">6</td><td>A required pointer is <code>NULL</code></td></tr>
+                                <tr><td><code>OC_ERR_OUT_OF_MEMORY</code></td><td class="num">7</td><td>Allocation failed</td></tr>
+                                <tr><td><code>OC_ERR_INTERNAL</code></td><td class="num">8</td><td>Unexpected internal error</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p><code>const char* oc_status_string(oc_status)</code> returns a static description; <code>const char* oc_version(void)</code> returns the library version.</p>
+
+                    <h2 id="lifecycle">Lifecycle</h2>
+                    <div class="api-method">
+                        <pre class="method-signature">oc_book*  oc_book_new(void);
+void      oc_book_free(oc_book* book);
+oc_status oc_book_clear(oc_book* book);</pre>
+                        <p><code>oc_book_new</code> returns <code>NULL</code> if allocation fails. <code>oc_book_free(NULL)</code> is a no-op.</p>
+                    </div>
+
+                    <h2 id="entry">Order entry</h2>
+                    <div class="api-method">
+                        <pre class="method-signature">oc_status oc_book_limit(oc_book* book, oc_side side, uint64_t order_id,
+                        uint32_t quantity, uint64_t price, uint32_t* filled);
+oc_status oc_book_market(oc_book* book, oc_side side, uint64_t order_id,
+                         uint32_t quantity, uint32_t* filled);</pre>
+                        <p>Submit a limit or an immediate-or-cancel market order. <code>filled</code> (optional) receives the quantity filled immediately; it is set to 0 when the call fails.</p>
+                    </div>
+                    <div class="api-method">
+                        <pre class="method-signature">oc_status oc_book_cancel(oc_book* book, uint64_t order_id);
+oc_status oc_book_reduce(oc_book* book, uint64_t order_id, uint32_t quantity);</pre>
+                        <p>Cancel a resting order, or reduce its quantity while keeping queue priority (reducing by the full amount cancels it).</p>
+                    </div>
+
+                    <h2 id="queries">Queries</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Function</th><th>Returns</th></tr></thead>
+                            <tbody>
+                                <tr><td><code>int oc_book_has(const oc_book*, uint64_t order_id)</code></td><td>1 if resting, else 0</td></tr>
+                                <tr><td><code>oc_status oc_book_get(const oc_book*, uint64_t order_id, oc_order* out)</code></td><td>Copies the resting order into <code>out</code></td></tr>
+                                <tr><td><code>uint64_t oc_book_best_price(const oc_book*, oc_side)</code></td><td>Best price of a side, or 0</td></tr>
+                                <tr><td><code>uint64_t oc_book_mid_price(const oc_book*)</code></td><td>Mid price rounded down, or 0</td></tr>
+                                <tr><td><code>uint64_t oc_book_best_volume(const oc_book*, oc_side)</code></td><td>Open quantity at the best price</td></tr>
+                                <tr><td><code>uint64_t oc_book_volume(const oc_book*)</code></td><td>Total open quantity</td></tr>
+                                <tr><td><code>uint64_t oc_book_side_volume(const oc_book*, oc_side)</code></td><td>Open quantity on a side</td></tr>
+                                <tr><td><code>uint64_t oc_book_volume_at(const oc_book*, uint64_t price)</code></td><td>Open quantity at a price</td></tr>
+                                <tr><td><code>uint64_t oc_book_side_volume_at(const oc_book*, oc_side, uint64_t price)</code></td><td>Open quantity at a price on a side</td></tr>
+                                <tr><td><code>uint64_t oc_book_count(const oc_book*)</code></td><td>Number of resting orders</td></tr>
+                                <tr><td><code>uint64_t oc_book_side_count(const oc_book*, oc_side)</code></td><td>Resting orders on a side</td></tr>
+                                <tr><td><code>uint64_t oc_book_count_at(const oc_book*, uint64_t price)</code></td><td>Orders resting at a price</td></tr>
+                                <tr><td><code>size_t oc_book_depth(const oc_book*, oc_side, oc_level* levels, size_t capacity)</code></td><td>Writes up to <code>capacity</code> levels, best first; returns the number written</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 id="callbacks">Trade callback</h2>
+                    <div class="api-method">
+                        <pre class="method-signature">oc_status oc_book_set_trade_callback(oc_book* book, oc_trade_callback callback, void* user_data);</pre>
+                        <p>Register a function called once per execution, after the operation has updated the book. <code>user_data</code> is passed through unchanged. The callback may query the book but must not modify it; the <code>oc_trade</code> pointer is only valid during the call. Pass <code>NULL</code> to disable.</p>
+                    </div>
+
+                    <h2 id="linking">Building and linking</h2>
+<pre><code class="language-bash">bazel build //:shared_lib                     # lib_orderly_chaos.so / .dylib / .dll
+cc -std=c99 -I include app.c -L bazel-bin -l:lib_orderly_chaos.so -o app   # Linux example</code></pre>
+                    <p>With Bazel, depend on <code>//:orderly_chaos_c</code> to link the C API statically. See <a href="https://github.com/Meetmendapara09/Orderly-Chaos/blob/main/examples/c/quickstart.c"><code>examples/c/quickstart.c</code></a> for a complete program.</p>
+
+                    <h2 id="ffi">Using from other languages</h2>
+                    <p>The API uses only fixed-width integers, plain structs, and function pointers, so it maps directly onto any C FFI. For example, Rust:</p>
+<pre><code class="language-rust">#[repr(C)] pub struct OcBook { _private: [u8; 0] }
+
+extern "C" {
+    fn oc_book_new() -&gt; *mut OcBook;
+    fn oc_book_free(book: *mut OcBook);
+    fn oc_book_limit(book: *mut OcBook, side: i32, id: u64, qty: u32, price: u64, filled: *mut u32) -&gt; i32;
+    fn oc_book_best_price(book: *const OcBook, side: i32) -&gt; u64;
+}</code></pre>
+                    <p>The Python package is itself a thin <code>ctypes</code> layer over this API (<code>python/orderly_chaos/_library.py</code>) and is a good reference for writing new bindings.</p>
+                </article>
             </div>
         </div>
     </main>
 
     <footer id="footer-slot" class="footer"></footer>
-    <script src="../components.js" defer></script>
-    <script src="../copy-code.js" defer></script>
 </body>
 </html>
